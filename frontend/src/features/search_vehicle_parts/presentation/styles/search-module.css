@@ -60,7 +60,7 @@
 
 .wizard__step--active .wizard__step-index {
   background: var(--gradient-brand);
-  color: #04122e;
+  color: var(--on-brand);
 }
 
 /* ---- Encabezado de paso ---- */
@@ -115,6 +115,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+  perspective: var(--perspective);
 }
 
 .category-card {
@@ -123,13 +124,15 @@
   border: 1px solid var(--border);
   background: var(--bg-elevated);
   text-align: left;
-  transition: all var(--transition-smooth);
+  transform-style: preserve-3d;
+  transition: transform var(--transition-spring), border-color var(--transition-smooth),
+    box-shadow var(--transition-smooth);
 }
 
 .category-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px) rotateX(4deg) rotateY(-4deg);
   border-color: var(--accent-neon);
-  box-shadow: var(--glow-accent);
+  box-shadow: var(--shadow-3d-hover);
 }
 
 .category-card__icon {
@@ -249,9 +252,9 @@
   font-weight: 700;
 }
 
-.badge--in { background: rgba(46, 230, 166, 0.14); color: var(--success); }
-.badge--low { background: rgba(255, 181, 71, 0.14); color: var(--warning); }
-.badge--out { background: rgba(255, 93, 115, 0.14); color: var(--danger); }
+.badge--in { background: var(--success-soft); color: var(--success); }
+.badge--low { background: var(--warning-soft); color: var(--warning); }
+.badge--out { background: var(--danger-soft); color: var(--danger); }
 
 .wizard__footer {
   display: flex;

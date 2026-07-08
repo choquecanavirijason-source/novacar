@@ -1,54 +1,66 @@
 /**
  * Presentation · Component · PartCard
- * Tarjeta de producto estilo marketplace: foto (gradiente), descuento, precio,
- * envío, garantía y calificación. Compone atoms del sistema de diseño.
+ * Tarjeta de producto sobre el common @ui/ProductCard: foto (gradiente +
+ * icono de categoría), descuento, precio, envío, garantía y calificación.
  */
 
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
 import { discountPercent, type MarketplacePart } from "../../domain/entities/MarketplacePart";
 import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { RatingStars } from "@ui/atoms/RatingStars";
+import { ProductCard } from "@ui/molecules/ProductCard";
 import { categoryIcon, categoryKey, conditionKey } from "../partPresentation";
+import { ProductInquiryModal } from "./ProductInquiryModal";
 
 export function PartCard({ part, index = 0 }: { part: MarketplacePart; index?: number }) {
   const { t } = useTranslation();
   const off = discountPercent(part);
+  const CategoryIcon = categoryIcon[part.category];
+  const [inquiryOpen, setInquiryOpen] = useState(false);
+
+  const shippingFeature = part.freeShipping
+    ? t("market.free")
+    : part.warrantyMonths > 0
+      ? t("market.warrantyShort", { n: part.warrantyMonths })
+      : `${part.brand} · ${part.seller}`;
 
   return (
-    <Link href={`/autopartes/${part.id}`} className="mk-card" style={{ animationDelay: `${index * 40}ms` }}>
-      <div
-        className="mk-card__photo"
-        style={{ background: `linear-gradient(140deg, ${part.accentFrom}, ${part.accentTo})` }}
-      >
-        <div className="mk-card__badges">
-          <span className="tag-pill">{t(conditionKey(part.condition))}</span>
-        </div>
-        {off > 0 && <span className="mk-discount">-{off}% {t("market.off")}</span>}
-        <span className="mk-card__icon">{categoryIcon[part.category]}</span>
-      </div>
-
-      <div className="mk-card__body">
-        <span className="mk-card__cat">{t(categoryKey(part.category))}</span>
-        <div className="mk-card__name">{part.name}</div>
-        <RatingStars value={part.rating} reviews={part.reviews} />
-
-        <div className="mk-card__price-row">
-          <span className="mk-card__price text-gradient">{formatCurrency(part.price)}</span>
-          {part.originalPrice && <span className="mk-card__old">{formatCurrency(part.originalPrice)}</span>}
-        </div>
-
-        {part.freeShipping && <span className="mk-card__ship">✓ {t("market.free")}</span>}
-        {part.warrantyMonths > 0 && (
-          <span className="mk-card__meta">🛡️ {t("market.warrantyShort", { n: part.warrantyMonths })}</span>
-        )}
-
-        <div className="mk-card__foot">
-          <div className="mk-card__meta">{part.brand} · {part.seller}</div>
-        </div>
-      </div>
-    </Link>
+    <>
+      <ProductCard
+        onCtaClick={() => setInquiryOpen(true)}
+        index={index}
+        accentFrom={part.accentFrom}
+        accentTo={part.accentTo}
+        photoHeight={150}
+        photoIcon={<CategoryIcon size={48} strokeWidth={1.5} aria-hidden />}
+        photoTopSlot={
+          <div className="mk-card__badges">
+            <span className="tag-pill">{t(conditionKey(part.condition))}</span>
+          </div>
+        }
+        photoCornerSlot={off > 0 && <span className="mk-discount">-{off}% {t("market.off")}</span>}
+        title={part.name}
+        subtitle={
+          <>
+            <span className="text-gradient">{formatCurrency(part.price)}</span>
+            {part.originalPrice && (
+              <s style={{ marginLeft: 6, color: "var(--text-muted)" }}>{formatCurrency(part.originalPrice)}</s>
+            )}
+          </>
+        }
+        features={[
+          t(categoryKey(part.category)),
+          <RatingStars key="rating" value={part.rating} reviews={part.reviews} />,
+          shippingFeature,
+        ]}
+        ctaLabel={t("market.viewProduct")}
+      />
+      {inquiryOpen && (
+        <ProductInquiryModal productName={part.name} onClose={() => setInquiryOpen(false)} />
+      )}
+    </>
   );
 }

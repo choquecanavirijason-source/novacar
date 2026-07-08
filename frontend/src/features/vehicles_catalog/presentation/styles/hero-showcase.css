@@ -1,0 +1,271 @@
+/* ============================================================
+   HeroShowcase · Hero principal (HUD Sci-Fi de auto eléctrico)
+   Full-bleed, se monta pegado bajo el Navbar fijo/transparente
+   (margin-top negativo cancela el padding-top del body para que
+   el nav flote transparente sobre esta sección). Usa tokens :root.
+   ============================================================ */
+
+.hero2 {
+  position: relative;
+  overflow: hidden;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-top: -72px;
+  min-height: 100vh;
+  background: #030303;
+  isolation: isolate;
+}
+
+/* ---- Fondo: resplandor radial de alto contraste ---- */
+.hero2__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(
+    55% 55% at 50% 42%,
+    rgba(27, 196, 182, 0.65) 0%,
+    rgba(16, 130, 126, 0.28) 35%,
+    rgba(8, 8, 8, 0.92) 68%,
+    #030303 100%
+  );
+}
+
+/* ---- Capa 1: texto gigante + cápsula sci-fi ---- */
+.hero2__bgtext {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+}
+
+.hero2__capsule {
+  position: absolute;
+  width: min(78vw, 900px);
+  height: 220px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  clip-path: polygon(
+    48px 0,
+    calc(100% - 48px) 0,
+    100% 48px,
+    100% calc(100% - 48px),
+    calc(100% - 48px) 100%,
+    48px 100%,
+    0 calc(100% - 48px),
+    0 48px
+  );
+}
+
+.hero2__giant {
+  position: relative;
+  font-size: clamp(3.6rem, 14vw, 11rem);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.35);
+  text-shadow:
+    0 2px 0 #c8c8c8,
+    0 4px 0 #9a9a9a,
+    0 8px 24px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(255, 255, 255, 0.15);
+}
+
+/* ---- Capa 4: paginadores laterales ---- */
+.hero2__side {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.hero2__side--left {
+  left: 28px;
+}
+
+.hero2__side--right {
+  right: 28px;
+}
+
+.hero2__dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.hero2__dot--active::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+}
+
+/* ---- Capa 3: HUD dashboard inferior curvo ---- */
+.hero2__hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  height: 210px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(3, 3, 3, 0) 0%, rgba(3, 3, 3, 0.85) 30%, #030303 100%);
+  border-radius: 50% 50% 0 0 / 90px 90px 0 0;
+}
+
+.hero2__segment {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 26px;
+  border-top: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.hero2__segment::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(var(--hero2-tilt, 0deg));
+  transform-origin: bottom center;
+}
+
+.hero2__segment:first-child::before {
+  display: none;
+}
+
+.hero2__segment--active {
+  border-top-color: #fff;
+  box-shadow: 0 -1px 24px rgba(255, 255, 255, 0.3);
+}
+
+.hero2__segment-index {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.hero2__segment--active .hero2__segment-index {
+  color: #fff;
+}
+
+.hero2__segment-inactive {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.hero2__segment-inactive span {
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+  max-width: 100px;
+}
+
+.hero2__segment-content {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.hero2__segment-title {
+  color: #fff;
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  max-width: 380px;
+  line-height: 1.15;
+}
+
+.hero2__segment-desc {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.76rem;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.hero2__gauge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 900px) {
+  .hero2__hud {
+    height: 180px;
+  }
+
+  .hero2__segment-inactive span {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero2 {
+    min-height: 92vh;
+  }
+
+  .hero2__side {
+    display: none;
+  }
+
+  .hero2__capsule {
+    height: 150px;
+  }
+
+  .hero2__hud {
+    height: 160px;
+    border-radius: 50% 50% 0 0 / 50px 50px 0 0;
+  }
+
+  .hero2__segment {
+    padding-top: 16px;
+  }
+
+  .hero2__segment-desc {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero2__dot {
+    transition: none;
+  }
+}

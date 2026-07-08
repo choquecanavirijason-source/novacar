@@ -47,36 +47,49 @@ export function CategoriesBento() {
         </Link>
       </div>
 
-      {!facets ? (
-        <div className="bento">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className={`skeleton ${SPAN[i] ?? ""}`} style={{ minHeight: 150 }} />
-          ))}
+      <details className="categories-dropdown">
+        <summary className="categories-dropdown__summary">
+          <span>Ver categorías</span>
+          <span className="categories-dropdown__chevron">▾</span>
+        </summary>
+
+        <div className="categories-dropdown__body">
+          {!facets ? (
+            <div className="bento bento--stacked">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="skeleton bento__item" style={{ minHeight: 90 }} />
+              ))}
+            </div>
+          ) : (
+            <div className="bento bento--stacked">
+              {cats.map((c, i) => {
+                const CategoryIcon = categoryIcon[c.value];
+                return (
+                  <Link
+                    key={c.value}
+                    href={`/autopartes?cat=${c.value}`}
+                    className="bento__item bento__item--row"
+                    style={{ animationDelay: `${i * 35}ms` }}
+                  >
+                    <div className="bento__row-main">
+                      <span className="bento__icon bento__icon--row">
+                        <CategoryIcon size={24} strokeWidth={1.5} aria-hidden />
+                      </span>
+                      <div className="bento__meta">
+                        <div className="bento__name">{t(categoryKey(c.value))}</div>
+                        <div className="bento__count">
+                          {c.count} {t("home.items")}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="bento__cta">{t("home.bentoCta")} →</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="bento">
-          {cats.map((c, i) => {
-            const featured = i === 0;
-            return (
-              <Link
-                key={c.value}
-                href={`/autopartes?cat=${c.value}`}
-                className={`bento__item ${SPAN[i] ?? ""} ${featured ? "bento__item--accent" : ""}`}
-                style={{ animationDelay: `${i * 40}ms` }}
-              >
-                <span className="bento__icon">{categoryIcon[c.value]}</span>
-                <div className="bento__meta">
-                  <div className="bento__name">{t(categoryKey(c.value))}</div>
-                  <div className="bento__count">
-                    {c.count} {t("home.items")}
-                  </div>
-                </div>
-                {featured && <span className="bento__cta">{t("home.bentoCta")} →</span>}
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      </details>
     </section>
   );
 }

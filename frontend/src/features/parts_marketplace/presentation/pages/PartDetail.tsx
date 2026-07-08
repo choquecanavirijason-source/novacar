@@ -18,6 +18,7 @@ import "../styles/marketplace.css";
 export function PartDetail({ part }: { part: MarketplacePart }) {
   const { t } = useTranslation();
   const off = discountPercent(part);
+  const CategoryIcon = categoryIcon[part.category];
 
   return (
     <section style={{ paddingTop: 24 }}>
@@ -30,7 +31,9 @@ export function PartDetail({ part }: { part: MarketplacePart }) {
           className="mk-detail__photo"
           style={{ background: `linear-gradient(140deg, ${part.accentFrom}, ${part.accentTo})` }}
         >
-          <span className="mk-card__icon">{categoryIcon[part.category]}</span>
+          <span className="mk-card__icon">
+            <CategoryIcon size={96} strokeWidth={1.5} aria-hidden />
+          </span>
         </div>
 
         <div>

@@ -26,7 +26,7 @@ interface StatCardProps {
 export function StatCard({ label, value, icon, hint, accent = "primary" }: StatCardProps) {
   const color = ACCENTS[accent];
   return (
-    <Card animate style={{ padding: 20, position: "relative", overflow: "hidden" }}>
+    <Card animate tilt3d style={{ padding: 20, position: "relative", overflow: "hidden" }}>
       <div
         aria-hidden
         style={{

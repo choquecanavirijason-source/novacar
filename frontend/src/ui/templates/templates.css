@@ -4,6 +4,182 @@
    Consume exclusivamente tokens :root.
    ============================================================ */
 
+/* ---- ProductCard grid: 1 col móvil / 2 tablet / 3 desktop, exactas ---- */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: stretch;
+  gap: 24px 24px;
+  row-gap: 36px;
+  perspective: var(--perspective);
+}
+
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- ProductCard (common: autos, autopartes...) ---- */
+/* overflow: visible a propósito → habilita el efecto pop-out/out-of-bounds
+   de .product-card__real-img, que se sale del marco de la tarjeta. */
+.product-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-soft);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform var(--transition-spring), border-color var(--transition-smooth),
+    box-shadow var(--transition-smooth);
+  animation: fadeInUp var(--transition-smooth) both;
+}
+
+.product-card:hover {
+  transform: translateY(-8px) rotateX(4deg) rotateY(-4deg);
+  border-color: var(--primary-glow);
+  box-shadow: var(--shadow-3d-hover);
+}
+
+.product-card__photo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.product-card__photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 100% at 50% 0%, rgba(255, 255, 255, 0.12), transparent 60%);
+  mix-blend-mode: overlay;
+  z-index: 2;
+}
+
+.product-card__icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  color: var(--text-primary);
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.4));
+}
+
+/* Foto real: efecto pop-out / out-of-bounds */
+.product-card__real-img {
+  position: absolute;
+  top: -13%;
+  left: 50%;
+  width: 96%;
+  z-index: 3;
+  object-fit: cover;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md);
+  pointer-events: none;
+  transform: translateX(-50%) scale(1.06);
+  filter: drop-shadow(0 22px 26px rgba(0, 0, 0, 0.6));
+  transition: transform var(--transition-spring), filter var(--transition-smooth);
+}
+
+.product-card:hover .product-card__real-img {
+  transform: translateX(-50%) scale(1.14) translateY(-10px);
+  filter: drop-shadow(0 30px 34px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 40px rgba(27, 196, 182, 0.25));
+}
+
+.product-card__body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: var(--gradient-surface);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.product-card__body-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.product-card__title {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.product-card__subtitle {
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+}
+
+.product-card__features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  text-align: left;
+}
+
+.product-card__features li {
+  position: relative;
+  padding-left: 14px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.product-card__features li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-neon);
+}
+
+/* Requisito crítico: el CTA queda siempre anclado abajo, sin importar
+   cuánto texto haya arriba, gracias a este margin-top: auto. */
+.product-card__cta-wrap {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.product-card__cta {
+  display: block;
+  width: 100%;
+  padding: 11px 0;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-brand);
+  color: var(--on-brand);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-align: center;
+  transition: transform var(--transition-spring), box-shadow var(--transition-smooth);
+}
+
+.product-card:hover .product-card__cta {
+  transform: translateY(-1px);
+  box-shadow: var(--glow-primary);
+}
+
 /* ---- Section wrapper ---- */
 .tpl-section {
   padding-block: 48px;
@@ -80,6 +256,7 @@
   display: grid;
   place-items: center;
   min-height: 320px;
+  perspective: var(--perspective);
 }
 
 .tpl-hero__glass {
@@ -89,14 +266,25 @@
   aspect-ratio: 1 / 0.86;
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(120% 100% at 70% 10%, rgba(34, 224, 255, 0.28), transparent 55%),
-    radial-gradient(120% 120% at 10% 90%, rgba(47, 91, 255, 0.4), transparent 55%),
-    var(--bg-elevated);
-  border: 1px solid var(--border-strong);
-  box-shadow: var(--shadow-soft), var(--glow-primary);
+    radial-gradient(120% 100% at 70% 10%, rgba(27, 196, 182, 0.3), transparent 55%),
+    radial-gradient(120% 120% at 10% 90%, rgba(16, 130, 126, 0.42), transparent 55%),
+    var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-3d), var(--glow-primary);
   display: grid;
   place-items: center;
   overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform var(--transition-spring), box-shadow var(--transition-smooth);
+  animation: float3d 7s ease-in-out infinite;
+}
+
+.tpl-hero__glass:hover {
+  transform: rotateX(6deg) rotateY(-8deg) translateY(-6px) scale(1.02);
+  box-shadow: var(--shadow-3d-hover), var(--glow-primary);
+  animation-play-state: paused;
 }
 
 /* ---- Catalog layout (sidebar + contenido) ---- */
@@ -179,11 +367,13 @@
   text-align: center;
   padding: 56px 32px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--glass-border);
   background:
-    radial-gradient(80% 120% at 50% 0%, rgba(47, 91, 255, 0.2), transparent 60%),
-    var(--bg-elevated);
-  box-shadow: var(--shadow-soft);
+    radial-gradient(80% 120% at 50% 0%, rgba(16, 130, 126, 0.28), transparent 60%),
+    var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  box-shadow: var(--shadow-3d);
 }
 
 .tpl-cta__title {
@@ -210,6 +400,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  perspective: var(--perspective);
 }
 
 @media (max-width: 880px) {
@@ -230,12 +421,15 @@
   border: 1px solid var(--border);
   background: var(--gradient-surface);
   text-align: center;
-  transition: transform var(--transition-smooth), border-color var(--transition-smooth);
+  transform-style: preserve-3d;
+  transition: transform var(--transition-spring), border-color var(--transition-smooth),
+    box-shadow var(--transition-smooth);
 }
 
 .tpl-feature-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px) rotateX(5deg) rotateY(-5deg);
   border-color: var(--primary-glow);
+  box-shadow: var(--shadow-3d-hover);
 }
 
 .tpl-feature-card__icon {
@@ -262,6 +456,10 @@
 }
 
 /* ---- Tile grid (categorías) ---- */
+.tpl-grid--tiles {
+  perspective: var(--perspective);
+}
+
 .tpl-tile {
   display: flex;
   align-items: center;
@@ -270,15 +468,16 @@
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background: var(--gradient-surface);
-  transition: transform var(--transition-smooth), border-color var(--transition-smooth),
+  transform-style: preserve-3d;
+  transition: transform var(--transition-spring), border-color var(--transition-smooth),
     box-shadow var(--transition-smooth);
   animation: fadeInUp var(--transition-smooth) both;
 }
 
 .tpl-tile:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px) rotateX(4deg) rotateY(-4deg);
   border-color: var(--accent-neon);
-  box-shadow: var(--glow-accent);
+  box-shadow: var(--shadow-3d-hover);
 }
 
 .tpl-tile__icon {
@@ -309,6 +508,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+  perspective: var(--perspective);
 }
 
 @media (max-width: 760px) {
@@ -323,15 +523,16 @@
   gap: 16px;
   padding: 22px 24px;
   border-radius: var(--radius-lg);
-  color: #04122e;
+  color: var(--on-brand);
   overflow: hidden;
   box-shadow: var(--shadow-soft);
-  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+  transform-style: preserve-3d;
+  transition: transform var(--transition-spring), box-shadow var(--transition-smooth);
 }
 
 .tpl-promo-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-soft), var(--glow-accent);
+  transform: translateY(-6px) rotateX(4deg) rotateY(4deg);
+  box-shadow: var(--shadow-3d-hover);
 }
 
 .promo-card__icon {
@@ -362,6 +563,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
+  perspective: var(--perspective);
 }
 
 @media (max-width: 880px) {
@@ -379,12 +581,15 @@
   border: 1px solid var(--border);
   background: var(--gradient-surface);
   box-shadow: var(--shadow-soft);
-  transition: transform var(--transition-smooth), border-color var(--transition-smooth);
+  transform-style: preserve-3d;
+  transition: transform var(--transition-spring), border-color var(--transition-smooth),
+    box-shadow var(--transition-smooth);
 }
 
 .tpl-testi-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px) rotateX(4deg) rotateY(-4deg);
   border-color: var(--primary-glow);
+  box-shadow: var(--shadow-3d-hover);
 }
 
 .testi-quote {
@@ -417,7 +622,7 @@
   display: grid;
   place-items: center;
   font-weight: 800;
-  color: #04122e;
+  color: var(--on-brand);
   flex-shrink: 0;
 }
 

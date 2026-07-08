@@ -15,7 +15,7 @@ import { UserTopPanel } from "@ui/organisms/UserTopPanel";
 import { Footer } from "@ui/organisms/Footer";
 
 export const metadata: Metadata = {
-  title: "AutoDrive · Autos y autopartes compatibles",
+  title: "NOVACAR · Autos y autopartes compatibles",
   description:
     "Plataforma de venta de autos y autopartes (baterías y fusibles) con buscador inteligente de compatibilidad.",
 };
@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Suspense fallback={null}>
               <UserTopPanel />
             </Suspense>
-            <main className="container" style={{ minHeight: "calc(100vh - 66px)" }}>
+            <main className="container" style={{ minHeight: "calc(100vh - 72px)" }}>
               {children}
             </main>
             <Footer />

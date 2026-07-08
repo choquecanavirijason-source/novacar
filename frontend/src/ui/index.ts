@@ -22,6 +22,7 @@ export { SpecBadge } from "./molecules/SpecBadge";
 export { SectionHeader } from "./molecules/SectionHeader";
 export { EmptyState } from "./molecules/EmptyState";
 export { ErrorState } from "./molecules/ErrorState";
+export { ProductCard } from "./molecules/ProductCard";
 
 // organisms
 export { Navbar } from "./organisms/Navbar";

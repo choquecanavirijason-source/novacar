@@ -14,9 +14,9 @@ export function Testimonials() {
   const { t } = useTranslation();
 
   const reviews = [
-    { q: t("testimonials.q1"), n: t("testimonials.n1"), r: t("testimonials.r1"), rating: 5, from: "#3d6bff", to: "#22e0ff" },
-    { q: t("testimonials.q2"), n: t("testimonials.n2"), r: t("testimonials.r2"), rating: 5, from: "#5b6cff", to: "#9b5bff" },
-    { q: t("testimonials.q3"), n: t("testimonials.n3"), r: t("testimonials.r3"), rating: 4.5, from: "#2ee6a6", to: "#22e0ff" },
+    { q: t("testimonials.q1"), n: t("testimonials.n1"), r: t("testimonials.r1"), rating: 5, gradient: "var(--gradient-brand)" },
+    { q: t("testimonials.q2"), n: t("testimonials.n2"), r: t("testimonials.r2"), rating: 5, gradient: "var(--gradient-brand-deep)" },
+    { q: t("testimonials.q3"), n: t("testimonials.n3"), r: t("testimonials.r3"), rating: 4.5, gradient: "var(--gradient-brand-cool)" },
   ];
 
   return (
@@ -33,7 +33,7 @@ export function Testimonials() {
             <span className="testi-quote" aria-hidden>“</span>
             <blockquote className="testi-text">{rv.q}</blockquote>
             <figcaption className="testi-author">
-              <span className="testi-avatar" style={{ background: `linear-gradient(135deg, ${rv.from}, ${rv.to})` }}>
+              <span className="testi-avatar" style={{ background: rv.gradient }}>
                 {rv.n.charAt(0)}
               </span>
               <span>

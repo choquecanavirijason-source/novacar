@@ -5,7 +5,7 @@
 import { PartsMarketplace } from "@features/parts_marketplace/presentation/pages/PartsMarketplace";
 
 export const metadata = {
-  title: "Autopartes · AutoDrive",
+  title: "Autopartes · NOVACAR",
   description: "Marketplace de refacciones: motores, llantas, asientos, baterías y más.",
 };
 

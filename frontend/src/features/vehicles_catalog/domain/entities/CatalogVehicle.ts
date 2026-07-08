@@ -4,7 +4,7 @@
  * para alimentar tarjetas, filtros y página de detalle.
  */
 
-export type BodyType = "sedan" | "suv" | "hatchback" | "pickup";
+export type BodyType = "sedan" | "suv" | "hatchback" | "pickup" | "motocicleta";
 export type FuelType = "gasolina" | "hibrido" | "electrico" | "diesel";
 export type Transmission = "manual" | "automatica";
 export type Condition = "nuevo" | "seminuevo";

@@ -12,7 +12,7 @@ import { Eyebrow } from "@ui/atoms/Eyebrow";
 import { Skeleton } from "@ui/atoms/Skeleton";
 import { SearchInput } from "@ui/molecules/SearchInput";
 import { CatalogFilters } from "../components/CatalogFilters";
-import { VehicleCard } from "../components/VehicleCard";
+import { VehicleShowcaseSlide } from "../components/VehicleShowcaseSlide";
 import "../styles/catalog.css";
 
 export function CatalogExplorer() {
@@ -35,41 +35,40 @@ export function CatalogExplorer() {
       </header>
 
       <div className="explorer">
-        <CatalogFilters />
-
-        <div>
-          <div className="catalog-toolbar">
+        <div className="catalog-toolbar">
+          <div className="catalog-toolbar__controls">
             <SearchInput
               value={filters.search ?? ""}
               onChange={(v) => void setFilter("search", v || undefined)}
               placeholder={t("catalog.searchPlaceholder")}
               aria-label={t("catalog.searchPlaceholder")}
             />
-            <span style={{ color: "var(--text-muted)", fontSize: "0.88rem", whiteSpace: "nowrap" }}>
-              {loading ? t("catalog.searching") : t("catalog.count", { n: vehicles.length })}
-            </span>
+            <CatalogFilters />
           </div>
-
-          {loading ? (
-            <div className="catalog-grid">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} height={320} radius="var(--radius-lg)" />
-              ))}
-            </div>
-          ) : vehicles.length === 0 ? (
-            <div className="empty-state">
-              <div style={{ fontSize: "2.4rem", marginBottom: 10 }}>🔍</div>
-              <strong style={{ display: "block", marginBottom: 6 }}>{t("catalog.emptyTitle")}</strong>
-              {t("catalog.empty")}
-            </div>
-          ) : (
-            <div className="catalog-grid">
-              {vehicles.map((v, i) => (
-                <VehicleCard key={v.id} vehicle={v} index={i} />
-              ))}
-            </div>
-          )}
+          <span style={{ color: "var(--text-muted)", fontSize: "0.88rem", whiteSpace: "nowrap" }}>
+            {loading ? t("catalog.searching") : t("catalog.count", { n: vehicles.length })}
+          </span>
         </div>
+
+        {loading ? (
+          <div className="catalog-grid">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} height={320} radius="var(--radius-lg)" />
+            ))}
+          </div>
+        ) : vehicles.length === 0 ? (
+          <div className="empty-state">
+            <div style={{ fontSize: "2.4rem", marginBottom: 10 }}>🔍</div>
+            <strong style={{ display: "block", marginBottom: 6 }}>{t("catalog.emptyTitle")}</strong>
+            {t("catalog.empty")}
+          </div>
+        ) : (
+          <div className="vehicle-stack">
+            {vehicles.map((v, i) => (
+              <VehicleShowcaseSlide key={v.id} vehicle={v} index={i} total={vehicles.length} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

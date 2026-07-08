@@ -86,9 +86,9 @@
   display: grid;
   place-items: center;
   font-size: 0.7rem;
-  color: #04122e;
+  color: var(--on-brand);
   flex-shrink: 0;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .mk-check--active {
@@ -276,38 +276,31 @@
   color: var(--accent-neon);
 }
 
-/* ---- Grilla de productos ---- */
+/* ---- Grilla de productos: 1 col móvil / 2 tablet / 3 desktop (exactas) ---- */
 .mk-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: stretch;
+  gap: 24px 24px;
+  row-gap: 36px;
+  perspective: var(--perspective);
 }
 
-.mk-card {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background: var(--gradient-surface);
-  box-shadow: var(--shadow-soft);
-  transition: transform var(--transition-smooth), border-color var(--transition-smooth),
-    box-shadow var(--transition-smooth);
-  animation: fadeInUp var(--transition-smooth) both;
+@media (max-width: 1024px) {
+  .mk-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-.mk-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--primary-glow);
-  box-shadow: var(--glow-primary);
+@media (max-width: 620px) {
+  .mk-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.mk-card__photo {
-  position: relative;
-  height: 150px;
-  display: grid;
-  place-items: center;
-}
+/* El marco (tilt 3D, foto, CornerFrame) vive en el common @ui/ProductCard
+   (.product-card*, ver ui/templates/templates.css). Aquí solo queda el
+   contenido específico de la autoparte (badges, precio, meta). */
 
 .mk-card__icon {
   font-size: 3.4rem;
@@ -331,43 +324,9 @@
   padding: 4px 9px;
   border-radius: var(--radius-pill);
   background: var(--danger);
-  color: #fff;
+  color: var(--on-brand);
   font-size: 0.72rem;
   font-weight: 800;
-}
-
-.mk-card__body {
-  padding: 14px 16px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-}
-
-.mk-card__cat {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--accent-neon);
-}
-
-.mk-card__name {
-  font-size: 0.96rem;
-  font-weight: 700;
-  line-height: 1.25;
-  min-height: 2.4em;
-}
-
-.mk-card__price-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.mk-card__price {
-  font-size: 1.3rem;
-  font-weight: 900;
 }
 
 .mk-card__old {
@@ -385,11 +344,6 @@
   color: var(--success);
   font-size: 0.78rem;
   font-weight: 700;
-}
-
-.mk-card__foot {
-  margin-top: auto;
-  padding-top: 6px;
 }
 
 .mk-empty {
@@ -414,12 +368,56 @@
 }
 
 /* ---- Bento de categorías ---- */
+.categories-dropdown {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--gradient-surface);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+.categories-dropdown__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.categories-dropdown__summary::-webkit-details-marker {
+  display: none;
+}
+
+.categories-dropdown__chevron {
+  transition: transform var(--transition-fast);
+  color: var(--text-muted);
+}
+
+.categories-dropdown[open] .categories-dropdown__chevron {
+  transform: rotate(180deg);
+}
+
+.categories-dropdown__body {
+  padding: 0 12px 12px;
+}
+
 .bento {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: 158px;
   grid-auto-flow: dense;
   gap: 14px;
+  perspective: var(--perspective);
+}
+
+.bento--stacked {
+  grid-template-columns: 1fr;
+  grid-auto-rows: minmax(78px, auto);
+  gap: 12px;
 }
 
 .bento__item {
@@ -432,23 +430,32 @@
   border: 1px solid var(--border);
   background: var(--gradient-surface);
   overflow: hidden;
-  transition: transform var(--transition-smooth), border-color var(--transition-smooth),
+  transform-style: preserve-3d;
+  transition: transform var(--transition-spring), border-color var(--transition-smooth),
     box-shadow var(--transition-smooth);
   animation: fadeInUp var(--transition-smooth) both;
+}
+
+.bento__item--row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  min-height: 84px;
 }
 
 .bento__item::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(120% 90% at 100% 0%, rgba(34, 224, 255, 0.08), transparent 55%);
+  background: radial-gradient(120% 90% at 100% 0%, rgba(27, 196, 182, 0.1), transparent 55%);
   pointer-events: none;
 }
 
 .bento__item:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px) rotateX(4deg) rotateY(-4deg);
   border-color: var(--accent-neon);
-  box-shadow: var(--glow-accent);
+  box-shadow: var(--shadow-3d-hover);
 }
 
 .bento__item--featured {
@@ -468,7 +475,7 @@
 .bento__item--accent {
   background: var(--gradient-brand);
   border-color: transparent;
-  color: #04122e;
+  color: var(--on-brand);
   box-shadow: var(--glow-primary);
 }
 
@@ -488,8 +495,26 @@
   z-index: 1;
 }
 
+.bento__icon--row {
+  font-size: 1.3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
 .bento__item--featured .bento__icon {
   font-size: 3.4rem;
+}
+
+.bento__row-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
 }
 
 .bento__meta {

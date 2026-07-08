@@ -49,6 +49,7 @@ export function PartsFilters() {
         <div className="mk-group__title">{t("market.category")}</div>
         {facets.categories.map((c) => {
           const on = filters.categories.includes(c.value);
+          const CategoryIcon = categoryIcon[c.value];
           return (
             <button
               key={c.value}
@@ -58,7 +59,9 @@ export function PartsFilters() {
               aria-pressed={on}
             >
               <span className="mk-check__box">{on ? "✓" : ""}</span>
-              <span className="mk-check__icon">{categoryIcon[c.value]}</span>
+              <span className="mk-check__icon">
+                <CategoryIcon size={16} strokeWidth={1.75} aria-hidden />
+              </span>
               <span>{t(categoryKey(c.value))}</span>
               <span className="mk-check__count">{c.count}</span>
             </button>

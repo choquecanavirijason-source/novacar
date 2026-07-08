@@ -34,20 +34,23 @@ export function CategoryTabs() {
       >
         {t("market.all")}
       </button>
-      {facets.categories.map((c) => (
-        <button
-          key={c.value}
-          type="button"
-          role="tab"
-          aria-selected={single === c.value}
-          className={`mk-tab ${single === c.value ? "mk-tab--active" : ""}`}
-          onClick={() => select(c.value)}
-        >
-          <span aria-hidden>{categoryIcon[c.value]}</span>
-          {t(categoryKey(c.value))}
-          <span className="mk-tab__count">{c.count}</span>
-        </button>
-      ))}
+      {facets.categories.map((c) => {
+        const CategoryIcon = categoryIcon[c.value];
+        return (
+          <button
+            key={c.value}
+            type="button"
+            role="tab"
+            aria-selected={single === c.value}
+            className={`mk-tab ${single === c.value ? "mk-tab--active" : ""}`}
+            onClick={() => select(c.value)}
+          >
+            <CategoryIcon size={15} strokeWidth={1.75} aria-hidden />
+            {t(categoryKey(c.value))}
+            <span className="mk-tab__count">{c.count}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }

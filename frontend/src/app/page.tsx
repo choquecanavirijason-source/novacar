@@ -4,7 +4,7 @@
  * testimonios → razones para elegirnos.
  */
 
-import { LandingHero } from "@features/vehicles_catalog/presentation/components/LandingHero";
+import { HeroShowcase } from "@features/vehicles_catalog/presentation/components/HeroShowcase";
 import { FeaturedVehicles } from "@features/vehicles_catalog/presentation/components/FeaturedVehicles";
 import { DiscountBanners } from "@features/vehicles_catalog/presentation/components/DiscountBanners";
 import { WhyChooseUs } from "@features/vehicles_catalog/presentation/components/WhyChooseUs";
@@ -14,7 +14,7 @@ import { CategoriesBento } from "@features/parts_marketplace/presentation/compon
 export default function HomePage() {
   return (
     <>
-      <LandingHero />
+      <HeroShowcase />
       <CategoriesBento />
       <DiscountBanners />
       <FeaturedVehicles />

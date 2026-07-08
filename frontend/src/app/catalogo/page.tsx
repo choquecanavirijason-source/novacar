@@ -6,7 +6,7 @@
 import { CatalogExplorer } from "@features/vehicles_catalog/presentation/pages/CatalogExplorer";
 
 export const metadata = {
-  title: "Catálogo de autos · AutoDrive",
+  title: "Catálogo de autos · NOVACAR",
   description: "Explora autos nuevos y seminuevos con filtros inteligentes.",
 };
 

@@ -6,7 +6,7 @@
 import { StepWizard } from "@features/search_vehicle_parts/presentation/pages/StepWizard";
 
 export const metadata = {
-  title: "Buscador de autopartes · AutoDrive",
+  title: "Buscador de autopartes · NOVACAR",
   description: "Encuentra baterías y fusibles 100% compatibles con tu vehículo.",
 };
 

@@ -42,14 +42,18 @@ export function PopularCategories({ limit }: { limit?: number }) {
           ? Array.from({ length: limit ?? 8 }).map((_, i) => (
               <div key={i} className="skeleton" style={{ height: 110 }} />
             ))
-          : cats.map((c, i) => (
+          : cats.map((c, i) => {
+              const CategoryIcon = categoryIcon[c.value];
+              return (
               <Link
                 key={c.value}
                 href={`/autopartes?cat=${c.value}`}
                 className="cat-tile"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
-                <span className="cat-tile__icon">{categoryIcon[c.value]}</span>
+                <span className="cat-tile__icon">
+                  <CategoryIcon size={24} strokeWidth={1.75} aria-hidden />
+                </span>
                 <div>
                   <div className="cat-tile__name">{t(categoryKey(c.value))}</div>
                   <div className="cat-tile__count">
@@ -57,7 +61,8 @@ export function PopularCategories({ limit }: { limit?: number }) {
                   </div>
                 </div>
               </Link>
-            ))}
+              );
+            })}
       </div>
     </section>
   );
