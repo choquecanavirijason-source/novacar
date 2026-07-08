@@ -1,0 +1,22 @@
+---
+pid: 35668
+cwd: "C:\Users\Predator\Desktop\novacar"
+command: "cd \"C:\\Users\\Predator\\Desktop\\novacar\"; npm run dev"
+started_at: 2026-06-23T13:55:15.300Z
+running_for_ms: 31095001 
+---
+
+> autodrive@0.1.0 dev
+> next dev -p 3001
+
+⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3001
+    at <unknown> (Error: listen EADDRINUSE: address already in use :::3001)
+    at new Promise (<anonymous>) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+

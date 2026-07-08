@@ -1,0 +1,366 @@
+/* ============================================================
+   vehicles_catalog · estilos de presentación
+   Consume exclusivamente las variables :root del tema global.
+   ============================================================ */
+
+/* ---- Hero ---- */
+.hero {
+  position: relative;
+  padding: 88px 0 56px;
+  text-align: center;
+}
+
+.hero__title {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.hero__subtitle {
+  color: var(--text-secondary);
+  max-width: 620px;
+  margin: 20px auto 32px;
+  font-size: 1.1rem;
+}
+
+.hero__actions {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hero__stats {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  margin-top: 56px;
+  flex-wrap: wrap;
+}
+
+.hero__stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.hero__stat-label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ---- Layout explorador (filtros + grid) ---- */
+.explorer {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 28px;
+  align-items: start;
+  padding-bottom: 80px;
+}
+
+@media (max-width: 880px) {
+  .explorer {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Filtros ---- */
+.filters {
+  position: sticky;
+  top: 88px;
+  padding: 22px;
+}
+
+.filters__group {
+  margin-bottom: 22px;
+}
+
+.filters__label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.filters__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all var(--transition-smooth);
+}
+
+.chip:hover {
+  border-color: var(--accent-neon);
+  color: var(--text-primary);
+}
+
+.chip--active {
+  border-color: var(--primary-glow);
+  background: var(--primary-soft);
+  color: var(--text-primary);
+  box-shadow: var(--glow-primary);
+}
+
+.filters__range {
+  width: 100%;
+  accent-color: var(--accent-neon);
+}
+
+/* ---- Grid de autos ---- */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.catalog-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.catalog-search {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.catalog-search:focus {
+  border-color: var(--accent-neon);
+  box-shadow: var(--glow-accent);
+}
+
+/* ---- Tarjeta de auto ---- */
+.vehicle-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-soft);
+  transition: transform var(--transition-smooth), border-color var(--transition-smooth),
+    box-shadow var(--transition-smooth);
+  animation: fadeInUp var(--transition-smooth) both;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--primary-glow);
+  box-shadow: var(--glow-primary);
+}
+
+.vehicle-card__photo {
+  position: relative;
+  height: 168px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.vehicle-card__photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 100% at 50% 0%, rgba(255, 255, 255, 0.18), transparent 60%);
+  mix-blend-mode: overlay;
+}
+
+.vehicle-card__icon {
+  font-size: 4.2rem;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.4));
+  z-index: 1;
+}
+
+.vehicle-card__tags {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+
+.tag-pill {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: rgba(7, 11, 22, 0.66);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+}
+
+.vehicle-card__body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.vehicle-card__brand {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.vehicle-card__model {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.vehicle-card__specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.spec-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+.vehicle-card__iconrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.vehicle-card__icspec {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+}
+
+.vehicle-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.vehicle-card__price {
+  font-size: 1.3rem;
+  font-weight: 900;
+}
+
+/* ---- Detalle ---- */
+.detail {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 32px;
+  padding: 40px 0 80px;
+  align-items: start;
+}
+
+@media (max-width: 880px) {
+  .detail {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detail__photo {
+  height: 360px;
+  border-radius: var(--radius-lg);
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.detail__photo .vehicle-card__icon {
+  font-size: 8rem;
+  animation: float 4s ease-in-out infinite;
+}
+
+.detail__specs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 22px 0;
+}
+
+.detail__spec {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+
+.detail__spec-label {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.detail__spec-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.detail__features {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.detail__feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.detail__feature::before {
+  content: "✓";
+  color: var(--accent-neon);
+  font-weight: 800;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}

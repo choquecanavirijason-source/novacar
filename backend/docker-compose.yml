@@ -1,0 +1,9 @@
+services:
+  api:
+    image: php:8.4-cli
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8002:8000"
+    command: php artisan serve --host=0.0.0.0 --port=8000

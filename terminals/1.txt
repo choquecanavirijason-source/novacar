@@ -1,0 +1,20 @@
+---
+pid: 30600
+cwd: "C:\Users\Predator\Desktop\novacar"
+command: "docker run --rm -v \"C:\\Users\\Predator\\Desktop\\novacar\\backend:/app\" -w /app -p 8001:8001 composer:2 php artisan serve --host=0.0.0.0 --port=8001"
+started_at: 2026-06-22T20:51:06.753Z
+running_for_ms: 86400014 
+---
+
+   INFO  Server running on [http://0.0.0.0:8001].  
+
+  Press Ctrl+C to stop the server
+
+  2026-06-22 20:51:26 /api/catalog/vehicles ............................ ~ 3s
+  2026-06-22 20:51:29 /api/auth/login .................................. ~ 2s
+
+---
+exit_code: -1
+elapsed_ms: 86400014
+ended_at: 2026-06-23T20:50:51.428Z
+---
