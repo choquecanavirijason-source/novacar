@@ -8,12 +8,12 @@
    ============================================================ */
 
 .vshowcase {
-  --vs-accent: #00e5ff;
-  --vs-accent-soft: rgba(0, 229, 255, 0.16);
-  --vs-glass-bg: rgba(8, 8, 8, 0.55);
-  --vs-glass-border: rgba(255, 255, 255, 0.12);
+  --vs-accent: #00aaff;
+  --vs-accent-soft: rgba(0, 170, 255, 0.16);
+  --vs-glass-bg: rgba(13, 13, 13, 0.55);
+  --vs-glass-border: rgba(0, 170, 255, 0.25);
   --vs-text-muted: #b9b9b9;
-  --vs-on-accent: #052024;
+  --vs-on-accent: #14120a;
 
   position: relative;
   display: grid;
@@ -21,7 +21,7 @@
   min-height: clamp(300px, 46vh, 420px);
   border-radius: 20px;
   overflow: hidden;
-  background: #050505;
+  background: #0d0d0d;
   font-family: var(--font-sans, "Segoe UI", system-ui, sans-serif);
   isolation: isolate;
 }
@@ -63,7 +63,7 @@
   width: 18px;
   height: 18px;
   color: var(--vs-accent);
-  filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.6));
+  filter: drop-shadow(0 0 10px rgba(0, 170, 255, 0.6));
   transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -112,7 +112,7 @@
 
 .vshowcase__dot--active {
   background: var(--vs-accent);
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.7);
+  box-shadow: 0 0 10px rgba(0, 170, 255, 0.7);
   transform: scale(1.3);
 }
 
@@ -160,25 +160,43 @@
 }
 
 .vshowcase__cta {
+  position: relative;
   display: inline-flex;
   width: fit-content;
   margin-top: 18px;
   border: 1.5px solid var(--vs-accent);
-  border-radius: 999px;
+  border-radius: var(--radius-btn);
   background: transparent;
   overflow: hidden;
+  transform: skewX(-12deg);
   transition: transform 300ms ease, box-shadow 300ms ease;
 }
 
+.vshowcase__cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.04) 45%,
+    rgba(255, 255, 255, 0) 55%,
+    rgba(0, 0, 0, 0.15) 100%
+  );
+  pointer-events: none;
+}
+
 .vshowcase__cta:hover {
-  transform: translateY(-2px);
+  transform: skewX(-12deg) translateY(-2px);
   box-shadow: 0 0 24px var(--vs-accent-soft);
 }
 
 .vshowcase__cta-inner {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 14px;
+  transform: skewX(12deg);
 }
 
 .vshowcase__cta-label {

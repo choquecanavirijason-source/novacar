@@ -1,10 +1,18 @@
 /**
  * Presentation · Component · Testimonials
  * Sección de reseñas de clientes con calificación (prueba social).
+ * Carrusel 3D "Coverflow" (Swiper.js): tarjetas HUD con esquinas recortadas
+ * (clip-path), la reseña activa queda de frente al centro y las adyacentes
+ * se inclinan en perspectiva — mismo lenguaje visual y tokens del sitio.
  */
 
 "use client";
 
+import { Swiper, SwiperSlide } from "swiper/react";
+import { EffectCoverflow, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/effect-coverflow";
+import "swiper/css/pagination";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { SectionHeader } from "@ui/molecules/SectionHeader";
 import { RatingStars } from "@ui/atoms/RatingStars";
@@ -27,26 +35,46 @@ export function Testimonials() {
         subtitle={t("testimonials.subtitle")}
         align="center"
       />
-      <div className="testi-grid">
-        {reviews.map((rv, i) => (
-          <figure key={rv.n} className="testi-card animate-in" style={{ animationDelay: `${i * 70}ms` }}>
-            <span className="testi-quote" aria-hidden>“</span>
-            <blockquote className="testi-text">{rv.q}</blockquote>
-            <figcaption className="testi-author">
-              <span className="testi-avatar" style={{ background: rv.gradient }}>
-                {rv.n.charAt(0)}
+
+      <Swiper
+        className="testi-swiper"
+        modules={[EffectCoverflow, Pagination]}
+        effect="coverflow"
+        grabCursor
+        centeredSlides
+        slidesPerView="auto"
+        loop
+        coverflowEffect={{ rotate: 40, stretch: 0, depth: 220, modifier: 1, slideShadows: true }}
+        pagination={{ el: ".testi-swiper__pagination", clickable: true }}
+      >
+        {reviews.map((rv) => (
+          <SwiperSlide key={rv.n} className="testi-hud-slide">
+            <div className="testi-hud-card group">
+              <div className="testi-hud-card__border" aria-hidden />
+
+              <span className="testi-hud-card__quote" aria-hidden>
+                &ldquo;
               </span>
-              <span>
-                <span className="testi-name">{rv.n}</span>
-                <span className="testi-role">{rv.r}</span>
-              </span>
-              <span style={{ marginLeft: "auto" }}>
-                <RatingStars value={rv.rating} />
-              </span>
-            </figcaption>
-          </figure>
+              <blockquote className="testi-hud-card__text">{rv.q}</blockquote>
+
+              <div className="testi-hud-card__footer">
+                <span className="testi-hud-card__avatar" style={{ background: rv.gradient }}>
+                  {rv.n.charAt(0)}
+                </span>
+                <span className="testi-hud-card__identity">
+                  <span className="testi-hud-card__name">{rv.n}</span>
+                  <span className="testi-hud-card__role">{rv.r}</span>
+                </span>
+                <span className="testi-hud-card__rating">
+                  <RatingStars value={rv.rating} />
+                </span>
+              </div>
+            </div>
+          </SwiperSlide>
         ))}
-      </div>
+      </Swiper>
+
+      <div className="testi-swiper__pagination" />
     </section>
   );
 }

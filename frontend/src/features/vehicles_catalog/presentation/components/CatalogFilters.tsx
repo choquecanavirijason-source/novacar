@@ -12,7 +12,7 @@ import { useTranslation } from "@core/i18n/I18nProvider";
 import { bodyTypeKey, fuelKey } from "../vehiclePresentation";
 
 export function CatalogFilters() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { options, filters, setFilter, clearFilters } = useCatalogStore();
   const [open, setOpen] = useState(false);
 
@@ -98,7 +98,7 @@ export function CatalogFilters() {
 
           <div className="catalog-filter-panel__row">
             <label className="catalog-filter-panel__label" htmlFor="catalog-price-range">
-              {t("catalog.maxPrice")}: {formatCurrency(filters.maxPrice ?? options.priceRange.max)}
+              {t("catalog.maxPrice")}: {formatCurrency(filters.maxPrice ?? options.priceRange.max, locale)}
             </label>
             <input
               id="catalog-price-range"

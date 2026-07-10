@@ -12,11 +12,11 @@ import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { RatingStars } from "@ui/atoms/RatingStars";
 import { ProductCard } from "@ui/molecules/ProductCard";
-import { categoryIcon, categoryKey, conditionKey } from "../partPresentation";
+import { categoryIcon, categoryKey, conditionKey, partPhotoUrl } from "../partPresentation";
 import { ProductInquiryModal } from "./ProductInquiryModal";
 
 export function PartCard({ part, index = 0 }: { part: MarketplacePart; index?: number }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const off = discountPercent(part);
   const CategoryIcon = categoryIcon[part.category];
   const [inquiryOpen, setInquiryOpen] = useState(false);
@@ -30,11 +30,14 @@ export function PartCard({ part, index = 0 }: { part: MarketplacePart; index?: n
   return (
     <>
       <ProductCard
+        href={`/autopartes/${part.id}`}
         onCtaClick={() => setInquiryOpen(true)}
         index={index}
-        accentFrom={part.accentFrom}
-        accentTo={part.accentTo}
-        photoHeight={150}
+        accentFrom="#252525"
+        accentTo="#252525"
+        photoHeight={190}
+        imageUrl={partPhotoUrl(part.id, part.category)}
+        imageAlt={part.name}
         photoIcon={<CategoryIcon size={48} strokeWidth={1.5} aria-hidden />}
         photoTopSlot={
           <div className="mk-card__badges">
@@ -45,9 +48,9 @@ export function PartCard({ part, index = 0 }: { part: MarketplacePart; index?: n
         title={part.name}
         subtitle={
           <>
-            <span className="text-gradient">{formatCurrency(part.price)}</span>
+            <span className="mk-price-badge">{formatCurrency(part.price, locale)}</span>
             {part.originalPrice && (
-              <s style={{ marginLeft: 6, color: "var(--text-muted)" }}>{formatCurrency(part.originalPrice)}</s>
+              <s style={{ marginLeft: 8, color: "var(--text-muted)" }}>{formatCurrency(part.originalPrice, locale)}</s>
             )}
           </>
         }

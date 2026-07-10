@@ -37,6 +37,8 @@ function PartSpec({ part }: { part: Part }) {
 }
 
 export function CompatiblePartsResult({ parts, emptyLabel }: { parts: Part[]; emptyLabel: string }) {
+  const { locale } = useTranslation();
+
   if (parts.length === 0) {
     return <p className="empty">{emptyLabel}</p>;
   }
@@ -53,7 +55,7 @@ export function CompatiblePartsResult({ parts, emptyLabel }: { parts: Part[]; em
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div className="part-card__price">{formatCurrency(part.price)}</div>
+            <div className="part-card__price">{formatCurrency(part.price, locale)}</div>
             <div className="part-card__meta">SKU {part.sku}</div>
           </div>
         </article>

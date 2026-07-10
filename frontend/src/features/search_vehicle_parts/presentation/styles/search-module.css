@@ -115,7 +115,6 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  perspective: var(--perspective);
 }
 
 .category-card {
@@ -124,19 +123,24 @@
   border: 1px solid var(--border);
   background: var(--bg-elevated);
   text-align: left;
-  transform-style: preserve-3d;
   transition: transform var(--transition-spring), border-color var(--transition-smooth),
     box-shadow var(--transition-smooth);
 }
 
 .category-card:hover {
-  transform: translateY(-6px) rotateX(4deg) rotateY(-4deg);
+  transform: translateY(-6px);
   border-color: var(--accent-neon);
   box-shadow: var(--shadow-3d-hover);
 }
 
 .category-card__icon {
-  font-size: 2rem;
+  display: inline-grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  color: var(--accent-neon);
+  background: var(--accent-soft);
 }
 
 .category-card__name {

@@ -1,0 +1,60 @@
+/* ============================================================
+   BrandTicker · franja de marcas (marquee) bajo el Hero
+   ============================================================ */
+
+.brand-ticker {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  overflow: hidden;
+  background: #1a1a1a;
+  border-block: 1px solid var(--border);
+  padding-block: 20px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.brand-ticker__track {
+  display: flex;
+  align-items: center;
+  gap: 64px;
+  width: max-content;
+  animation: brand-ticker-scroll 28s linear infinite;
+}
+
+.brand-ticker:hover .brand-ticker__track {
+  animation-play-state: paused;
+}
+
+.brand-ticker__item {
+  flex-shrink: 0;
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.75;
+  transition: color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.brand-ticker__item:hover {
+  color: var(--accent-neon);
+  opacity: 1;
+}
+
+@keyframes brand-ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-ticker__track {
+    animation: none;
+  }
+}

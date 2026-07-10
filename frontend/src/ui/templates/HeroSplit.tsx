@@ -12,7 +12,7 @@ export interface HeroStat {
 }
 
 interface HeroSplitProps {
-  eyebrow?: string;
+  eyebrow?: ReactNode;
   title: ReactNode;
   subtitle?: string;
   actions?: ReactNode;

@@ -4,6 +4,7 @@
  * Usada en el panel admin y en secciones de estadísticas.
  */
 
+import type { ReactNode } from "react";
 import { Card } from "../atoms/Card";
 
 type Accent = "primary" | "neon" | "danger" | "success";
@@ -18,7 +19,7 @@ const ACCENTS: Record<Accent, string> = {
 interface StatCardProps {
   label: string;
   value: string | number;
-  icon?: string;
+  icon?: ReactNode;
   hint?: string;
   accent?: Accent;
 }
@@ -38,7 +39,7 @@ export function StatCard({ label, value, icon, hint, accent = "primary" }: StatC
       <div style={{ position: "relative" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span style={{ color: "var(--text-secondary)", fontSize: "0.84rem" }}>{label}</span>
-          {icon && <span style={{ fontSize: "1.2rem" }}>{icon}</span>}
+          {icon && <span style={{ color, display: "inline-flex" }}>{icon}</span>}
         </div>
         <div style={{ fontSize: "1.9rem", fontWeight: 800, color, marginTop: 8 }}>{value}</div>
         {hint && (

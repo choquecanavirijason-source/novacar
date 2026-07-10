@@ -3,52 +3,6 @@
    Consume exclusivamente las variables :root del tema global.
    ============================================================ */
 
-/* ---- Hero ---- */
-.hero {
-  position: relative;
-  padding: 88px 0 56px;
-  text-align: center;
-}
-
-.hero__title {
-  font-size: clamp(2.4rem, 6vw, 4rem);
-  font-weight: 900;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-}
-
-.hero__subtitle {
-  color: var(--text-secondary);
-  max-width: 620px;
-  margin: 20px auto 32px;
-  font-size: 1.1rem;
-}
-
-.hero__actions {
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.hero__stats {
-  display: flex;
-  gap: 40px;
-  justify-content: center;
-  margin-top: 56px;
-  flex-wrap: wrap;
-}
-
-.hero__stat-value {
-  font-size: 2rem;
-  font-weight: 800;
-}
-
-.hero__stat-label {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
 /* ---- Layout explorador (filtros arriba + stack de showcases) ---- */
 .explorer {
   display: flex;
@@ -84,7 +38,7 @@
   padding: 0 6px;
   border-radius: 999px;
   background: var(--accent-neon);
-  color: #05131f;
+  color: var(--on-brand);
   font-size: 0.74rem;
 }
 
@@ -208,13 +162,102 @@
   accent-color: var(--accent-neon);
 }
 
-/* ---- Grid de autos (legado, ver .vehicle-stack para VehicleShowcaseCard) ---- */
+/* ---- Grid de autos (skeleton de carga) ---- */
 .catalog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px 20px;
   row-gap: 32px;
-  perspective: var(--perspective);
+}
+
+/* ---- Modo "Cuadrícula": 4 tarjetas por fila, medidas uniformes (CSS Grid
+   iguala el alto de cada fila automáticamente) + líneas horizontales entre
+   filas (nunca en la primera fila de cada breakpoint). ---- */
+.catalog-grid--fixed {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.catalog-grid--fixed > * {
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.catalog-grid--fixed > *:nth-child(-n + 4) {
+  padding-top: 0;
+  border-top: none;
+}
+
+@media (max-width: 1080px) {
+  .catalog-grid--fixed {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .catalog-grid--fixed > *:nth-child(-n + 4) {
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .catalog-grid--fixed > *:nth-child(-n + 2) {
+    padding-top: 0;
+    border-top: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .catalog-grid--fixed {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-grid--fixed > *:nth-child(-n + 2) {
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .catalog-grid--fixed > *:nth-child(-n + 1) {
+    padding-top: 0;
+    border-top: none;
+  }
+}
+
+.grid-card__badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ---- Toggle de vista (Horizontal / Cuadrícula) ---- */
+.catalog-view-toggle {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+
+.catalog-view-toggle__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  background: transparent;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.catalog-view-toggle__btn:hover {
+  color: var(--text-primary);
+}
+
+.catalog-view-toggle__btn--active {
+  color: var(--on-brand);
+  background: var(--gradient-brand);
 }
 
 /* ---- Stack de showcases (Home Destacados + /catalogo) ---- */
@@ -222,178 +265,6 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-
-.featured-carousel {
-  display: grid;
-  gap: 14px;
-}
-
-.featured-carousel--loading {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.featured-carousel__slide {
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  min-height: 360px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  background: var(--gradient-surface);
-  box-shadow: var(--shadow-soft);
-}
-
-.featured-carousel__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  aspect-ratio: 16 / 10;
-}
-
-.featured-carousel__content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 24px;
-}
-
-.featured-carousel__vehicle {
-  display: grid;
-  gap: 8px;
-}
-
-.featured-carousel__tag {
-  display: inline-flex;
-  width: fit-content;
-  padding: 5px 10px;
-  border-radius: var(--radius-pill);
-  background: var(--accent-soft);
-  color: var(--accent-neon);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.featured-carousel__title {
-  font-size: 1.35rem;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-
-.featured-carousel__subtitle {
-  color: var(--text-secondary);
-  font-size: 0.92rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.featured-carousel__desc {
-  color: var(--text-secondary);
-  font-size: 0.92rem;
-  line-height: 1.6;
-  max-width: 560px;
-}
-
-.featured-carousel__cta {
-  display: inline-flex;
-  width: fit-content;
-  margin-top: 4px;
-  color: var(--accent-neon);
-  font-weight: 700;
-}
-
-.featured-carousel__parts {
-  display: grid;
-  gap: 10px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-}
-
-.featured-carousel__parts-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-}
-
-.featured-carousel__parts-head h4 {
-  font-size: 0.95rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.featured-carousel__parts-head a {
-  color: var(--accent-neon);
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.featured-carousel__parts-list {
-  display: grid;
-  gap: 8px;
-  list-style: none;
-}
-
-.featured-carousel__part-link {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-}
-
-.featured-carousel__part-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.featured-carousel__part-price {
-  color: var(--accent-neon);
-  font-size: 0.82rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.featured-carousel__controls {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-.featured-carousel__dot {
-  width: 8px;
-  height: 8px;
-  padding: 0;
-  border: none;
-  border-radius: 999px;
-  background: var(--border);
-  cursor: pointer;
-  transition: transform var(--transition-fast), background var(--transition-fast);
-}
-
-.featured-carousel__dot--active {
-  background: var(--accent-neon);
-  transform: scale(1.2);
-}
-
-@media (max-width: 880px) {
-  .featured-carousel__slide {
-    grid-template-columns: 1fr;
-  }
-
-  .featured-carousel__image {
-    min-height: 220px;
-  }
 }
 
 .catalog-toolbar {
@@ -430,13 +301,6 @@
   box-shadow: var(--glow-accent);
 }
 
-/* ---- Icono de body type (usado en VehicleDetail) ---- */
-.vehicle-card__icon {
-  font-size: 4.2rem;
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.4));
-  z-index: 1;
-}
-
 .tag-pill {
   padding: 4px 10px;
   border-radius: var(--radius-pill);
@@ -458,85 +322,436 @@
   border: 1px solid var(--border);
 }
 
-/* ---- Detalle ---- */
-.detail {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 32px;
-  padding: 40px 0 80px;
-  align-items: start;
-}
-
-@media (max-width: 880px) {
-  .detail {
-    grid-template-columns: 1fr;
-  }
-}
-
-.detail__photo {
-  height: 360px;
-  border-radius: var(--radius-lg);
-  display: grid;
-  place-items: center;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--border);
-}
-
-.detail__photo .vehicle-card__icon {
-  font-size: 8rem;
-  animation: float 4s ease-in-out infinite;
-}
-
-.detail__specs-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin: 22px 0;
-}
-
-.detail__spec {
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
-}
-
-.detail__spec-label {
-  font-size: 0.74rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-.detail__spec-value {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-top: 2px;
-}
-
-.detail__features {
-  display: grid;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.detail__feature {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text-secondary);
-  font-size: 0.92rem;
-}
-
-.detail__feature::before {
-  content: "✓";
-  color: var(--accent-neon);
-  font-weight: 800;
-}
-
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
   padding: 60px 20px;
   color: var(--text-muted);
+}
+
+/* ============================================================
+   VehicleDetail: Hero "Broken Grid" — tríptico técnico de fondo + auto
+   real en primer plano rompiendo las columnas vía z-index, con acentos
+   brutalistas (decals, retículas, VIN corrido).
+   ============================================================ */
+.vdetail-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  /* Altura total del hero (tríptico + banda del auto). Ajustar aquí para
+     agrandar/achicar todo el bloque de una sola vez. */
+  height: clamp(520px, 72vw, 760px);
+  background: var(--bg-base);
+}
+
+.vdetail-hero__crumbs {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 6;
+}
+
+/* ---- Tríptico: 3 columnas, mismo vehículo con encuadres distintos.
+   Banda superior del hero — ajustar `flex-basis` para agrandar/achicar
+   esta zona respecto a la banda del auto de abajo. ---- */
+.vdetail-triptych {
+  position: relative;
+  z-index: 0;
+  flex: 1 1 58%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  background: var(--bg-base);
+}
+
+.vdetail-triptych__col {
+  position: relative;
+  overflow: hidden;
+}
+
+.vdetail-triptych__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(70%) contrast(1.2) brightness(0.5);
+  transition: filter var(--transition-smooth);
+}
+
+.vdetail-triptych__col:hover .vdetail-triptych__img {
+  filter: grayscale(35%) contrast(1.15) brightness(0.65);
+}
+
+.vdetail-triptych__col::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.75) 100%);
+}
+
+/* ---- Tech decal: etiqueta monoespaciada por columna ---- */
+.vdetail-decal {
+  position: absolute;
+  z-index: 1;
+  bottom: 16px;
+  left: 16px;
+  padding-left: 10px;
+  border-left: 2px solid var(--accent-neon);
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+/* ---- Retículas (crosshair) brutalistas en las esquinas ---- */
+.vdetail-crosshair {
+  position: absolute;
+  z-index: 6;
+  width: 22px;
+  height: 22px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.vdetail-crosshair::before,
+.vdetail-crosshair::after {
+  content: "";
+  position: absolute;
+  background: var(--accent-neon);
+}
+
+.vdetail-crosshair::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.vdetail-crosshair::after {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+.vdetail-crosshair--br {
+  bottom: 28px;
+  right: 28px;
+}
+
+/* ---- VIN corrido: etiqueta técnica en la esquina (el auto ahora ocupa
+   el centro inferior, en modo horizontal) ---- */
+.vdetail-vin {
+  position: absolute;
+  z-index: 4;
+  top: 28px;
+  right: 28px;
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.3em;
+  color: var(--text-muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ---- Auto real: banda inferior del hero, debajo del tríptico, a todo
+   el ancho horizontal (full-bleed, sin márgenes). Ajustar `flex-basis`
+   para agrandar/achicar esta banda; `object-position` en la imagen para
+   recentrar el recorte si el auto queda mal encuadrado. ---- */
+.vdetail-breakout {
+  position: relative;
+  z-index: 5;
+  flex: 0 0 52%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.vdetail-breakout::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 1;
+  height: 35%;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent);
+  pointer-events: none;
+}
+
+/* Halo oscuro abajo-izquierda para que el nombre del modelo se lea sobre
+   la foto del auto. */
+.vdetail-breakout::after {
+  content: "";
+  position: absolute;
+  inset: auto auto 0 0;
+  z-index: 1;
+  width: min(60%, 420px);
+  height: 70%;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), transparent 70%);
+  pointer-events: none;
+}
+
+.vdetail-breakout__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+}
+
+/* Ancla el nombre del modelo abajo-izquierda de la imagen del auto (no de
+   todo el hero) — es hija de .vdetail-breakout, ver JSX. */
+.vdetail-hero__copy {
+  position: absolute;
+  z-index: 6;
+  bottom: 18px;
+  left: 20px;
+  max-width: 260px;
+  pointer-events: none;
+}
+
+.vdetail-hero__brand {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--accent-neon);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+}
+
+.vdetail-hero__title {
+  margin-top: 8px;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
+}
+
+@media (max-width: 720px) {
+  .vdetail-triptych {
+    flex-basis: 46%;
+  }
+
+  .vdetail-breakout {
+    flex-basis: 54%;
+  }
+
+  .vdetail-hero__copy {
+    max-width: 70%;
+  }
+}
+
+/* ---- Tarjeta "Precio de lista": a todo el ancho, sin espacios laterales ---- */
+.vdetail-pricecard-wrap {
+  padding: 40px 0 0;
+}
+
+.vdetail-pricecard {
+  width: 100%;
+  padding: 28px clamp(24px, 5vw, 64px) 40px;
+  border: 1px solid var(--border-strong);
+  border-left: none;
+  border-right: none;
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-3d), var(--glow-accent);
+}
+
+.vdetail-pricecard__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vdetail-pricecard__label {
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+}
+
+.vdetail-pricecard__badge {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent-neon);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.vdetail-pricecard__value {
+  display: block;
+  margin-top: 10px;
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.vdetail-pricecard__tagline {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.vdetail-pricecard__divider {
+  margin: 20px 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+}
+
+.vdetail-pricecard__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.vdetail-pricecard__meta span:not(:last-child) {
+  position: relative;
+  padding-right: 18px;
+}
+
+.vdetail-pricecard__meta span:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  transform: translateY(-50%);
+}
+
+.vdetail-pricecard__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+
+/* ---- ImportQuoteModal (cotización automática de Importaciones) ---- */
+.import-quote-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  animation: fadeInUp 220ms ease both;
+}
+
+.import-quote-panel {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+}
+
+.import-quote-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+}
+
+.import-quote-close:hover {
+  color: var(--text-primary);
+}
+
+.import-quote-vehicle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-right: 32px;
+}
+
+.import-quote-vehicle__img {
+  width: 72px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.import-quote-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.import-quote-vehicle__name {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  margin-top: 2px;
+}
+
+.import-quote-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+.import-quote-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.import-quote-row--total {
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  color: var(--text-primary);
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.import-quote-row--total span:last-child {
+  color: var(--accent-neon);
+}
+
+.import-quote-row--muted {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.import-quote-disclaimer {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.5;
 }

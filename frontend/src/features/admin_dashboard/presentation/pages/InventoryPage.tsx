@@ -5,16 +5,21 @@
 
 "use client";
 
+import { useState } from "react";
+import { Plus } from "lucide-react";
 import { useAdminDashboardStore } from "../store/useAdminDashboardStore";
 import { DataTable, type Column } from "../components/DataTable";
+import { AddPartModal } from "../components/AddPartModal";
 import { isLowStock, type InventoryItem } from "../../domain/entities/InventoryItem";
 import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Skeleton } from "@ui/atoms/Skeleton";
+import { Button } from "@ui/atoms/Button";
 
 export function InventoryPage() {
-  const { t } = useTranslation();
-  const { inventory, loading, updateStock } = useAdminDashboardStore();
+  const { t, locale } = useTranslation();
+  const { inventory, loading, updateStock, addItem } = useAdminDashboardStore();
+  const [addOpen, setAddOpen] = useState(false);
 
   if (loading) return <Skeleton height={320} />;
 
@@ -26,7 +31,7 @@ export function InventoryPage() {
       header: t("admin.colType"),
       render: (r) => <span style={{ color: "var(--text-secondary)" }}>{r.category}</span>,
     },
-    { key: "price", header: t("admin.colPrice"), align: "right", render: (r) => formatCurrency(r.price) },
+    { key: "price", header: t("admin.colPrice"), align: "right", render: (r) => formatCurrency(r.price, locale) },
     {
       key: "stock",
       header: t("admin.colStock"),
@@ -56,8 +61,18 @@ export function InventoryPage() {
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
-      <h1 style={{ fontSize: "1.6rem", fontWeight: 800 }}>{t("admin.inventory")}</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <h1 style={{ fontSize: "1.6rem", fontWeight: 800 }}>{t("admin.inventory")}</h1>
+        <Button size="sm" onClick={() => setAddOpen(true)}>
+          <Plus size={15} strokeWidth={2.25} aria-hidden /> {t("admin.addPart")}
+        </Button>
+      </div>
+
       <DataTable columns={columns} rows={inventory} rowKey={(r) => r.id} />
+
+      {addOpen && (
+        <AddPartModal onClose={() => setAddOpen(false)} onSubmit={addItem} />
+      )}
     </div>
   );
 }

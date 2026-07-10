@@ -4,33 +4,155 @@
    ============================================================ */
 
 .market {
-  display: grid;
-  grid-template-columns: 290px 1fr;
-  gap: 28px;
-  align-items: start;
   padding: 32px 0 80px;
 }
 
-@media (max-width: 940px) {
-  .market {
+/* ============================================================
+   FeaturedCategoryBlocks: Hero de Autopartes "Soft Card UI"
+   - Mixed-Corner Radius: radios asimétricos por tarjeta (alterna diagonal).
+   - Soft Drop Shadows: sombra amplia, difusa, de baja opacidad (sin 3D duro).
+   - Cut-out Object Photography: la foto real del producto rompe la esquina
+     superior de su tarjeta en vez de quedar contenida con padding.
+   ============================================================ */
+.mk-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px 28px;
+  padding: 12px 4px 8px;
+}
+
+/* Si el último bloque queda solo en su fila (total impar), ocupa las dos
+   columnas en vez de quedar a la mitad. */
+.mk-hero-grid > *:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .mk-hero-grid {
     grid-template-columns: 1fr;
   }
+
+  .mk-hero-grid > *:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
 }
 
-/* ---- Sidebar de filtros (largo) ---- */
+.mk-hero-card {
+  position: relative;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 230px;
+  padding: 26px 24px 24px;
+  text-align: left;
+  color: inherit;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  /* Radios asimétricos: grande arriba-izq/abajo-der, casi recto en las otras
+     dos esquinas — rompe la rigidez de la cuadrícula uniforme. */
+  border-radius: 32px 10px 32px 10px;
+  box-shadow: 0 36px 60px -28px rgba(0, 0, 0, 0.6), 0 14px 28px -16px rgba(0, 0, 0, 0.35);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth),
+    border-color var(--transition-smooth);
+}
+
+.mk-hero-card--alt {
+  border-radius: 10px 32px 10px 32px;
+}
+
+.mk-hero-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--border-strong);
+  box-shadow: 0 46px 70px -24px rgba(0, 0, 0, 0.65), 0 18px 32px -14px rgba(0, 0, 0, 0.4),
+    var(--glow-accent);
+}
+
+.mk-hero-card__photo {
+  position: absolute;
+  top: -12px;
+  right: 56px;
+  width: 250px;
+  height: 250px;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.55));
+  pointer-events: none;
+  transition: transform var(--transition-smooth);
+}
+
+.mk-hero-card--alt .mk-hero-card__photo {
+  top: auto;
+  bottom: -22px;
+  right: -16px;
+}
+
+.mk-hero-card:hover .mk-hero-card__photo {
+  transform: scale(1.08) translateY(-4px);
+}
+
+.mk-hero-card__title {
+  margin-top: auto;
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+}
+
+.mk-hero-card--alt .mk-hero-card__title {
+  margin-top: 0;
+}
+
+.mk-hero-card__subtitle {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.mk-hero-card__cta {
+  margin-top: 14px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-neon);
+}
+
+/* ---- Filtros: panel desplegable (ya no sidebar fijo) ---- */
+.mk-filters-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 0.86rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.mk-filters-toggle:hover {
+  border-color: var(--accent-neon);
+  color: var(--accent-neon);
+}
+
+.mk-filters-toggle svg:last-child {
+  transition: transform var(--transition-fast);
+}
+
+.mk-filters-toggle[aria-expanded="true"] svg:last-child {
+  transform: rotate(180deg);
+}
+
 .mk-filters {
-  position: sticky;
-  top: 88px;
-  max-height: calc(100vh - 110px);
+  max-height: 60vh;
   overflow-y: auto;
   padding: 22px;
-}
-
-@media (max-width: 940px) {
-  .mk-filters {
-    position: static;
-    max-height: none;
-  }
+  margin-bottom: 24px;
+  animation: fadeInUp 220ms ease both;
 }
 
 .mk-filters__head {
@@ -134,6 +256,12 @@
   font-size: 0.9rem;
 }
 
+.mk-toggle__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .mk-toggle:hover {
   color: var(--text-primary);
 }
@@ -225,15 +353,54 @@
   line-height: 1;
 }
 
-/* ---- Tabs de categoría (estilo Brator "Featured Product") ---- */
+/* ---- Carrusel de tabs (modo + categoría fusionados) con flechas ---- */
+.mk-carousel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mk-carousel__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.mk-carousel__arrow:hover {
+  color: var(--accent-neon);
+  border-color: var(--accent-neon);
+}
+
 .mk-tabs {
   display: flex;
+  align-items: center;
   gap: 6px;
   overflow-x: auto;
   padding: 6px 0 14px;
-  margin-bottom: 18px;
-  border-bottom: 1px solid var(--border);
-  scrollbar-width: thin;
+  scrollbar-width: none;
+}
+
+.mk-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.mk-tabs__divider {
+  flex-shrink: 0;
+  width: 1px;
+  align-self: stretch;
+  margin: 4px 6px;
+  background: var(--border);
 }
 
 .mk-tab {
@@ -276,36 +443,99 @@
   color: var(--accent-neon);
 }
 
-/* ---- Grilla de productos: 1 col móvil / 2 tablet / 3 desktop (exactas) ---- */
+/* ---- Grilla de productos "E-commerce Dark UI": 1 col móvil / 2 tablet /
+   4 desktop (grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6) ---- */
 .mk-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   align-items: stretch;
-  gap: 24px 24px;
-  row-gap: 36px;
-  perspective: var(--perspective);
+  gap: 24px;
 }
 
-@media (max-width: 1024px) {
+@media (min-width: 640px) {
   .mk-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 620px) {
+@media (min-width: 1024px) {
   .mk-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
-/* El marco (tilt 3D, foto, CornerFrame) vive en el common @ui/ProductCard
+/* ---- Vista "Horizontal": una columna, tarjetas a todo el ancho ---- */
+.mk-grid.mk-grid--list {
+  grid-template-columns: 1fr;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+/* ---- Tarjeta de producto "Blocky": bloques planos, sin glass/gradiente,
+   compacta (menos padding/gaps que la ProductCard base). ---- */
+.mk-grid .product-card {
+  background: #1a1a1a;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.mk-grid .product-card__photo {
+  background: #252525;
+  padding: 18px;
+}
+
+.mk-grid .product-card__real-img {
+  position: static;
+  width: 100%;
+  max-width: 150px;
+  aspect-ratio: 1 / 1;
+  transform: none;
+  filter: none;
+}
+
+.mk-grid .product-card:hover .product-card__real-img {
+  transform: none;
+  filter: none;
+}
+
+.mk-grid .product-card__body {
+  padding: 14px;
+}
+
+.mk-grid .product-card__body-main {
+  gap: 4px;
+}
+
+/* Sin línea divisoria arriba: el precio ahora es una placa (badge) con
+   glow difuminado ("efecto derrame") en vez de texto con gradiente. */
+.mk-grid .product-card__subtitle {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.mk-price-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--gradient-brand);
+  color: var(--on-brand);
+  font-size: 1.05rem;
+  font-weight: 800;
+  box-shadow: 0 0 18px 2px rgba(0, 170, 255, 0.45);
+}
+
+.mk-grid .product-card__features {
+  margin-top: 8px;
+  gap: 4px;
+}
+
+.mk-grid .product-card__cta-wrap {
+  padding-top: 10px;
+}
+
+/* El marco (tilt 3D, foto) vive en el common @ui/ProductCard
    (.product-card*, ver ui/templates/templates.css). Aquí solo queda el
    contenido específico de la autoparte (badges, precio, meta). */
-
-.mk-card__icon {
-  font-size: 3.4rem;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.4));
-}
 
 .mk-card__badges {
   position: absolute;
@@ -367,42 +597,84 @@
   flex-wrap: wrap;
 }
 
-/* ---- Bento de categorías ---- */
-.categories-dropdown {
+.mk-guided__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: var(--accent-neon);
+  background: var(--accent-soft);
+}
+
+/* ---- Bento de categorías: botón que abre el popup ---- */
+.categories-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--gradient-surface);
-  overflow: hidden;
   box-shadow: var(--shadow-soft);
+  color: var(--text-primary);
+  font-weight: 700;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.categories-dropdown__summary {
+.categories-trigger:hover {
+  border-color: var(--accent-neon);
+  box-shadow: var(--glow-accent);
+}
+
+/* ---- Popup de categorías ---- */
+.categories-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 16px;
-  cursor: pointer;
-  list-style: none;
-  font-weight: 700;
-  color: var(--text-primary);
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg-overlay);
+  animation: fadeInUp var(--transition-fast) both;
 }
 
-.categories-dropdown__summary::-webkit-details-marker {
+.categories-modal {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  max-height: 80vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 32px;
+  border-radius: var(--radius-lg);
+}
+
+.categories-modal::-webkit-scrollbar {
   display: none;
 }
 
-.categories-dropdown__chevron {
-  transition: transform var(--transition-fast);
+.categories-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
   color: var(--text-muted);
+  background: none;
+  border: none;
 }
 
-.categories-dropdown[open] .categories-dropdown__chevron {
-  transform: rotate(180deg);
+.categories-modal__close:hover {
+  color: var(--text-primary);
 }
 
-.categories-dropdown__body {
-  padding: 0 12px 12px;
+.categories-modal__title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  padding-right: 32px;
 }
 
 .bento {
@@ -411,7 +683,6 @@
   grid-auto-rows: 158px;
   grid-auto-flow: dense;
   gap: 14px;
-  perspective: var(--perspective);
 }
 
 .bento--stacked {
@@ -430,7 +701,6 @@
   border: 1px solid var(--border);
   background: var(--gradient-surface);
   overflow: hidden;
-  transform-style: preserve-3d;
   transition: transform var(--transition-spring), border-color var(--transition-smooth),
     box-shadow var(--transition-smooth);
   animation: fadeInUp var(--transition-smooth) both;
@@ -448,12 +718,12 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(120% 90% at 100% 0%, rgba(27, 196, 182, 0.1), transparent 55%);
+  background: radial-gradient(120% 90% at 100% 0%, rgba(0, 170, 255, 0.1), transparent 55%);
   pointer-events: none;
 }
 
 .bento__item:hover {
-  transform: translateY(-6px) rotateX(4deg) rotateY(-4deg);
+  transform: translateY(-6px);
   border-color: var(--accent-neon);
   box-shadow: var(--shadow-3d-hover);
 }
@@ -565,7 +835,7 @@
 .mk-detail {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 32px;
+  gap: 40px;
   padding: 28px 0 80px;
   align-items: start;
 }
@@ -576,17 +846,58 @@
   }
 }
 
+.mk-detail__media {
+  position: relative;
+}
+
 .mk-detail__photo {
+  position: relative;
   height: 340px;
   border-radius: var(--radius-lg);
-  display: grid;
-  place-items: center;
+  overflow: hidden;
+  background: var(--gradient-surface);
   border: 1px solid var(--border);
 }
 
-.mk-detail__photo .mk-card__icon {
-  font-size: 7rem;
-  animation: float 4s ease-in-out infinite;
+@media (max-width: 480px) {
+  .mk-detail__photo {
+    height: 260px;
+  }
+}
+
+.mk-detail__real-img {
+  position: absolute;
+  inset: -4%;
+  width: 108%;
+  height: 108%;
+  object-fit: cover;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mk-detail__media:hover .mk-detail__real-img {
+  transform: scale(1.04);
+}
+
+.mk-detail__badge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: var(--radius-pill);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  border: 1px solid var(--glass-border);
+  color: var(--accent-neon);
+  font-weight: 800;
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  box-shadow: var(--glow-accent);
 }
 
 .mk-specs {

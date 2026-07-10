@@ -62,7 +62,16 @@ export function VehicleShowcaseCard({
   return (
     <section className={`vshowcase ${className}`.trim()}>
       {/* eslint-disable-next-line @next/next/no-img-element -- imagen de contenido, cubre todo el card */}
-      <img className="vshowcase__bg" src={imageUrl} alt={imageAlt} />
+      <img
+        className="vshowcase__bg"
+        src={imageUrl}
+        alt={imageAlt}
+        loading="lazy"
+        decoding="async"
+        onError={(e) => {
+          e.currentTarget.style.display = "none";
+        }}
+      />
 
       <div className="vshowcase__left">
         <div className="vshowcase__hp animate-in">

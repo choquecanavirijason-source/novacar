@@ -1,92 +1,68 @@
 /**
  * Presentation · Component · HeroShowcase
- * Hero principal estilo HUD Sci-Fi: fondo radial + texto gigante/cápsula detrás,
- * auto en vista de pájaro superpuesto, dashboard inferior curvo de 5 segmentos
- * (03 activo) y paginadores laterales. Al hacer click en el auto se abre
- * VehiclePartsModal con el estado de sus autopartes.
+ * Hero cinematográfico (estilo Brator): lienzo negro con degradado radial +
+ * "suelo" simulado. El contenido vive dentro de `.hero3__inner` — el mismo
+ * `.container` (max-width + centrado) que usa el Navbar — para que el
+ * bloque de texto quede siempre alineado con el logo, sin importar el ancho
+ * de pantalla. Texto en la mitad izquierda; auto (PNG transparente) en la
+ * mitad derecha, con posicionamiento absoluto interno para poder superponer
+ * ligeramente el texto sin afectar su ancho/posición.
  */
 
 "use client";
 
-import { type CSSProperties } from "react";
-import { Gauge, Wind, Layers, SlidersHorizontal, BatteryCharging, type LucideIcon } from "lucide-react";
+import { Gauge } from "lucide-react";
 import { useTranslation } from "@core/i18n/I18nProvider";
+import { Button } from "@ui/atoms/Button";
 import "../styles/hero-showcase.css";
 
-const SIDE_DOTS = 5;
-const ACTIVE_INDEX = 2;
-
-interface InactiveSegment {
-  icon: LucideIcon;
-  label: string;
-}
+const HERO_CAR_PNG = "/car-azul-hero.png";
 
 export function HeroShowcase() {
   const { t } = useTranslation();
 
-  const segments: Array<InactiveSegment | null> = [
-    { icon: Wind, label: t("hero2.seg1") },
-    { icon: Layers, label: t("hero2.seg2") },
-    null,
-    { icon: SlidersHorizontal, label: t("hero2.seg4") },
-    { icon: BatteryCharging, label: t("hero2.seg5") },
-  ];
-
   return (
-    <section className="hero2">
-      <div className="hero2__bg" aria-hidden />
+    <section className="hero3">
+      <div className="hero3__bg" aria-hidden />
 
-      <div className="hero2__bgtext" aria-hidden>
-        <span className="hero2__capsule" />
-        <h1 className="hero2__giant">{t("hero2.bgWord")}</h1>
-      </div>
+      <div className="hero3__inner container">
+        <div className="hero3__copy">
+          <h1 className="hero3__title">
+            <span className="hero3__title-line hero3__title-line--metal">
+              {t("hero2.titleTop")}
+            </span>
+            <span className="hero3__title-line hero3__title-line--gold">
+              {t("hero2.titleBottom")}
+            </span>
+          </h1>
 
-      <div className="hero2__side hero2__side--left" aria-hidden>
-        {Array.from({ length: SIDE_DOTS }).map((_, i) => (
-          <span key={i} className={`hero2__dot ${i === ACTIVE_INDEX ? "hero2__dot--active" : ""}`} />
-        ))}
-      </div>
-      <div className="hero2__side hero2__side--right" aria-hidden>
-        {Array.from({ length: SIDE_DOTS }).map((_, i) => (
-          <span key={i} className={`hero2__dot ${i === ACTIVE_INDEX ? "hero2__dot--active" : ""}`} />
-        ))}
-      </div>
+          <p className="hero3__desc">{t("hero2.desc")}</p>
 
-      <div className="hero2__hud">
-        {segments.map((seg, i) => {
-          const isActive = i === ACTIVE_INDEX;
-          const Icon = seg?.icon;
-          const tiltStyle = { "--hero2-tilt": `${(i - ACTIVE_INDEX) * 6}deg` } as CSSProperties;
+          <div className="hero3__gauge">
+            <Gauge size={16} strokeWidth={1.75} aria-hidden />
+            <span>{t("hero2.gauge")}</span>
+          </div>
 
-          return (
-            <div
-              key={i}
-              className={`hero2__segment ${isActive ? "hero2__segment--active" : ""}`}
-              style={tiltStyle}
-            >
-              <span className="hero2__segment-index">0{i + 1}</span>
+          <div className="hero3__actions">
+            <Button href="/catalogo">{t("hero.ctaCars")}</Button>
+            <Button href="/autopartes" variant="ghost">{t("hero.ctaParts")}</Button>
+          </div>
+        </div>
 
-              {isActive ? (
-                <div className="hero2__segment-content">
-                  <h2 className="hero2__segment-title">{t("hero2.title")}</h2>
-                  <p className="hero2__segment-desc">{t("hero2.desc")}</p>
-                  <div className="hero2__gauge">
-                    <Gauge size={16} strokeWidth={1.75} aria-hidden />
-                    <span>{t("hero2.gauge")}</span>
-                  </div>
-                </div>
-              ) : (
-                Icon &&
-                seg && (
-                  <div className="hero2__segment-inactive">
-                    <Icon size={20} strokeWidth={1.5} aria-hidden />
-                    <span>{seg.label}</span>
-                  </div>
-                )
-              )}
-            </div>
-          );
-        })}
+        <div className="hero3__car-slot" aria-hidden>
+          <div className="hero3__car-shadow" />
+          {/* eslint-disable-next-line @next/next/no-img-element -- PNG transparente manual, con fallback silencioso */}
+          <img
+            className="hero3__car-img"
+            src={HERO_CAR_PNG}
+            alt=""
+            loading="eager"
+            decoding="async"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+        </div>
       </div>
     </section>
   );

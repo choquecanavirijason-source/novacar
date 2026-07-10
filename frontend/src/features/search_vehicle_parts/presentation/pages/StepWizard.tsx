@@ -9,6 +9,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { BatteryCharging, Zap, type LucideIcon } from "lucide-react";
 import { useSearchWizardState, type WizardStep } from "../hooks/useSearchWizardState";
 import { VehicleSelector } from "../components/VehicleSelector";
 import { SearchBarPredictive } from "../components/SearchBarPredictive";
@@ -30,9 +31,9 @@ export function StepWizard() {
 
   const steps = [t("finder.stepBrand"), t("finder.stepModel"), t("finder.stepYear"), t("finder.stepCategory")];
 
-  const categories: { id: PartCategory; icon: string; name: string; desc: string }[] = [
-    { id: "battery", icon: "🔋", name: t("finder.batteries"), desc: t("finder.batteriesDesc") },
-    { id: "fuse", icon: "⚡", name: t("finder.fuses"), desc: t("finder.fusesDesc") },
+  const categories: { id: PartCategory; icon: LucideIcon; name: string; desc: string }[] = [
+    { id: "battery", icon: BatteryCharging, name: t("finder.batteries"), desc: t("finder.batteriesDesc") },
+    { id: "fuse", icon: Zap, name: t("finder.fuses"), desc: t("finder.fusesDesc") },
   ];
 
   return (
@@ -135,7 +136,9 @@ export function StepWizard() {
                       : undefined
                   }
                 >
-                  <div className="category-card__icon">{c.icon}</div>
+                  <div className="category-card__icon">
+                    <c.icon size={26} strokeWidth={1.5} aria-hidden />
+                  </div>
                   <div className="category-card__name">{c.name}</div>
                   <div className="category-card__desc">{c.desc}</div>
                 </button>

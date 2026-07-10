@@ -6,7 +6,7 @@ import { createApiClient } from "@core/http/createApiClient";
 import { getAuthToken } from "@core/auth/token";
 import type { HttpClient } from "@core/http/HttpClient";
 import type { AnalyticsSummary } from "../../domain/entities/DashboardStats";
-import type { InventoryItem } from "../../domain/entities/InventoryItem";
+import type { InventoryItem, NewInventoryItem } from "../../domain/entities/InventoryItem";
 import type { InventoryItemDTO } from "../models/InventoryItemDTO";
 import type { AnalyticsSummaryDTO } from "../models/AnalyticsSummaryDTO";
 import { mapInventory, mapAnalytics } from "../mappers/adminMapper";
@@ -15,6 +15,7 @@ export interface AdminRemoteDataSource {
   fetchInventory(): Promise<InventoryItem[]>;
   fetchAnalytics(): Promise<AnalyticsSummary>;
   patchStock(itemId: string, newStock: number): Promise<InventoryItem>;
+  createItem(input: NewInventoryItem): Promise<InventoryItem>;
 }
 
 export class AdminHttpDataSource implements AdminRemoteDataSource {
@@ -37,6 +38,17 @@ export class AdminHttpDataSource implements AdminRemoteDataSource {
   async patchStock(itemId: string, newStock: number) {
     const dto = await this.http().patch<InventoryItemDTO>(`/admin/inventory/${itemId}/stock`, {
       stock: newStock,
+    });
+    return mapInventory(dto);
+  }
+
+  async createItem(input: NewInventoryItem) {
+    const dto = await this.http().post<InventoryItemDTO>("/admin/inventory", {
+      name: input.name,
+      category: input.category,
+      stock: input.stock,
+      price: input.price,
+      reorder_level: input.reorderLevel,
     });
     return mapInventory(dto);
   }
@@ -81,5 +93,16 @@ export class AdminMockDataSource implements AdminRemoteDataSource {
     const updated = INVENTORY.find((i) => i.id === itemId);
     if (!updated) return Promise.reject(new Error("Ítem no encontrado."));
     return delay(updated);
+  }
+
+  createItem(input: NewInventoryItem): Promise<InventoryItem> {
+    const prefix = input.category === "vehicle" ? "VH" : input.category === "battery" ? "BAT" : "FUS";
+    const item: InventoryItem = {
+      id: `${prefix.toLowerCase()}-${Date.now()}`,
+      sku: `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`,
+      ...input,
+    };
+    INVENTORY = [item, ...INVENTORY];
+    return delay(item);
   }
 }

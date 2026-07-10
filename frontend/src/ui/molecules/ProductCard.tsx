@@ -1,22 +1,27 @@
 /**
  * Molecule · ProductCard
  * Common reutilizable para tarjetas de producto (autos, autopartes, ...).
- * Estructura fija: foto arriba (100% ancho, tilt 3D + pop-out + CornerFrame),
- * cuerpo en columna (título, subtítulo, 3 features cortas alineadas a la
- * izquierda) y un CTA de ancho completo siempre anclado abajo (margin-top:auto),
- * sin importar cuánto texto tenga el cuerpo. Pensada para vivir dentro de un
+ * Estructura fija: foto arriba (100% ancho, tilt 3D + pop-out), cuerpo en
+ * columna (título, subtítulo, 3 features cortas alineadas a la izquierda)
+ * y un CTA de ancho completo siempre anclado abajo (margin-top:auto), sin
+ * importar cuánto texto tenga el cuerpo. Pensada para vivir dentro de un
  * grid responsivo (1 col móvil / 2 tablet / 3 desktop, ver .product-grid).
  */
 
+"use client";
+
 import Link from "next/link";
-import type { CSSProperties, ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import type { Route } from "next";
-import { CornerFrame } from "../atoms/CornerFrame";
 
 interface ProductCardProps {
-  /** Navega al hacer click en el CTA (ignorado si se pasa `onCtaClick`). */
+  /**
+   * Navega al hacer click en la tarjeta. Si también se pasa `onCtaClick`,
+   * la tarjeta completa navega a `href` y solo el botón CTA (con
+   * stopPropagation) dispara `onCtaClick` en su lugar.
+   */
   href?: Route | string;
-  /** Si se pasa, el CTA abre algo (ej. popup) en vez de navegar. */
+  /** Acción del CTA (ej. abrir popup). Ver nota de `href`. */
   onCtaClick?: () => void;
   index?: number;
   /** Gradiente de fondo de la foto (mientras no haya imagen real definitiva). */
@@ -61,9 +66,11 @@ export function ProductCard({
   className = "",
   style,
 }: ProductCardProps) {
+  const [imgFailed, setImgFailed] = useState(false);
+
   const photo = (
     <div
-      className="product-card__photo corner-frame"
+      className="product-card__photo"
       style={{
         background: `linear-gradient(140deg, ${accentFrom}, ${accentTo})`,
         height: photoHeight,
@@ -71,15 +78,21 @@ export function ProductCard({
     >
       {photoTopSlot}
 
-      {imageUrl ? (
+      {imageUrl && !imgFailed ? (
         // eslint-disable-next-line @next/next/no-img-element -- placeholder, se reemplaza por asset real
-        <img className="product-card__real-img" src={imageUrl} alt={imageAlt} loading="lazy" />
+        <img
+          className="product-card__real-img"
+          src={imageUrl}
+          alt={imageAlt}
+          loading="lazy"
+          decoding="async"
+          onError={() => setImgFailed(true)}
+        />
       ) : (
         photoIcon && <span className="product-card__icon">{photoIcon}</span>
       )}
 
       {photoCornerSlot}
-      <CornerFrame />
     </div>
   );
 
@@ -96,26 +109,42 @@ export function ProductCard({
       </div>
 
       <div className="product-card__cta-wrap">
-        <span className="product-card__cta">{ctaLabel}</span>
+        {onCtaClick && href ? (
+          <button
+            type="button"
+            className="product-card__cta product-card__cta--btn"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onCtaClick();
+            }}
+          >
+            <span className="product-card__cta-label">{ctaLabel}</span>
+          </button>
+        ) : (
+          <span className="product-card__cta">
+            <span className="product-card__cta-label">{ctaLabel}</span>
+          </span>
+        )}
       </div>
     </div>
   );
 
   const cardStyle = { animationDelay: `${index * 50}ms`, ...style };
 
-  if (onCtaClick) {
+  if (href) {
     return (
-      <button type="button" className={`product-card ${className}`.trim()} style={cardStyle} onClick={onCtaClick}>
+      <Link href={href as Route} className={`product-card ${className}`.trim()} style={cardStyle}>
         {photo}
         {body}
-      </button>
+      </Link>
     );
   }
 
   return (
-    <Link href={(href ?? "#") as Route} className={`product-card ${className}`.trim()} style={cardStyle}>
+    <button type="button" className={`product-card ${className}`.trim()} style={cardStyle} onClick={onCtaClick}>
       {photo}
       {body}
-    </Link>
+    </button>
   );
 }

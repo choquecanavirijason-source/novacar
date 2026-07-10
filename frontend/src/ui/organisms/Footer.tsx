@@ -1,6 +1,6 @@
 /**
  * Organism · Footer
- * Pie global traducido.
+ * Pie global traducido, 4 columnas: marca, enlaces rápidos, contacto, newsletter.
  */
 
 "use client";
@@ -9,36 +9,49 @@ import Link from "next/link";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Logo } from "../atoms/Logo";
 
+const QUICK_LINKS = [
+  { href: "/", key: "nav.home" },
+  { href: "/catalogo", key: "nav.catalog" },
+  { href: "/autopartes", key: "nav.parts" },
+  { href: "/buscador", key: "nav.finder" },
+  { href: "/admin", key: "nav.admin" },
+] as const;
+
 export function Footer() {
   const { t } = useTranslation();
 
   return (
     <footer className="footer">
-      <div className="container footer__inner">
-        <div style={{ maxWidth: 280 }}>
+      <div className="container footer__grid">
+        <div className="footer__col">
           <Logo />
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginTop: 10 }}>
-            {t("footer.tagline")}
-          </p>
+          <p className="footer__desc">{t("footer.tagline")}</p>
         </div>
 
         <div className="footer__col">
           <span className="footer__title">{t("footer.explore")}</span>
-          <Link href="/catalogo" className="footer__link">{t("nav.catalog")}</Link>
-          <Link href="/buscador" className="footer__link">{t("nav.finder")}</Link>
-          <Link href="/admin" className="footer__link">{t("nav.admin")}</Link>
+          {QUICK_LINKS.map((link) => (
+            <Link key={link.href} href={link.href} className="footer__link">
+              {t(link.key)}
+            </Link>
+          ))}
         </div>
 
         <div className="footer__col">
-          <span className="footer__title">{t("footer.company")}</span>
-          <span className="footer__link">{t("footer.about")}</span>
-          <span className="footer__link">{t("footer.contact")}</span>
-          <span className="footer__link">{t("footer.careers")}</span>
+          <span className="footer__title">{t("footer.contact")}</span>
+          <span className="footer__text">{t("footer.contactAddress")}</span>
+          <span className="footer__text">{t("footer.contactPhone")}</span>
+          <span className="footer__text">{t("footer.contactEmail")}</span>
+        </div>
+
+        <div className="footer__col">
+          <span className="footer__title">{t("footer.newsletterTitle")}</span>
+          <p className="footer__text">{t("footer.newsletterDesc")}</p>
         </div>
       </div>
 
       <div className="footer__bottom">
-        © {2026} AutoDrive · {t("footer.rights")}
+        © {2026} NOVACAR · {t("footer.rights")}
       </div>
     </footer>
   );

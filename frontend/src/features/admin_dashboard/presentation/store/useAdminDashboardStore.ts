@@ -7,7 +7,7 @@
 
 import { create } from "zustand";
 import type { AnalyticsSummary } from "../../domain/entities/DashboardStats";
-import type { InventoryItem } from "../../domain/entities/InventoryItem";
+import type { InventoryItem, NewInventoryItem } from "../../domain/entities/InventoryItem";
 import { adminUseCases } from "../../di";
 
 interface AdminDashboardState {
@@ -18,6 +18,7 @@ interface AdminDashboardState {
 
   load: () => Promise<void>;
   updateStock: (itemId: string, newStock: number) => Promise<void>;
+  addItem: (input: NewInventoryItem) => Promise<boolean>;
 }
 
 export const useAdminDashboardStore = create<AdminDashboardState>((set, get) => ({
@@ -47,6 +48,17 @@ export const useAdminDashboardStore = create<AdminDashboardState>((set, get) => 
       });
     } catch (e) {
       set({ error: (e as Error).message });
+    }
+  },
+
+  addItem: async (input) => {
+    try {
+      const created = await adminUseCases.createInventoryItem.execute(input);
+      set({ inventory: [created, ...get().inventory] });
+      return true;
+    } catch (e) {
+      set({ error: (e as Error).message });
+      return false;
     }
   },
 }));

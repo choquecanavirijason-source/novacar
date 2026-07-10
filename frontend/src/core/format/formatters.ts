@@ -3,13 +3,20 @@
  * Funciones puras de presentación de datos (cross-cutting, sin estado).
  */
 
-const currencyFormatter = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import type { Locale } from "@core/i18n/dictionaries";
 
-export const formatCurrency = (value: number): string => currencyFormatter.format(value);
+/**
+ * El precio siempre es en pesos mexicanos (MXN) — eso no cambia con el idioma.
+ * Pero el locale de formato sí debe seguir la UI: en "en", Intl antepone "MX$"
+ * en vez de "$" a secas, para no confundir a un usuario angloparlante con USD.
+ */
+const CURRENCY_FORMATTER: Record<Locale, Intl.NumberFormat> = {
+  es: new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }),
+  en: new Intl.NumberFormat("en-US", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }),
+};
+
+export const formatCurrency = (value: number, locale: Locale = "es"): string =>
+  CURRENCY_FORMATTER[locale].format(value);
 
 export const formatAmperage = (amp: number): string => `${amp} A`;
 

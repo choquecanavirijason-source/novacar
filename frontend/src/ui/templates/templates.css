@@ -11,7 +11,6 @@
   align-items: stretch;
   gap: 24px 24px;
   row-gap: 36px;
-  perspective: var(--perspective);
 }
 
 @media (max-width: 1024px) {
@@ -37,21 +36,17 @@
   height: 100%;
   overflow: visible;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
   background: var(--gradient-surface);
   box-shadow: var(--shadow-soft);
   font-family: inherit;
   text-align: left;
   cursor: pointer;
-  transform-style: preserve-3d;
-  transition: transform var(--transition-spring), border-color var(--transition-smooth),
-    box-shadow var(--transition-smooth);
+  transition: transform var(--transition-spring), box-shadow var(--transition-smooth);
   animation: fadeInUp var(--transition-smooth) both;
 }
 
 .product-card:hover {
-  transform: translateY(-8px) rotateX(4deg) rotateY(-4deg);
-  border-color: var(--primary-glow);
+  transform: translateY(-8px);
   box-shadow: var(--shadow-3d-hover);
 }
 
@@ -99,7 +94,7 @@
 
 .product-card:hover .product-card__real-img {
   transform: translateX(-50%) scale(1.14) translateY(-10px);
-  filter: drop-shadow(0 30px 34px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 40px rgba(27, 196, 182, 0.25));
+  filter: drop-shadow(0 30px 34px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 40px rgba(0, 170, 255, 0.25));
 }
 
 .product-card__body {
@@ -162,22 +157,55 @@
   padding-top: 16px;
 }
 
+/* Mismo acabado glossy que el sistema de botones global (.btn--primary):
+   barniz de cristal (::before) + bisel con inset shadows. Sin el skewX
+   real del sistema global porque, al ser un botón 100% del ancho de la
+   tarjeta, el paralelogramo cortaría los bordes de forma antinatural. */
 .product-card__cta {
+  position: relative;
   display: block;
   width: 100%;
   padding: 11px 0;
-  border-radius: var(--radius-pill);
+  overflow: hidden;
+  border-radius: var(--radius-btn);
   background: var(--gradient-brand);
   color: var(--on-brand);
   font-size: 0.86rem;
   font-weight: 700;
   text-align: center;
+  box-shadow: var(--glow-primary), inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.22);
   transition: transform var(--transition-spring), box-shadow var(--transition-smooth);
+}
+
+.product-card__cta-label {
+  position: relative;
+}
+
+.product-card__cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0) 55%,
+    rgba(0, 0, 0, 0.12) 100%
+  );
+  pointer-events: none;
 }
 
 .product-card:hover .product-card__cta {
   transform: translateY(-1px);
-  box-shadow: var(--glow-primary);
+  box-shadow: var(--glow-primary), var(--glow-accent), inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.22);
+}
+
+.product-card__cta--btn {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 /* ---- Section wrapper ---- */
@@ -256,7 +284,6 @@
   display: grid;
   place-items: center;
   min-height: 320px;
-  perspective: var(--perspective);
 }
 
 .tpl-hero__glass {
@@ -266,8 +293,8 @@
   aspect-ratio: 1 / 0.86;
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(120% 100% at 70% 10%, rgba(27, 196, 182, 0.3), transparent 55%),
-    radial-gradient(120% 120% at 10% 90%, rgba(16, 130, 126, 0.42), transparent 55%),
+    radial-gradient(120% 100% at 70% 10%, rgba(0, 170, 255, 0.3), transparent 55%),
+    radial-gradient(120% 120% at 10% 90%, rgba(0, 95, 143, 0.42), transparent 55%),
     var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur)) saturate(150%);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
@@ -276,13 +303,12 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  transform-style: preserve-3d;
   transition: transform var(--transition-spring), box-shadow var(--transition-smooth);
   animation: float3d 7s ease-in-out infinite;
 }
 
 .tpl-hero__glass:hover {
-  transform: rotateX(6deg) rotateY(-8deg) translateY(-6px) scale(1.02);
+  transform: translateY(-6px) scale(1.02);
   box-shadow: var(--shadow-3d-hover), var(--glow-primary);
   animation-play-state: paused;
 }
@@ -369,7 +395,7 @@
   border-radius: var(--radius-lg);
   border: 1px solid var(--glass-border);
   background:
-    radial-gradient(80% 120% at 50% 0%, rgba(16, 130, 126, 0.28), transparent 60%),
+    radial-gradient(80% 120% at 50% 0%, rgba(0, 95, 143, 0.28), transparent 60%),
     var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur)) saturate(140%);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
@@ -400,7 +426,6 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  perspective: var(--perspective);
 }
 
 @media (max-width: 880px) {
@@ -421,13 +446,12 @@
   border: 1px solid var(--border);
   background: var(--gradient-surface);
   text-align: center;
-  transform-style: preserve-3d;
   transition: transform var(--transition-spring), border-color var(--transition-smooth),
     box-shadow var(--transition-smooth);
 }
 
 .tpl-feature-card:hover {
-  transform: translateY(-6px) rotateX(5deg) rotateY(-5deg);
+  transform: translateY(-6px);
   border-color: var(--primary-glow);
   box-shadow: var(--shadow-3d-hover);
 }
@@ -439,8 +463,10 @@
   height: 60px;
   border-radius: 50%;
   font-size: 1.7rem;
+  color: var(--accent-neon);
   background: var(--primary-soft);
   border: 1px solid var(--border-strong);
+  filter: drop-shadow(0 0 8px rgba(0, 170, 255, 0.35));
   margin-bottom: 14px;
 }
 
@@ -455,9 +481,98 @@
   line-height: 1.5;
 }
 
+/* ---- ConnectedNodes: nodos dorados unidos por una línea con "paradas" ---- */
+.node-track {
+  position: relative;
+  padding-block: 8px;
+}
+
+.node-track__line {
+  position: absolute;
+  top: 32px;
+  left: 6%;
+  right: 6%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--border-strong) 10%, var(--border-strong) 90%, transparent);
+  z-index: 0;
+}
+
+.node-track__stop {
+  position: absolute;
+  top: 32px;
+  width: 7px;
+  height: 7px;
+  background: var(--accent-neon);
+  transform: translate(-50%, -50%) rotate(45deg);
+  box-shadow: 0 0 6px rgba(0, 170, 255, 0.5);
+  z-index: 1;
+}
+
+.node-track__items {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.node-track__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 240px;
+  text-align: center;
+  animation: fadeInUp var(--transition-smooth) both;
+}
+
+.node-track__node {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  color: var(--on-brand);
+  box-shadow: var(--glow-primary);
+  margin-bottom: 18px;
+}
+
+.node-track__title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.node-track__desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+@media (max-width: 720px) {
+  .node-track__line,
+  .node-track__stop {
+    display: none;
+  }
+
+  .node-track__items {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 32px;
+  }
+
+  .node-track__item {
+    flex: 0 1 45%;
+  }
+}
+
 /* ---- Tile grid (categorías) ---- */
 .tpl-grid--tiles {
-  perspective: var(--perspective);
 }
 
 .tpl-tile {
@@ -468,14 +583,13 @@
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background: var(--gradient-surface);
-  transform-style: preserve-3d;
   transition: transform var(--transition-spring), border-color var(--transition-smooth),
     box-shadow var(--transition-smooth);
   animation: fadeInUp var(--transition-smooth) both;
 }
 
 .tpl-tile:hover {
-  transform: translateY(-6px) rotateX(4deg) rotateY(-4deg);
+  transform: translateY(-6px);
   border-color: var(--accent-neon);
   box-shadow: var(--shadow-3d-hover);
 }
@@ -508,7 +622,6 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
-  perspective: var(--perspective);
 }
 
 @media (max-width: 760px) {
@@ -526,12 +639,11 @@
   color: var(--on-brand);
   overflow: hidden;
   box-shadow: var(--shadow-soft);
-  transform-style: preserve-3d;
   transition: transform var(--transition-spring), box-shadow var(--transition-smooth);
 }
 
 .tpl-promo-card:hover {
-  transform: translateY(-6px) rotateX(4deg) rotateY(4deg);
+  transform: translateY(-6px);
   box-shadow: var(--shadow-3d-hover);
 }
 
@@ -563,7 +675,6 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
-  perspective: var(--perspective);
 }
 
 @media (max-width: 880px) {
@@ -581,13 +692,12 @@
   border: 1px solid var(--border);
   background: var(--gradient-surface);
   box-shadow: var(--shadow-soft);
-  transform-style: preserve-3d;
   transition: transform var(--transition-spring), border-color var(--transition-smooth),
     box-shadow var(--transition-smooth);
 }
 
 .tpl-testi-card:hover {
-  transform: translateY(-6px) rotateX(4deg) rotateY(-4deg);
+  transform: translateY(-6px);
   border-color: var(--primary-glow);
   box-shadow: var(--shadow-3d-hover);
 }

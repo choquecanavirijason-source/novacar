@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!useApi) {
       const session: AuthUser = {
         id: "1",
-        name: "Admin AutoDrive",
+        name: "Admin NOVACAR",
         email: email.trim(),
         role: "admin",
       };

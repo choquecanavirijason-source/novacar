@@ -1,271 +1,232 @@
 /* ============================================================
-   HeroShowcase · Hero principal (HUD Sci-Fi de auto eléctrico)
-   Full-bleed, se monta pegado bajo el Navbar fijo/transparente
-   (margin-top negativo cancela el padding-top del body para que
-   el nav flote transparente sobre esta sección). Usa tokens :root.
+   HeroShowcase · Hero cinematográfico (estilo Brator)
+   Lienzo negro full-bleed (.hero3) con degradado radial + "suelo" simulado.
+   El contenido real vive en .hero3__inner, que reutiliza .container
+   (mismo max-width + centrado que .nav__inner) para que el texto quede
+   siempre alineado con el logo del Navbar, en cualquier ancho de pantalla.
+   Mobile-first: columna apilada por defecto, fila 50/50 desde 960px.
+   Se monta pegado bajo el Navbar fijo/transparente (margin-top negativo
+   cancela el padding-top del body). Usa tokens :root (negro + oro).
    ============================================================ */
 
-.hero2 {
+.hero3 {
   position: relative;
-  overflow: hidden;
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  margin-top: -72px;
-  min-height: 100vh;
-  background: #030303;
+  margin-top: -72px; /* Cancela el padding-top del body */
+  overflow: hidden;
+  background: #0d0d0d;
   isolation: isolate;
 }
 
-/* ---- Fondo: resplandor radial de alto contraste ---- */
-.hero2__bg {
+/* Degradado radial sutil en el centro + degradado/textura inferior (suelo) */
+.hero3__bg {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: radial-gradient(
-    55% 55% at 50% 42%,
-    rgba(27, 196, 182, 0.65) 0%,
-    rgba(16, 130, 126, 0.28) 35%,
-    rgba(8, 8, 8, 0.92) 68%,
-    #030303 100%
-  );
+  background:
+    radial-gradient(ellipse 65% 55% at 50% 32%, rgba(0, 170, 255, 0.12) 0%, transparent 68%),
+    linear-gradient(180deg, transparent 0%, transparent 52%, rgba(0, 0, 0, 0.6) 80%, #050505 100%);
 }
 
-/* ---- Capa 1: texto gigante + cápsula sci-fi ---- */
-.hero2__bgtext {
+.hero3__bg::after {
+  content: "";
   position: absolute;
-  inset: 0;
+  inset: auto 0 0 0;
+  height: 22%;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.02) 0px,
+    rgba(255, 255, 255, 0.02) 1px,
+    transparent 1px,
+    transparent 44px
+  );
+  mask-image: linear-gradient(180deg, transparent, #000 65%);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 65%);
+}
+
+/* ---- Contenedor de contenido: mismo box model que .nav__inner ---- */
+.hero3__inner {
+  position: relative;
   z-index: 1;
-  display: grid;
-  place-items: center;
-}
-
-.hero2__capsule {
-  position: absolute;
-  width: min(78vw, 900px);
-  height: 220px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  clip-path: polygon(
-    48px 0,
-    calc(100% - 48px) 0,
-    100% 48px,
-    100% calc(100% - 48px),
-    calc(100% - 48px) 100%,
-    48px 100%,
-    0 calc(100% - 48px),
-    0 48px
-  );
-}
-
-.hero2__giant {
-  position: relative;
-  font-size: clamp(3.6rem, 14vw, 11rem);
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #fff;
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.35);
-  text-shadow:
-    0 2px 0 #c8c8c8,
-    0 4px 0 #9a9a9a,
-    0 8px 24px rgba(0, 0, 0, 0.6),
-    0 0 60px rgba(255, 255, 255, 0.15);
-}
-
-/* ---- Capa 4: paginadores laterales ---- */
-.hero2__side {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 4;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 18px;
+  min-height: 80vh;
+  padding-block: 140px 56px; /* Deja espacio real bajo el Navbar fijo (72px) en mobile */
+  gap: 32px;
 }
 
-.hero2__side--left {
-  left: 28px;
-}
-
-.hero2__side--right {
-  right: 28px;
-}
-
-.hero2__dot {
+.hero3__copy {
   position: relative;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-.hero2__dot--active::after {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
-}
-
-/* ---- Capa 3: HUD dashboard inferior curvo ---- */
-.hero2__hud {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
   z-index: 2;
-  display: flex;
-  height: 210px;
-  overflow: hidden;
-  background: linear-gradient(180deg, rgba(3, 3, 3, 0) 0%, rgba(3, 3, 3, 0.85) 30%, #030303 100%);
-  border-radius: 50% 50% 0 0 / 90px 90px 0 0;
-}
-
-.hero2__segment {
-  position: relative;
-  flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding-top: 26px;
-  border-top: 2px solid rgba(255, 255, 255, 0.08);
+  text-align: left;
 }
 
-.hero2__segment::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  transform: rotate(var(--hero2-tilt, 0deg));
-  transform-origin: bottom center;
-}
-
-.hero2__segment:first-child::before {
-  display: none;
-}
-
-.hero2__segment--active {
-  border-top-color: #fff;
-  box-shadow: 0 -1px 24px rgba(255, 255, 255, 0.3);
-}
-
-.hero2__segment-index {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.hero2__segment--active .hero2__segment-index {
-  color: #fff;
-}
-
-.hero2__segment-inactive {
+.hero3__title {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.hero3__title-line {
+  font-size: clamp(2.4rem, 6.2vw, 5.5rem);
+}
+
+.hero3__title-line--metal {
+  background: linear-gradient(
+    135deg,
+    var(--text-primary) 0%,
+    var(--text-muted) 45%,
+    var(--text-secondary) 65%,
+    var(--text-primary) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero3__title-line--gold {
+  color: var(--accent-neon);
+  text-shadow: var(--text-glow, none);
+}
+
+.hero3__desc {
+  color: var(--text-secondary);
+  font-size: 1.02rem;
+  line-height: 1.65;
+  max-width: 520px;
   margin-top: 22px;
-  color: rgba(255, 255, 255, 0.4);
 }
 
-.hero2__segment-inactive span {
-  font-size: 0.66rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  text-align: center;
-  max-width: 100px;
-}
-
-.hero2__segment-content {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 8px;
-  padding: 0 16px;
-}
-
-.hero2__segment-title {
-  color: #fff;
-  font-size: clamp(1rem, 1.8vw, 1.4rem);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  max-width: 380px;
-  line-height: 1.15;
-}
-
-.hero2__segment-desc {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.76rem;
-  max-width: 320px;
-  line-height: 1.5;
-}
-
-.hero2__gauge {
+.hero3__gauge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 2px;
-  padding: 7px 15px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  color: #fff;
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  width: fit-content;
+  margin-top: 24px;
+  padding: 9px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  color: var(--accent-neon);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
 }
 
-@media (max-width: 900px) {
-  .hero2__hud {
-    height: 180px;
-  }
-
-  .hero2__segment-inactive span {
-    display: none;
-  }
+.hero3__actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 30px;
 }
 
-@media (max-width: 640px) {
-  .hero2 {
-    min-height: 92vh;
-  }
-
-  .hero2__side {
-    display: none;
-  }
-
-  .hero2__capsule {
-    height: 150px;
-  }
-
-  .hero2__hud {
-    height: 160px;
-    border-radius: 50% 50% 0 0 / 50px 50px 0 0;
-  }
-
-  .hero2__segment {
-    padding-top: 16px;
-  }
-
-  .hero2__segment-desc {
-    display: none;
-  }
+/* ---- El auto: PNG transparente ---- */
+.hero3__car-slot {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 300px; /* Un poco más de altura en mobile */
+  display: flex;
+  align-items: flex-end; /* Alinea abajo en mobile */
+  justify-content: center;
+  pointer-events: none;
+  margin-top: auto; /* Empuja hacia abajo si hay espacio en mobile */
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero2__dot {
-    transition: none;
+.hero3__car-img {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto; /* Ancho automático para mantener proporción */
+  height: 100%; /* Ocupa el alto del slot */
+  object-fit: contain;
+  object-position: bottom; /* Centrado abajo */
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7)); /* Sombra más sutil */
+}
+
+/* Sombra de contacto en el "suelo" bajo el auto */
+.hero3__car-shadow {
+  position: absolute;
+  bottom: 4%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.6) 0%, transparent 72%);
+  filter: blur(3px);
+}
+
+/* ============================================================
+   Desktop Layout (960px+)
+   Cambia a flex-row para poner texto e imagen lado a lado.
+   ============================================================ */
+@media (min-width: 960px) {
+  .hero3 {
+    margin-top: -72px; /* Mantiene pegado al Navbar */
+  }
+
+  .hero3__inner {
+    flex-direction: row; /* Texto e imagen lado a lado */
+    align-items: center; /* Centrado vertical perfecto de ambas columnas */
+    padding-block: 96px 40px; /* Garantiza espacio real bajo el Navbar, no solo el centrado */
+    gap: 0; /* Usamos flex:50% en los hijos, no hace falta gap */
+    height: calc(100vh - 72px); /* Alto completo de pantalla menos Navbar */
+    min-height: 650px; /* Altura mínima para no colapsar */
+  }
+
+  .hero3__copy {
+    flex: 0 0 50%; /* Ocupa exactamente la mitad */
+    width: 50%;
+    padding-right: 40px; /* Espacio para que no pegue con el auto */
+    padding-bottom: 50px; /* Pequeño ajuste visual hacia arriba */
+  }
+
+  .hero3__car-slot {
+    flex: 0 0 50%; /* Ocupa la otra mitad */
+    width: 50%;
+    height: 100%;
+    align-self: stretch;
+    align-items: center; /* Centrado vertical interno para el absoluto */
+    justify-content: flex-start; /* Empieza desde la izquierda del slot */
+    margin-top: 0;
+  }
+
+  .hero3__car-img {
+    position: absolute;
+    /* --- EL CAMBIO CLAVE ESTÁ AQUÍ --- */
+    top: 50%; /* Lo alinea al 50% de la altura del hero */
+    transform: translateY(-50%) translateX(-46%); /* Centrado vertical matemático y ajuste horizontal (-46% = auto movido hacia el centro) */
+    bottom: auto; /* Cancela la alineación inferior de mobile */
+    left: 30%; /* Empieza centrado horizontalmente */
+    
+    width: 140%; /* Un poco más grande para superponer texto */
+    max-width: 950px; /* Tamaño máximo mayor */
+    height: auto; /* Mantener proporción */
+    object-position: center; /* Centrado interno de la imagen */
+    filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.6)); /* Sombra de contacto */
+  }
+
+  .hero3__car-shadow {
+    bottom: auto; /* Cancela mobile */
+    top: calc(50% + 20% + 20px); /* Posición calculada para quedar bajo el auto centrado */
+    transform: translateX(-50%) translateY(-50%);
+    width: 70%;
+    height: 30px;
+    left: 50%;
+    filter: blur(5px);
   }
 }

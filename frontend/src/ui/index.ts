@@ -13,6 +13,7 @@ export { Skeleton } from "./atoms/Skeleton";
 export { Logo } from "./atoms/Logo";
 export { Eyebrow } from "./atoms/Eyebrow";
 export { RatingStars } from "./atoms/RatingStars";
+export { ScrollReveal } from "./atoms/ScrollReveal";
 
 // molecules
 export { LanguageSwitcher } from "./molecules/LanguageSwitcher";
@@ -23,6 +24,10 @@ export { SectionHeader } from "./molecules/SectionHeader";
 export { EmptyState } from "./molecules/EmptyState";
 export { ErrorState } from "./molecules/ErrorState";
 export { ProductCard } from "./molecules/ProductCard";
+export { RouteLoading } from "./molecules/RouteLoading";
+export { Breadcrumbs } from "./molecules/Breadcrumbs";
+export type { BreadcrumbItem } from "./molecules/Breadcrumbs";
+export { Pagination } from "./molecules/Pagination";
 
 // organisms
 export { Navbar } from "./organisms/Navbar";
@@ -40,6 +45,8 @@ export { DetailLayout } from "./templates/DetailLayout";
 export { CTABand } from "./templates/CTABand";
 export { FeatureGrid } from "./templates/FeatureGrid";
 export type { FeatureItem } from "./templates/FeatureGrid";
+export { ConnectedNodes } from "./templates/ConnectedNodes";
+export type { NodeItem } from "./templates/ConnectedNodes";
 export { TileGrid } from "./templates/TileGrid";
 export type { TileItem } from "./templates/TileGrid";
 export { PromoRow } from "./templates/PromoRow";

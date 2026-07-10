@@ -24,6 +24,7 @@ import {
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Badge } from "@ui/atoms/Badge";
 import { Button } from "@ui/atoms/Button";
+import { useModalA11y } from "@ui/hooks/useModalA11y";
 import "../styles/vehicle-parts-modal.css";
 
 type PartStatus = "good" | "warning" | "critical";
@@ -61,6 +62,7 @@ export function VehiclePartsModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = MOCK_PARTS.find((p) => p.id === selectedId) ?? null;
+  const panelRef = useModalA11y<HTMLDivElement>(onClose);
 
   return (
     <div
@@ -70,7 +72,12 @@ export function VehiclePartsModal({ onClose }: { onClose: () => void }) {
       aria-label={t("vehicleParts.title")}
       onClick={onClose}
     >
-      <div className="vparts-panel glass-panel" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={panelRef}
+        tabIndex={-1}
+        className="vparts-panel glass-panel"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           type="button"
           className="vparts-close"

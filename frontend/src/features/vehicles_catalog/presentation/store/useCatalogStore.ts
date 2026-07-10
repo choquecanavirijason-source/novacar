@@ -19,8 +19,11 @@ interface CatalogState {
   filters: VehicleFilters;
   loading: boolean;
 
-  init: () => Promise<void>;
+  /** `preset` (ej. filtros leídos de la URL al montar) tiene prioridad sobre el estado previo. */
+  init: (preset?: VehicleFilters) => Promise<void>;
   setFilter: <K extends keyof VehicleFilters>(key: K, value: VehicleFilters[K]) => Promise<void>;
+  /** Fusiona varios filtros a la vez (ej. buscador rápido del Home) con un solo fetch. */
+  setFilters: (partial: VehicleFilters) => Promise<void>;
   clearFilters: () => Promise<void>;
 }
 
@@ -30,11 +33,12 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
   filters: {},
   loading: false,
 
-  init: async () => {
-    set({ loading: true });
+  init: async (preset) => {
+    const filters = preset ?? get().filters;
+    set({ loading: true, filters });
     const [options, vehicles] = await Promise.all([
       catalogUseCases.filterVehicles.getOptions(),
-      catalogUseCases.filterVehicles.execute({}),
+      catalogUseCases.filterVehicles.execute(filters),
     ]);
     set({ options, vehicles, loading: false });
   },
@@ -46,6 +50,13 @@ export const useCatalogStore = create<CatalogState>((set, get) => ({
       ...current,
       [key]: current[key] === value ? undefined : value,
     };
+    set({ filters: next, loading: true });
+    const vehicles = await catalogUseCases.filterVehicles.execute(next);
+    set({ vehicles, loading: false });
+  },
+
+  setFilters: async (partial) => {
+    const next: VehicleFilters = { ...get().filters, ...partial };
     set({ filters: next, loading: true });
     const vehicles = await catalogUseCases.filterVehicles.execute(next);
     set({ vehicles, loading: false });

@@ -5,40 +5,51 @@
 
 "use client";
 
-import Link from "next/link";
+import { Truck, ShieldCheck, ShoppingCart } from "lucide-react";
 import { discountPercent, type MarketplacePart } from "../../domain/entities/MarketplacePart";
 import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Button } from "@ui/atoms/Button";
 import { Badge } from "@ui/atoms/Badge";
+import { Breadcrumbs } from "@ui/molecules/Breadcrumbs";
 import { RatingStars } from "@ui/atoms/RatingStars";
-import { categoryIcon, categoryKey, conditionKey } from "../partPresentation";
+import { categoryKey, conditionKey, partPhotoUrl } from "../partPresentation";
 import "../styles/marketplace.css";
 
 export function PartDetail({ part }: { part: MarketplacePart }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const off = discountPercent(part);
-  const CategoryIcon = categoryIcon[part.category];
 
   return (
     <section style={{ paddingTop: 24 }}>
-      <Link href="/autopartes" style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
-        ← {t("market.back")}
-      </Link>
+      <Breadcrumbs
+        items={[
+          { label: t("nav.home"), href: "/" },
+          { label: t("nav.parts"), href: "/autopartes" },
+          { label: part.name },
+        ]}
+      />
 
       <div className="mk-detail">
-        <div
-          className="mk-detail__photo"
-          style={{ background: `linear-gradient(140deg, ${part.accentFrom}, ${part.accentTo})` }}
-        >
-          <span className="mk-card__icon">
-            <CategoryIcon size={96} strokeWidth={1.5} aria-hidden />
-          </span>
+        <div className="mk-detail__media">
+          <div className="mk-detail__photo">
+            {/* eslint-disable-next-line @next/next/no-img-element -- placeholder, se reemplaza por asset real */}
+            <img
+              className="mk-detail__real-img"
+              src={partPhotoUrl(part.id, part.category, { w: 900, h: 700 })}
+              alt={part.name}
+              loading="eager"
+              decoding="async"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          </div>
+          <span className="mk-detail__badge">{t(categoryKey(part.category))}</span>
         </div>
 
         <div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
-            <Badge tone="neon">{t(categoryKey(part.category))}</Badge>
             <Badge tone={part.condition === "nuevo" ? "in" : "low"}>{t(conditionKey(part.condition))}</Badge>
             {part.stock <= 0 && <Badge tone="out">{t("finder.stockOut")}</Badge>}
           </div>
@@ -50,20 +61,26 @@ export function PartDetail({ part }: { part: MarketplacePart }) {
 
           <div style={{ display: "flex", alignItems: "baseline", gap: 12, margin: "12px 0" }}>
             <span className="text-gradient" style={{ fontSize: "2.4rem", fontWeight: 900 }}>
-              {formatCurrency(part.price)}
+              {formatCurrency(part.price, locale)}
             </span>
             {part.originalPrice && (
               <>
-                <span className="mk-card__old" style={{ fontSize: "1rem" }}>{formatCurrency(part.originalPrice)}</span>
+                <span className="mk-card__old" style={{ fontSize: "1rem" }}>{formatCurrency(part.originalPrice, locale)}</span>
                 {off > 0 && <span className="mk-discount" style={{ position: "static" }}>-{off}%</span>}
               </>
             )}
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}>
-            {part.freeShipping && <span className="mk-card__ship">🚚 {t("market.free")}</span>}
+            {part.freeShipping && (
+              <span className="mk-card__ship" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <Truck size={14} strokeWidth={2} aria-hidden /> {t("market.free")}
+              </span>
+            )}
             {part.warrantyMonths > 0 && (
-              <span className="mk-card__meta">🛡️ {t("market.warrantyShort", { n: part.warrantyMonths })}</span>
+              <span className="mk-card__meta" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <ShieldCheck size={14} strokeWidth={2} aria-hidden /> {t("market.warrantyShort", { n: part.warrantyMonths })}
+              </span>
             )}
             <span className="mk-card__meta">{t("market.seller")}: {part.seller} · {part.brand} · SKU {part.sku}</span>
           </div>
@@ -92,7 +109,9 @@ export function PartDetail({ part }: { part: MarketplacePart }) {
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             <Button>{t("market.buyNow")}</Button>
-            <Button variant="ghost">🛒 {t("market.addCart")}</Button>
+            <Button variant="ghost">
+              <ShoppingCart size={15} strokeWidth={2} aria-hidden /> {t("market.addCart")}
+            </Button>
           </div>
         </div>
       </div>

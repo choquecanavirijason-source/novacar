@@ -5,6 +5,7 @@
 
 "use client";
 
+import { LayoutDashboard, Package, type LucideIcon } from "lucide-react";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Logo } from "@ui/atoms/Logo";
 
@@ -16,9 +17,9 @@ interface AdminSidebarProps {
 export function AdminSidebar({ active, onNavigate }: AdminSidebarProps) {
   const { t } = useTranslation();
 
-  const items: { id: "inventory" | "analytics"; icon: string; label: string }[] = [
-    { id: "analytics", icon: "📊", label: t("admin.analytics") },
-    { id: "inventory", icon: "📦", label: t("admin.inventory") },
+  const items: { id: "inventory" | "analytics"; Icon: LucideIcon; label: string }[] = [
+    { id: "analytics", Icon: LayoutDashboard, label: t("admin.analytics") },
+    { id: "inventory", Icon: Package, label: t("admin.inventory") },
   ];
 
   return (
@@ -27,16 +28,16 @@ export function AdminSidebar({ active, onNavigate }: AdminSidebarProps) {
         <Logo size="1.1rem" suffix={t("admin.brand")} />
       </div>
       <nav className="admin-sidebar__nav">
-        {items.map((item) => (
+        {items.map(({ id, Icon, label }) => (
           <button
-            key={item.id}
+            key={id}
             type="button"
-            onClick={() => onNavigate(item.id)}
-            className={`admin-sidebar__item ${active === item.id ? "admin-sidebar__item--active" : ""}`}
-            aria-current={active === item.id ? "page" : undefined}
+            onClick={() => onNavigate(id)}
+            className={`admin-sidebar__item ${active === id ? "admin-sidebar__item--active" : ""}`}
+            aria-current={active === id ? "page" : undefined}
           >
-            <span aria-hidden="true">{item.icon}</span>
-            {item.label}
+            <Icon size={17} strokeWidth={1.75} aria-hidden />
+            {label}
           </button>
         ))}
       </nav>

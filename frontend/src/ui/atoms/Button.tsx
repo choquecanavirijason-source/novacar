@@ -2,6 +2,8 @@
  * Atom · Button
  * Botón base del sistema. Polimórfico: si recibe `href` renderiza un <Link>,
  * de lo contrario un <button>. Variantes: primary | ghost. Tamaños: sm | md.
+ * Forma sesgada (paralelogramo): `.btn` lleva el skewX real y `.btn__label`
+ * (el span interno) lleva el contra-skew, así el texto/ícono queda recto.
  */
 
 import Link from "next/link";
@@ -42,7 +44,7 @@ export function Button(props: ButtonAsButton | ButtonAsLink) {
     const { href } = props as ButtonAsLink;
     return (
       <Link href={href as Route} className={merged} style={sizeStyle[size]}>
-        {children}
+        <span className="btn__label">{children}</span>
       </Link>
     );
   }
@@ -53,7 +55,7 @@ export function Button(props: ButtonAsButton | ButtonAsLink) {
       style={sizeStyle[size]}
       {...(rest as ButtonHTMLAttributes<HTMLButtonElement>)}
     >
-      {children}
+      <span className="btn__label">{children}</span>
     </button>
   );
 }

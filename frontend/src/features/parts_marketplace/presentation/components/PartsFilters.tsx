@@ -6,15 +6,17 @@
 
 "use client";
 
+import type { ReactNode } from "react";
+import { Truck, ShieldCheck, PackageCheck } from "lucide-react";
 import { usePartsMarketplaceStore } from "../store/usePartsMarketplaceStore";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { categoryIcon, categoryKey, conditionKey } from "../partPresentation";
 import { Input } from "@ui/atoms/Input";
 
-function Toggle({ on, label, onClick }: { on: boolean; label: string; onClick: () => void }) {
+function Toggle({ on, label, onClick }: { on: boolean; label: ReactNode; onClick: () => void }) {
   return (
     <button type="button" className="mk-toggle" onClick={onClick} aria-pressed={on}>
-      <span>{label}</span>
+      <span className="mk-toggle__label">{label}</span>
       <span className={`mk-switch ${on ? "mk-switch--on" : ""}`} aria-hidden />
     </button>
   );
@@ -179,9 +181,21 @@ export function PartsFilters() {
 
       {/* Toggles */}
       <div className="mk-group">
-        <Toggle on={!!filters.freeShipping} label={`🚚 ${t("market.shipping")}`} onClick={() => void apply({ freeShipping: !filters.freeShipping || undefined })} />
-        <Toggle on={!!filters.withWarranty} label={`🛡️ ${t("market.warranty")}`} onClick={() => void apply({ withWarranty: !filters.withWarranty || undefined })} />
-        <Toggle on={!!filters.inStock} label={`📦 ${t("market.inStock")}`} onClick={() => void apply({ inStock: !filters.inStock || undefined })} />
+        <Toggle
+          on={!!filters.freeShipping}
+          label={<><Truck size={14} strokeWidth={1.75} aria-hidden /> {t("market.shipping")}</>}
+          onClick={() => void apply({ freeShipping: !filters.freeShipping || undefined })}
+        />
+        <Toggle
+          on={!!filters.withWarranty}
+          label={<><ShieldCheck size={14} strokeWidth={1.75} aria-hidden /> {t("market.warranty")}</>}
+          onClick={() => void apply({ withWarranty: !filters.withWarranty || undefined })}
+        />
+        <Toggle
+          on={!!filters.inStock}
+          label={<><PackageCheck size={14} strokeWidth={1.75} aria-hidden /> {t("market.inStock")}</>}
+          onClick={() => void apply({ inStock: !filters.inStock || undefined })}
+        />
       </div>
     </aside>
   );

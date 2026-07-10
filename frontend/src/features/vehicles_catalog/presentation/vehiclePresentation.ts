@@ -38,10 +38,21 @@ export const transmissionKey: Record<Transmission, string> = {
 export const mileageText = (km: number, t: (k: string, v?: Record<string, string | number>) => string): string =>
   km === 0 ? t("common.newMileage") : t("common.km", { n: km.toLocaleString("es-MX") });
 
+/** Fotos reales propias (public/vehicles) para los autos que ya cuentan con asset. */
+const VEHICLE_PHOTO_OVERRIDES: Record<string, string> = {
+  "nissan-versa-2021": "/vehicles/auto-1.jpg",
+  "vw-jetta-2022": "/vehicles/auto-2.jpg",
+  "toyota-corolla-2023": "/vehicles/auto-3.jpg",
+  "tesla-model3-2023": "/vehicles/auto-4.jpg",
+  "bmw-e46-m3-2004": "/vehicles/auto-5.webp",
+  "bmw-f650gs-2023": "/vehicles/moto-1.webp",
+};
+
 /**
- * URL de foto real de placeholder (a reemplazar por assets propios).
- * Genera una foto de auto vía keyword (marca + carrocería), con semilla estable
- * por id para que la misma tarjeta muestre siempre la misma imagen.
+ * URL de foto del vehículo: usa el asset real propio si existe (ver
+ * VEHICLE_PHOTO_OVERRIDES); si no, cae al placeholder externo vía keyword
+ * (marca + carrocería), con semilla estable por id para que la misma
+ * tarjeta muestre siempre la misma imagen.
  */
 export const vehiclePhotoUrl = (
   id: string,
@@ -49,6 +60,9 @@ export const vehiclePhotoUrl = (
   bodyType: BodyType,
   size: { w: number; h: number } = { w: 640, h: 480 },
 ): string => {
+  const override = VEHICLE_PHOTO_OVERRIDES[id];
+  if (override) return override;
+
   const seed = Array.from(id).reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const keywords = encodeURIComponent(`car,${brand},${bodyType}`);
   return `https://loremflickr.com/${size.w}/${size.h}/${keywords}?lock=${seed}`;
