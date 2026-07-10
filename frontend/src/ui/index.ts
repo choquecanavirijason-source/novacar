@@ -6,7 +6,6 @@
 // atoms
 export { Button } from "./atoms/Button";
 export { Badge } from "./atoms/Badge";
-export { Chip } from "./atoms/Chip";
 export { Card } from "./atoms/Card";
 export { Input } from "./atoms/Input";
 export { Skeleton } from "./atoms/Skeleton";
@@ -19,7 +18,6 @@ export { ScrollReveal } from "./atoms/ScrollReveal";
 export { LanguageSwitcher } from "./molecules/LanguageSwitcher";
 export { StatCard } from "./molecules/StatCard";
 export { SearchInput } from "./molecules/SearchInput";
-export { SpecBadge } from "./molecules/SpecBadge";
 export { SectionHeader } from "./molecules/SectionHeader";
 export { EmptyState } from "./molecules/EmptyState";
 export { ErrorState } from "./molecules/ErrorState";

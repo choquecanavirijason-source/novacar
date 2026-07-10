@@ -94,7 +94,7 @@
   -webkit-text-fill-color: transparent;
 }
 
-.hero3__title-line--gold {
+.hero3__title-line--accent {
   color: var(--accent-neon);
   text-shadow: var(--text-glow, none);
 }

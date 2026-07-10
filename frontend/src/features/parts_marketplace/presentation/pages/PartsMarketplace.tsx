@@ -24,6 +24,7 @@ import { TrustBar } from "../components/TrustBar";
 import { CategoryTabs } from "../components/CategoryTabs";
 import { DiscountBanners } from "@features/vehicles_catalog/presentation/components/DiscountBanners";
 import { Section } from "@ui/templates/Section";
+import { ScrollReveal } from "@ui/atoms/ScrollReveal";
 import "../styles/marketplace.css";
 
 type ViewMode = "horizontal" | "grid";
@@ -120,27 +121,33 @@ export function PartsMarketplace() {
       <FeaturedCategoryBlocks />
 
       {/* Barra de confianza (4 beneficios) */}
-      <Section size="sm">
-        <TrustBar />
-      </Section>
+      <ScrollReveal>
+        <Section size="sm">
+          <TrustBar />
+        </Section>
+      </ScrollReveal>
 
       {/* Banner: búsqueda guiada por compatibilidad (wizard) */}
-      <div className="mk-guided">
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span className="mk-guided__icon">
-            <Compass size={22} strokeWidth={1.75} aria-hidden />
-          </span>
-          <div>
-            <strong>{t("market.guided")}</strong>
-            <div style={{ color: "var(--text-secondary)", fontSize: "0.86rem" }}>
-              {t("finder.pageSubtitle")}
+      <ScrollReveal>
+        <div className="mk-guided">
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span className="mk-guided__icon">
+              <Compass size={22} strokeWidth={1.75} aria-hidden />
+            </span>
+            <div>
+              <strong>{t("market.guided")}</strong>
+              <div style={{ color: "var(--text-secondary)", fontSize: "0.86rem" }}>
+                {t("finder.pageSubtitle")}
+              </div>
             </div>
           </div>
+          <Button href="/buscador" variant="ghost" size="sm">{t("nav.finder")} →</Button>
         </div>
-        <Button href="/buscador" variant="ghost" size="sm">{t("nav.finder")} →</Button>
-      </div>
+      </ScrollReveal>
 
-      <DiscountBanners />
+      <ScrollReveal>
+        <DiscountBanners />
+      </ScrollReveal>
 
       <div id="mk-product-grid" className="market">
         <h2 className="text-center text-2xl font-black uppercase tracking-wide text-white sm:text-3xl">

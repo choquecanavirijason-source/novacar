@@ -31,7 +31,7 @@ export function HeroShowcase() {
             <span className="hero3__title-line hero3__title-line--metal">
               {t("hero2.titleTop")}
             </span>
-            <span className="hero3__title-line hero3__title-line--gold">
+            <span className="hero3__title-line hero3__title-line--accent">
               {t("hero2.titleBottom")}
             </span>
           </h1>

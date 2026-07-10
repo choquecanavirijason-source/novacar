@@ -97,66 +97,6 @@
   border-radius: var(--radius-pill);
 }
 
-.filters__head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-basis: 100%;
-}
-
-@media (min-width: 1080px) {
-  .filters__head {
-    flex-basis: auto;
-    margin-right: 8px;
-  }
-}
-
-.filters__group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 0;
-}
-
-.filters__label {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-.filters__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.chip {
-  padding: 8px 14px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: border-color var(--transition-smooth), background var(--transition-smooth),
-    color var(--transition-smooth), transform var(--transition-spring);
-}
-
-.chip:hover {
-  border-color: var(--accent-neon);
-  color: var(--text-primary);
-  transform: translateY(-1px);
-}
-
-.chip--active {
-  border-color: var(--primary-glow);
-  background: var(--primary-soft);
-  color: var(--text-primary);
-  box-shadow: var(--glow-primary);
-}
-
 .filters__range {
   width: 170px;
   accent-color: var(--accent-neon);

@@ -13,18 +13,29 @@ import { DiscountBanners } from "@features/vehicles_catalog/presentation/compone
 import { WhyChooseUs } from "@features/vehicles_catalog/presentation/components/WhyChooseUs";
 import { Testimonials } from "@features/vehicles_catalog/presentation/components/Testimonials";
 import { CategoriesBento } from "@features/parts_marketplace/presentation/components/CategoriesBento";
+import { ScrollReveal } from "@ui/atoms/ScrollReveal";
 
 export default function HomePage() {
   return (
     <>
       <HeroShowcase />
       <VehicleFinderBar />
-      <CategoriesBento />
+      <ScrollReveal>
+        <CategoriesBento />
+      </ScrollReveal>
       <BrandTicker />
-      <DiscountBanners />
-      <FeaturedVehicles />
-      <Testimonials />
-      <WhyChooseUs />
+      <ScrollReveal>
+        <DiscountBanners />
+      </ScrollReveal>
+      <ScrollReveal>
+        <FeaturedVehicles />
+      </ScrollReveal>
+      <ScrollReveal>
+        <Testimonials />
+      </ScrollReveal>
+      <ScrollReveal>
+        <WhyChooseUs />
+      </ScrollReveal>
     </>
   );
 }

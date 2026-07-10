@@ -15,6 +15,7 @@ import type { BodyType, FuelType, VehicleFilters } from "../../domain/entities/C
 import { useCatalogStore } from "../store/useCatalogStore";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Eyebrow } from "@ui/atoms/Eyebrow";
+import { ScrollReveal } from "@ui/atoms/ScrollReveal";
 import { Skeleton } from "@ui/atoms/Skeleton";
 import { SearchInput } from "@ui/molecules/SearchInput";
 import { Pagination } from "@ui/molecules/Pagination";
@@ -84,13 +85,15 @@ export function CatalogExplorer() {
 
   return (
     <section style={{ padding: "40px 0 0" }}>
-      <header style={{ marginBottom: 28 }}>
-        <Eyebrow>{t("catalog.eyebrow")}</Eyebrow>
-        <h1 style={{ fontSize: "2.2rem", fontWeight: 900, marginTop: 12 }}>
-          {t("catalog.titleA")} <span className="text-gradient">{t("catalog.titleHighlight")}</span>
-        </h1>
-        <p style={{ color: "var(--text-secondary)", marginTop: 8 }}>{t("catalog.subtitle")}</p>
-      </header>
+      <ScrollReveal>
+        <header style={{ marginBottom: 28 }}>
+          <Eyebrow>{t("catalog.eyebrow")}</Eyebrow>
+          <h1 style={{ fontSize: "2.2rem", fontWeight: 900, marginTop: 12 }}>
+            {t("catalog.titleA")} <span className="text-gradient">{t("catalog.titleHighlight")}</span>
+          </h1>
+          <p style={{ color: "var(--text-secondary)", marginTop: 8 }}>{t("catalog.subtitle")}</p>
+        </header>
+      </ScrollReveal>
 
       <div className="explorer">
         <div className="catalog-toolbar">
