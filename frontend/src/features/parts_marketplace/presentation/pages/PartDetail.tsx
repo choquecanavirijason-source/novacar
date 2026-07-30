@@ -5,6 +5,8 @@
 
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import { Truck, ShieldCheck, ShoppingCart } from "lucide-react";
 import { discountPercent, type MarketplacePart } from "../../domain/entities/MarketplacePart";
 import { formatCurrency } from "@core/format/formatters";
@@ -19,6 +21,7 @@ import "../styles/marketplace.css";
 export function PartDetail({ part }: { part: MarketplacePart }) {
   const { t, locale } = useTranslation();
   const off = discountPercent(part);
+  const [photoFailed, setPhotoFailed] = useState(false);
 
   return (
     <section style={{ paddingTop: 24 }}>
@@ -33,17 +36,18 @@ export function PartDetail({ part }: { part: MarketplacePart }) {
       <div className="mk-detail">
         <div className="mk-detail__media">
           <div className="mk-detail__photo">
-            {/* eslint-disable-next-line @next/next/no-img-element -- placeholder, se reemplaza por asset real */}
-            <img
-              className="mk-detail__real-img"
-              src={partPhotoUrl(part.id, part.category, { w: 900, h: 700 })}
-              alt={part.name}
-              loading="eager"
-              decoding="async"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
+            {!photoFailed && (
+              <Image
+                className="mk-detail__real-img"
+                src={partPhotoUrl(part.id, part.category, { w: 900, h: 700 })}
+                alt={part.name}
+                width={900}
+                height={700}
+                unoptimized
+                priority
+                onError={() => setPhotoFailed(true)}
+              />
+            )}
           </div>
           <span className="mk-detail__badge">{t(categoryKey(part.category))}</span>
         </div>

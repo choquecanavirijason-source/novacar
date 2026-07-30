@@ -12,12 +12,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import type { CatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import { catalogUseCases } from "../../di";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { formatCurrency } from "@core/format/formatters";
+import { CountUp } from "@ui/atoms/CountUp";
 import { Eyebrow } from "@ui/atoms/Eyebrow";
+import { Parallax } from "@ui/atoms/Parallax";
 import { Skeleton } from "@ui/atoms/Skeleton";
 import { fuelKey, transmissionKey, vehiclePhotoUrl } from "../vehiclePresentation";
 import "../styles/catalog.css";
@@ -29,10 +32,15 @@ export function FeaturedVehicles() {
   const { t, locale } = useTranslation();
   const [vehicles, setVehicles] = useState<CatalogVehicle[] | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [cutoutFailed, setCutoutFailed] = useState(false);
 
   useEffect(() => {
     void catalogUseCases.getFeaturedVehicles.execute().then(setVehicles);
   }, []);
+
+  useEffect(() => {
+    setCutoutFailed(false);
+  }, [activeIndex]);
 
   useEffect(() => {
     if (!vehicles || vehicles.length <= 1) return;
@@ -48,7 +56,14 @@ export function FeaturedVehicles() {
 
   const specs = vehicle
     ? [
-        { label: t("featured.specPower"), value: t("showcase.hp", { n: vehicle.horsepower }) },
+        {
+          label: t("featured.specPower"),
+          value: (
+            <>
+              <CountUp value={vehicle.horsepower} /> HP
+            </>
+          ),
+        },
         { label: t("featured.specFuel"), value: t(fuelKey[vehicle.fuelType]) },
         { label: t("featured.specTransmission"), value: t(transmissionKey[vehicle.transmission]) },
         {
@@ -75,13 +90,13 @@ export function FeaturedVehicles() {
       ) : vehicle ? (
         <>
           <div className="relative flex flex-col overflow-hidden rounded-[28px] border border-(--border) bg-(--bg-base) p-8 transition-colors duration-300 hover:border-(--accent-neon) lg:flex-row lg:p-16">
-            {/* Marca de agua decorativa */}
-            <span
-              aria-hidden
+            {/* Marca de agua decorativa: capa de fondo, se mueve más lento (profundidad) */}
+            <Parallax
+              speed={-0.12}
               className="pointer-events-none absolute -top-4 right-2 z-0 select-none text-[5rem] font-black uppercase leading-none text-white/5 sm:text-[7rem] lg:-top-8 lg:right-6 lg:text-[9rem]"
             >
-              {t("featured.watermark")}
-            </span>
+              <span aria-hidden>{t("featured.watermark")}</span>
+            </Parallax>
 
             {/* Columna izquierda: ficha técnica */}
             <div className="relative z-10 flex w-full flex-col justify-center space-y-10 text-left lg:w-1/2 lg:space-y-12">
@@ -121,26 +136,25 @@ export function FeaturedVehicles() {
               </Link>
             </div>
 
-            {/* Columna derecha: auto */}
+            {/* Columna derecha: auto (capa en primer plano, se mueve un poco más rápido) */}
             <div className="relative z-10 mt-12 min-h-[280px] w-full lg:mt-0 lg:min-h-0 lg:w-1/2">
-              <div className="pointer-events-none absolute inset-0">
-                {/* eslint-disable-next-line @next/next/no-img-element -- PNG transparente manual si existe; si no, foto real de respaldo */}
-                <img
+              <Parallax speed={0.1} className="pointer-events-none absolute inset-0">
+                <Image
                   key={vehicle.id}
                   className="absolute top-1/2 right-0 w-[120%] max-w-none -translate-y-1/2 object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)] lg:-right-10 lg:drop-shadow-[0_30px_50px_rgba(0,0,0,0.6)]"
-                  src={vehicleCutoutUrl(vehicle.brand)}
+                  src={
+                    cutoutFailed
+                      ? vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 900, h: 900 })
+                      : vehicleCutoutUrl(vehicle.brand)
+                  }
                   alt={`${vehicle.brand} ${vehicle.model}`}
+                  width={900}
+                  height={900}
+                  unoptimized={cutoutFailed}
                   loading="lazy"
-                  decoding="async"
-                  onError={(e) => {
-                    const fallback = vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, {
-                      w: 900,
-                      h: 900,
-                    });
-                    if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
-                  }}
+                  onError={() => setCutoutFailed(true)}
                 />
-              </div>
+              </Parallax>
             </div>
 
             {/* Tarjeta flotante de precio: esquina inferior derecha de la tarjeta general */}

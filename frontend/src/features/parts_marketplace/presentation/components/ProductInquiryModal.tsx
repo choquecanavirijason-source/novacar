@@ -9,6 +9,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Image from "next/image";
 import { Play, Send, X } from "lucide-react";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { useToast } from "@core/toast/ToastProvider";
@@ -28,6 +29,7 @@ export function ProductInquiryModal({
   const toast = useToast();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [mediaFailed, setMediaFailed] = useState(false);
   const panelRef = useModalA11y<HTMLDivElement>(onClose);
 
   const handleSubmit = (e: FormEvent) => {
@@ -83,17 +85,18 @@ export function ProductInquiryModal({
           </div>
 
           <div className="pinquiry__media">
-            {/* eslint-disable-next-line @next/next/no-img-element -- placeholder, se reemplaza por asset real */}
-            <img
-              className="pinquiry__media-img"
-              src={INQUIRY_MEDIA_URL}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-              }}
-            />
+            {!mediaFailed && (
+              <Image
+                className="pinquiry__media-img"
+                src={INQUIRY_MEDIA_URL}
+                alt=""
+                fill
+                unoptimized
+                sizes="(max-width: 768px) 100vw, 420px"
+                loading="lazy"
+                onError={() => setMediaFailed(true)}
+              />
+            )}
             <button type="button" className="pinquiry__play" aria-label={t("productInquiry.play")}>
               <Play size={20} strokeWidth={0} fill="currentColor" aria-hidden />
             </button>

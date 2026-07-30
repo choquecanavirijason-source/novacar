@@ -26,8 +26,10 @@
 }
 
 /* ---- ProductCard (common: autos, autopartes...) ---- */
-/* overflow: visible a propósito → habilita el efecto pop-out/out-of-bounds
-   de .product-card__real-img, que se sale del marco de la tarjeta. */
+/* Glassmorphism: cristal esmerilado + borde suave abierto abajo + barra de
+   neón inferior (::after) en vez del borde inferior. overflow: visible a
+   propósito → habilita el efecto pop-out/out-of-bounds de
+   .product-card__real-img, que se sale del marco de la tarjeta. */
 .product-card {
   position: relative;
   display: flex;
@@ -35,9 +37,13 @@
   width: 100%;
   height: 100%;
   overflow: visible;
-  border-radius: var(--radius-lg);
-  background: var(--gradient-surface);
-  box-shadow: var(--shadow-soft);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: none;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
   font-family: inherit;
   text-align: left;
   cursor: pointer;
@@ -45,9 +51,23 @@
   animation: fadeInUp var(--transition-smooth) both;
 }
 
+.product-card::after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  bottom: 0;
+  left: 5%;
+  width: 90%;
+  height: 3px;
+  border-radius: 4px;
+  background: var(--accent-neon);
+  box-shadow: 0 0 15px var(--accent-neon), 0 0 25px var(--accent-neon), 0 -2px 10px rgba(0, 170, 255, 0.6);
+  pointer-events: none;
+}
+
 .product-card:hover {
   transform: translateY(-8px);
-  box-shadow: var(--shadow-3d-hover);
+  box-shadow: 0 40px 70px rgba(0, 0, 0, 0.5);
 }
 
 .product-card__photo {
@@ -55,7 +75,7 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-radius: 28px 28px 0 0;
 }
 
 .product-card__photo::after {
@@ -98,22 +118,22 @@
 }
 
 .product-card__body {
-  padding: 18px;
+  position: relative;
+  z-index: 2;
+  padding: 14px 16px 16px;
   display: flex;
   flex-direction: column;
   flex: 1;
-  background: var(--gradient-surface);
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
 .product-card__body-main {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .product-card__title {
-  font-size: 1rem;
+  font-size: 0.96rem;
   font-weight: 800;
   line-height: 1.25;
 }
@@ -123,29 +143,42 @@
   font-size: 0.86rem;
 }
 
+/* Fila compacta (envuelve si hace falta) en vez de lista apilada — para
+   que el bloque de texto ocupe menos alto y la foto sea la protagonista. */
 .product-card__features {
   list-style: none;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 4px;
+  column-gap: 10px;
+  margin-top: 6px;
   text-align: left;
 }
 
 .product-card__features li {
   position: relative;
-  padding-left: 14px;
+  padding-left: 11px;
   color: var(--text-secondary);
-  font-size: 0.8rem;
+  font-size: 0.74rem;
+}
+
+.product-card__features li:first-child {
+  padding-left: 0;
+}
+
+.product-card__features li:first-child::before {
+  display: none;
 }
 
 .product-card__features li::before {
   content: "";
   position: absolute;
   left: 0;
-  top: 0.5em;
-  width: 5px;
-  height: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: var(--accent-neon);
 }
@@ -154,13 +187,12 @@
    cuánto texto haya arriba, gracias a este margin-top: auto. */
 .product-card__cta-wrap {
   margin-top: auto;
-  padding-top: 16px;
+  padding-top: 12px;
 }
 
-/* Mismo acabado glossy que el sistema de botones global (.btn--primary):
-   barniz de cristal (::before) + bisel con inset shadows. Sin el skewX
-   real del sistema global porque, al ser un botón 100% del ancho de la
-   tarjeta, el paralelogramo cortaría los bordes de forma antinatural. */
+/* Botón CTA "glass": sin fondo sólido por defecto (cristal + borde), se
+   "pinta" (llena de color + brillo glossy) al pasar el cursor/enfocar o
+   al pasar sobre la tarjeta completa. */
 .product-card__cta {
   position: relative;
   display: block;
@@ -168,14 +200,16 @@
   padding: 11px 0;
   overflow: hidden;
   border-radius: var(--radius-btn);
-  background: var(--gradient-brand);
-  color: var(--on-brand);
+  background: rgba(0, 170, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
   font-size: 0.86rem;
   font-weight: 700;
   text-align: center;
-  box-shadow: var(--glow-primary), inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    inset 0 -3px 5px rgba(0, 0, 0, 0.22);
-  transition: transform var(--transition-spring), box-shadow var(--transition-smooth);
+  transition: background var(--transition-smooth), border-color var(--transition-smooth),
+    color var(--transition-smooth), transform var(--transition-spring), box-shadow var(--transition-smooth);
 }
 
 .product-card__cta-label {
@@ -186,6 +220,7 @@
   content: "";
   position: absolute;
   inset: 0;
+  opacity: 0;
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.4) 0%,
@@ -193,17 +228,26 @@
     rgba(255, 255, 255, 0) 55%,
     rgba(0, 0, 0, 0.12) 100%
   );
+  transition: opacity var(--transition-smooth);
   pointer-events: none;
 }
 
-.product-card:hover .product-card__cta {
+.product-card:hover .product-card__cta,
+.product-card__cta:focus-visible {
+  background: var(--gradient-brand);
+  color: var(--on-brand);
+  border-color: transparent;
   transform: translateY(-1px);
   box-shadow: var(--glow-primary), var(--glow-accent), inset 0 1px 0 rgba(255, 255, 255, 0.55),
     inset 0 -3px 5px rgba(0, 0, 0, 0.22);
 }
 
+.product-card:hover .product-card__cta::before,
+.product-card__cta:focus-visible::before {
+  opacity: 1;
+}
+
 .product-card__cta--btn {
-  border: none;
   cursor: pointer;
   font-family: inherit;
 }

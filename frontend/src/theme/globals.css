@@ -273,6 +273,17 @@ h3,
   justify-content: center;
 }
 
+/* Wrapper del efecto magnético (ver Button.tsx): sin transform propio en
+   CSS para no pisar el skew de .btn — GSAP anima su x/y en JS. */
+.btn__magnet {
+  display: inline-block;
+}
+
+.btn__magnet--block {
+  display: block;
+  width: 100%;
+}
+
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -511,7 +522,30 @@ h3,
   flex: 1;
 }
 
-/* ---- Bloque central: 4 enlaces, centrado absoluto a la pantalla ---- */
+/* ---- Insignia angular del logo: placa metálica recortada (clip-path)
+   con bisel de brillo arriba, eco del "panel mecánico" de la marca ---- */
+.nav__logo-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 30px 9px 18px;
+  background: linear-gradient(180deg, var(--bg-elevated), var(--bg-surface));
+  clip-path: polygon(0 0, 92% 0%, 100% 100%, 8% 100%);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.nav__logo-badge::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 8%;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.6), transparent 85%);
+}
+
+/* ---- Bloque central: enlaces sobre un panel angular tipo "ala mecánica"
+   (clip-path parallelogramo, bisel de brillo superior) ---- */
 .nav__center {
   position: absolute;
   left: 50%;
@@ -520,7 +554,34 @@ h3,
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
-  gap: 44px;
+  gap: 28px;
+  padding: 13px 42px;
+  background: linear-gradient(180deg, var(--bg-elevated), var(--bg-surface));
+  clip-path: polygon(3% 0%, 100% 0%, 97% 100%, 0% 100%);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+}
+
+.nav__center::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 3%;
+  right: 3%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55) 50%, transparent);
+}
+
+.nav__link-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nav__sep {
+  margin-right: 28px;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 400;
+  font-size: 0.8rem;
 }
 
 .nav__link {
@@ -1386,4 +1447,164 @@ h3,
 .pagination__ellipsis {
   color: var(--text-muted);
   padding: 0 4px;
+}
+
+/* ============================================================
+   Grano de película sutil, sitewide — refuerza el acabado cinematográfico
+   del dark UI. Puramente decorativo, no bloquea clics/scroll.
+   ============================================================ */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  animation: grain-shift 1s steps(4) infinite;
+}
+
+@keyframes grain-shift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-4%, 3%); }
+  50% { transform: translate(3%, -4%); }
+  75% { transform: translate(-3%, -3%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ============================================================
+   IgnitionReveal ("efecto de arranque"): al entrar la sección al viewport,
+   el título/eyebrow parpadea como un rótulo de neón encendiéndose, mientras
+   el resto del contenido "se arma" (blur + leve giro 3D que converge a su
+   lugar) — ver IgnitionReveal.tsx.
+   ============================================================ */
+.ignition-reveal {
+  position: relative;
+}
+
+.ignition-reveal__content {
+  opacity: 0;
+}
+
+.ignition-reveal--visible .ignition-reveal__content {
+  animation: content-assemble 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ignition-reveal--visible .ignition-reveal__content .section-eyebrow,
+.ignition-reveal--visible .ignition-reveal__content h1,
+.ignition-reveal--visible .ignition-reveal__content h2 {
+  opacity: 0;
+  animation: title-flicker 1.1s linear both;
+  animation-delay: 120ms;
+}
+
+@keyframes content-assemble {
+  0% {
+    opacity: 0;
+    transform: perspective(900px) rotateX(6deg) translateY(36px) scale(0.97);
+    filter: blur(5px);
+  }
+  55% { opacity: 1; }
+  100% {
+    opacity: 1;
+    transform: perspective(900px) rotateX(0deg) translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Parpadeo irregular tipo rótulo de neón encendiéndose, hasta asentarse
+   en un brillo azul estable. */
+@keyframes title-flicker {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  10% { opacity: 0.2; }
+  12% { opacity: 1; }
+  14% { opacity: 0.3; }
+  16% {
+    opacity: 1;
+    text-shadow: 0 0 12px rgba(0, 170, 255, 0.7), 0 0 26px rgba(0, 170, 255, 0.4);
+  }
+  18% { opacity: 0.4; text-shadow: none; }
+  20%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 10px rgba(0, 170, 255, 0.5), 0 0 22px rgba(0, 170, 255, 0.25);
+  }
+}
+
+/* ============================================================
+   Bordes "glass" brillantes en todas las tarjetas del sitio: un borde de
+   1px con degradado (luz arriba-izquierda, tenue en medio, brillo azul
+   abajo-derecha) vía la técnica mask-composite, así funciona sobre
+   cualquier fondo/radio propio de cada tarjeta sin tocarlo.
+   ============================================================ */
+.mk-hero-card,
+.vdetail-pricecard,
+.testi-hud-card,
+.bento__item,
+.categories-modal {
+  position: relative;
+}
+
+.mk-hero-card::before,
+.vdetail-pricecard::before,
+.testi-hud-card::before,
+.bento__item::before,
+.categories-modal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(0, 170, 255, 0.12) 55%,
+    rgba(0, 170, 255, 0.4) 80%,
+    rgba(255, 255, 255, 0.5) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ============================================================
+   Landing (Home): telón fijo de fibra de carbono detrás de todas las
+   secciones (ver app/page.tsx y .landing-bg más abajo).
+   ============================================================ */
+.landing-wrap {
+  position: relative;
+  z-index: 0;
+}
+
+/* Textura de fibra de carbono (tejido diagonal) + viñeta oscura plateada —
+   sin imagen, 100% CSS, con un tinte azul azul muy tenue para casar con el
+   acento de marca. */
+.landing-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: #16171a;
+  background-image:
+    radial-gradient(1400px 700px at 50% -10%, rgba(0, 170, 255, 0.06), transparent 60%),
+    linear-gradient(27deg, #3a3b3e 5px, transparent 5px) 0 5px,
+    linear-gradient(207deg, #3a3b3e 5px, transparent 5px) 10px 0px,
+    linear-gradient(27deg, #202124 5px, transparent 5px) 0px 10px,
+    linear-gradient(207deg, #202124 5px, transparent 5px) 10px 5px,
+    linear-gradient(90deg, #2a2b2e 10px, transparent 10px),
+    linear-gradient(#2a2b2e 25%, #303134 25%, #303134 50%, transparent 50%, transparent 75%, #262729 75%, #262729);
+  background-size:
+    100% 100%,
+    20px 20px,
+    20px 20px,
+    20px 20px,
+    20px 20px,
+    20px 20px,
+    20px 20px;
+  opacity: 0.6;
+  pointer-events: none;
 }

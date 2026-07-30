@@ -13,6 +13,8 @@ import "@ui/templates/templates.css";
 import { I18nProvider } from "@core/i18n/I18nProvider";
 import { AuthProvider } from "@core/auth/AuthProvider";
 import { ToastProvider } from "@core/toast/ToastProvider";
+import { SmoothScroll } from "@core/motion/SmoothScroll";
+import { PageTransition } from "@core/motion/PageTransition";
 import { SkipLink } from "@ui/atoms/SkipLink";
 import { Navbar } from "@ui/organisms/Navbar";
 import { UserTopPanel } from "@ui/organisms/UserTopPanel";
@@ -54,6 +56,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <I18nProvider>
           <AuthProvider>
             <ToastProvider>
+              <SmoothScroll />
+              <div className="grain-overlay" aria-hidden />
               <SkipLink />
               <Navbar />
               <Suspense fallback={null}>
@@ -65,7 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 className="container"
                 style={{ minHeight: "calc(100vh - 72px)", outline: "none" }}
               >
-                {children}
+                <PageTransition>{children}</PageTransition>
               </main>
               <Footer />
             </ToastProvider>

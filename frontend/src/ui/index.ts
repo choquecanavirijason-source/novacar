@@ -13,6 +13,8 @@ export { Logo } from "./atoms/Logo";
 export { Eyebrow } from "./atoms/Eyebrow";
 export { RatingStars } from "./atoms/RatingStars";
 export { ScrollReveal } from "./atoms/ScrollReveal";
+export { IgnitionReveal } from "./atoms/IgnitionReveal";
+export { Parallax } from "./atoms/Parallax";
 
 // molecules
 export { LanguageSwitcher } from "./molecules/LanguageSwitcher";

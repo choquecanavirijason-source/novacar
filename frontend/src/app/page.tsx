@@ -13,29 +13,31 @@ import { DiscountBanners } from "@features/vehicles_catalog/presentation/compone
 import { WhyChooseUs } from "@features/vehicles_catalog/presentation/components/WhyChooseUs";
 import { Testimonials } from "@features/vehicles_catalog/presentation/components/Testimonials";
 import { CategoriesBento } from "@features/parts_marketplace/presentation/components/CategoriesBento";
-import { ScrollReveal } from "@ui/atoms/ScrollReveal";
+import { IgnitionReveal } from "@ui/atoms/IgnitionReveal";
 
 export default function HomePage() {
   return (
-    <>
+    <div className="landing-wrap">
+      <div className="landing-bg" aria-hidden />
+
       <HeroShowcase />
       <VehicleFinderBar />
-      <ScrollReveal>
+      <IgnitionReveal>
         <CategoriesBento />
-      </ScrollReveal>
+      </IgnitionReveal>
       <BrandTicker />
-      <ScrollReveal>
+      <IgnitionReveal>
         <DiscountBanners />
-      </ScrollReveal>
-      <ScrollReveal>
+      </IgnitionReveal>
+      <IgnitionReveal>
         <FeaturedVehicles />
-      </ScrollReveal>
-      <ScrollReveal>
+      </IgnitionReveal>
+      <IgnitionReveal>
         <Testimonials />
-      </ScrollReveal>
-      <ScrollReveal>
+      </IgnitionReveal>
+      <IgnitionReveal>
         <WhyChooseUs />
-      </ScrollReveal>
-    </>
+      </IgnitionReveal>
+    </div>
   );
 }

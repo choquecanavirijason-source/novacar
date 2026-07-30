@@ -8,6 +8,8 @@
 
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import { X } from "lucide-react";
 import type { CatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import { formatCurrency } from "@core/format/formatters";
@@ -28,9 +30,11 @@ export function ImportQuoteModal({
 }) {
   const { t, locale } = useTranslation();
   const panelRef = useModalA11y<HTMLDivElement>(onClose);
+  const [photoFailed, setPhotoFailed] = useState(false);
 
   const taxes = Math.round(vehicle.price * IMPORT_TAX_RATE);
   const total = vehicle.price + taxes + SHIPPING_ESTIMATE;
+  const photoUrl = vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 200, h: 150 });
 
   return (
     <div
@@ -46,17 +50,17 @@ export function ImportQuoteModal({
         </button>
 
         <div className="import-quote-vehicle">
-          {/* eslint-disable-next-line @next/next/no-img-element -- placeholder, se reemplaza por asset real */}
-          <img
-            className="import-quote-vehicle__img"
-            src={vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 200, h: 150 })}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
-          />
+          {!photoFailed && (
+            <Image
+              className="import-quote-vehicle__img"
+              src={photoUrl}
+              alt=""
+              width={72}
+              height={54}
+              unoptimized={photoUrl.startsWith("http")}
+              onError={() => setPhotoFailed(true)}
+            />
+          )}
           <div>
             <h2 className="import-quote-title">{t("imports.quoteModalTitle")}</h2>
             <p className="import-quote-vehicle__name">

@@ -11,6 +11,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, type CSSProperties, type ReactNode } from "react";
 import type { Route } from "next";
 
@@ -79,13 +80,15 @@ export function ProductCard({
       {photoTopSlot}
 
       {imageUrl && !imgFailed ? (
-        // eslint-disable-next-line @next/next/no-img-element -- placeholder, se reemplaza por asset real
-        <img
+        <Image
           className="product-card__real-img"
           src={imageUrl}
           alt={imageAlt}
+          width={480}
+          height={360}
+          unoptimized={imageUrl.startsWith("http")}
+          sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 320px"
           loading="lazy"
-          decoding="async"
           onError={() => setImgFailed(true)}
         />
       ) : (

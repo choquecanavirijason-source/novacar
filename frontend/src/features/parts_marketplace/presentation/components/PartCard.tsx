@@ -35,7 +35,7 @@ export function PartCard({ part, index = 0 }: { part: MarketplacePart; index?: n
         index={index}
         accentFrom="#252525"
         accentTo="#252525"
-        photoHeight={190}
+        photoHeight={220}
         imageUrl={partPhotoUrl(part.id, part.category)}
         imageAlt={part.name}
         photoIcon={<CategoryIcon size={48} strokeWidth={1.5} aria-hidden />}

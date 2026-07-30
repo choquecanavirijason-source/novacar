@@ -21,11 +21,15 @@ import { Logo } from "../atoms/Logo";
 import { LanguageSwitcher } from "../molecules/LanguageSwitcher";
 
 const DRAWER_LINKS = [
+  { href: "/", key: "nav.home" },
   { href: "/catalogo", key: "nav.catalog" },
   { href: "/autopartes", key: "nav.parts" },
   { href: "/buscador", key: "nav.finder" },
   { href: "/importaciones", key: "nav.imports" },
 ] as const;
+
+const isActiveLink = (pathname: string, href: string) =>
+  href === "/" ? pathname === "/" : pathname.startsWith(href);
 
 export function Navbar() {
   const { t } = useTranslation();
@@ -45,20 +49,25 @@ export function Navbar() {
     <header className={`nav ${scrolled ? "nav--scrolled" : ""}`}>
       <div className="nav__inner container">
         <div className="nav__logo">
-          <Logo />
+          <div className="nav__logo-badge">
+            <Logo />
+          </div>
         </div>
 
         <nav className="nav__center" aria-label={t("nav.menu")}>
-          {DRAWER_LINKS.map((link) => {
-            const active = pathname.startsWith(link.href);
+          {DRAWER_LINKS.map((link, i) => {
+            const active = isActiveLink(pathname, link.href);
             return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`nav__link ${active ? "nav__link--active" : ""}`}
-              >
-                {t(link.key)}
-              </Link>
+              <span key={link.href} className="nav__link-group">
+                {i > 0 && (
+                  <span className="nav__sep" aria-hidden>
+                    |
+                  </span>
+                )}
+                <Link href={link.href} className={`nav__link ${active ? "nav__link--active" : ""}`}>
+                  {t(link.key)}
+                </Link>
+              </span>
             );
           })}
         </nav>
@@ -99,7 +108,7 @@ export function Navbar() {
           {menuOpen && (
             <nav className="nav__drawer" aria-label={t("nav.menu")}>
               {DRAWER_LINKS.map((link) => {
-                const active = pathname.startsWith(link.href);
+                const active = isActiveLink(pathname, link.href);
                 return (
                   <Link
                     key={link.href}

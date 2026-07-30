@@ -11,11 +11,14 @@
 
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import { CheckCircle2 } from "lucide-react";
 import type { CatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Button } from "@ui/atoms/Button";
+import { CountUp } from "@ui/atoms/CountUp";
 import { Breadcrumbs } from "@ui/molecules/Breadcrumbs";
 import {
   bodyTypeKey,
@@ -35,6 +38,7 @@ const TRIPTYCH_COLUMNS = [
 
 export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
   const { t, locale } = useTranslation();
+  const [photoFailed, setPhotoFailed] = useState(false);
 
   const specColumns = [
     {
@@ -84,23 +88,23 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
 
         {/* Tríptico de fondo: 3 columnas, mismo vehículo con encuadres distintos */}
         <div className="vdetail-triptych" aria-hidden>
-          {TRIPTYCH_COLUMNS.map((col) => (
-            <div key={col.key} className="vdetail-triptych__col">
-              {/* eslint-disable-next-line @next/next/no-img-element -- crop técnico decorativo, no informativo */}
-              <img
-                className="vdetail-triptych__img"
-                src={photoUrl}
-                alt=""
-                style={{ objectPosition: col.position }}
-                loading="eager"
-                decoding="async"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
-              <span className="vdetail-decal">{col.label}</span>
-            </div>
-          ))}
+          {!photoFailed &&
+            TRIPTYCH_COLUMNS.map((col) => (
+              <div key={col.key} className="vdetail-triptych__col">
+                <Image
+                  className="vdetail-triptych__img"
+                  src={photoUrl}
+                  alt=""
+                  fill
+                  unoptimized={photoUrl.startsWith("http")}
+                  sizes="33vw"
+                  style={{ objectPosition: col.position }}
+                  loading="eager"
+                  onError={() => setPhotoFailed(true)}
+                />
+                <span className="vdetail-decal">{col.label}</span>
+              </div>
+            ))}
         </div>
 
         {/* Acentos brutalistas: retícula + VIN corrido */}
@@ -111,17 +115,18 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
 
         {/* Auto real: rompe la cuadrícula del tríptico, capa superior */}
         <div className="vdetail-breakout">
-          {/* eslint-disable-next-line @next/next/no-img-element -- placeholder, se reemplaza por asset real */}
-          <img
-            className="vdetail-breakout__img"
-            src={photoUrl}
-            alt={`${vehicle.brand} ${vehicle.model}`}
-            loading="eager"
-            decoding="async"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
-          />
+          {!photoFailed && (
+            <Image
+              className="vdetail-breakout__img"
+              src={photoUrl}
+              alt={`${vehicle.brand} ${vehicle.model}`}
+              fill
+              unoptimized={photoUrl.startsWith("http")}
+              sizes="(max-width: 720px) 84vw, 88vw"
+              loading="eager"
+              onError={() => setPhotoFailed(true)}
+            />
+          )}
 
           <div className="vdetail-hero__copy">
             <span className="vdetail-hero__brand">{vehicle.brand}</span>
@@ -141,7 +146,11 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
               </span>
             </div>
 
-            <span className="vdetail-pricecard__value">{formatCurrency(vehicle.price, locale)}</span>
+            <CountUp
+              value={vehicle.price}
+              format={(n) => formatCurrency(Math.round(n), locale)}
+              className="vdetail-pricecard__value"
+            />
 
             <p className="vdetail-pricecard__tagline">{vehicle.tagline}</p>
 
@@ -162,9 +171,9 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
 
             <div className="vdetail-pricecard__divider" />
 
-            <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4 lg:divide-x">
+            <div className="vdetail-specs grid grid-cols-1 md:grid-cols-4">
               {specColumns.map((col) => (
-                <div key={col.title} className="py-6 first:pt-0 last:pb-0 lg:px-6 lg:py-0 lg:first:pl-0 lg:last:pr-0">
+                <div key={col.title} className="vdetail-specs__col py-6 first:pt-0 last:pb-0 md:px-7 md:py-0 md:first:pl-0 md:last:pr-0">
                   <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-white">
                     {col.title}
                   </h3>

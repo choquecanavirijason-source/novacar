@@ -8,6 +8,8 @@
 
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { usePartsMarketplaceStore } from "../store/usePartsMarketplaceStore";
 import { categoryIcon, categoryKey, partPhotoUrl } from "../partPresentation";
@@ -18,6 +20,7 @@ const BLOCKS: PartCategory[] = ["engine", "tires", "battery", "oil", "audio"];
 export function FeaturedCategoryBlocks() {
   const { t } = useTranslation();
   const apply = usePartsMarketplaceStore((s) => s.apply);
+  const [failed, setFailed] = useState<Partial<Record<PartCategory, boolean>>>({});
 
   const selectCategory = (category: PartCategory) => {
     void apply({ categories: [category] });
@@ -36,17 +39,15 @@ export function FeaturedCategoryBlocks() {
             className={`mk-hero-card ${i % 2 === 1 ? "mk-hero-card--alt" : ""}`}
           >
             <Icon size={0} strokeWidth={1.25} className="text-(--accent-neon)" aria-hidden />
-            {/* eslint-disable-next-line @next/next/no-img-element -- cut-out real en /public/parts, con fallback a foto real */}
-            <img
+            <Image
               className="mk-hero-card__photo"
-              src={`/parts/${category}.png`}
+              src={failed[category] ? partPhotoUrl(category, category, { w: 300, h: 300 }) : `/parts/${category}.png`}
               alt=""
+              width={250}
+              height={250}
+              unoptimized={Boolean(failed[category])}
               loading="lazy"
-              decoding="async"
-              onError={(e) => {
-                const fallback = partPhotoUrl(category, category, { w: 300, h: 300 });
-                if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
-              }}
+              onError={() => setFailed((prev) => ({ ...prev, [category]: true }))}
             />
 
             <h3 className="mk-hero-card__title">{t(categoryKey(category))}</h3>

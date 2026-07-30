@@ -9,6 +9,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { FileText } from "lucide-react";
 import type { CatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import { formatCurrency } from "@core/format/formatters";
@@ -21,6 +22,7 @@ const vehicleCutoutUrl = (brand: string) => `/vehicles/${brand}.png`;
 export function ImportVehicleCard({ vehicle, index = 0 }: { vehicle: CatalogVehicle; index?: number }) {
   const { t, locale } = useTranslation();
   const [quoteOpen, setQuoteOpen] = useState(false);
+  const [cutoutFailed, setCutoutFailed] = useState(false);
 
   const specs = [
     { label: t("featured.specPower"), value: t("showcase.hp", { n: vehicle.horsepower }) },
@@ -86,17 +88,19 @@ export function ImportVehicleCard({ vehicle, index = 0 }: { vehicle: CatalogVehi
         {/* Columna derecha: auto */}
         <div className="relative z-10 mt-12 min-h-[280px] w-full lg:mt-0 lg:min-h-0 lg:w-1/2">
           <div className="pointer-events-none absolute inset-0">
-            {/* eslint-disable-next-line @next/next/no-img-element -- PNG transparente manual si existe; si no, foto real de respaldo */}
-            <img
+            <Image
               className="absolute top-1/2 right-0 w-[120%] max-w-none -translate-y-1/2 object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)] lg:-right-10 lg:drop-shadow-[0_30px_50px_rgba(0,0,0,0.6)]"
-              src={vehicleCutoutUrl(vehicle.brand)}
+              src={
+                cutoutFailed
+                  ? vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 900, h: 900 })
+                  : vehicleCutoutUrl(vehicle.brand)
+              }
               alt={`${vehicle.brand} ${vehicle.model}`}
+              width={900}
+              height={900}
+              unoptimized={cutoutFailed}
               loading="lazy"
-              decoding="async"
-              onError={(e) => {
-                const fallback = vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 900, h: 900 });
-                if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
-              }}
+              onError={() => setCutoutFailed(true)}
             />
           </div>
         </div>

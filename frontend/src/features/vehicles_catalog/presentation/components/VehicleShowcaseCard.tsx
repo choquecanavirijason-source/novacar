@@ -10,8 +10,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { Route } from "next";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { ArrowUpRight, Play } from "lucide-react";
 import "../styles/vehicle-showcase.css";
 
@@ -50,6 +51,8 @@ export function VehicleShowcaseCard({
   onDotClick,
   className = "",
 }: VehicleShowcaseCardProps) {
+  const [imgFailed, setImgFailed] = useState(false);
+
   const ctaContent = (
     <span className="vshowcase__cta-inner">
       <span className="vshowcase__cta-label">{ctaLabel}</span>
@@ -61,17 +64,18 @@ export function VehicleShowcaseCard({
 
   return (
     <section className={`vshowcase ${className}`.trim()}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- imagen de contenido, cubre todo el card */}
-      <img
-        className="vshowcase__bg"
-        src={imageUrl}
-        alt={imageAlt}
-        loading="lazy"
-        decoding="async"
-        onError={(e) => {
-          e.currentTarget.style.display = "none";
-        }}
-      />
+      {!imgFailed && (
+        <Image
+          className="vshowcase__bg"
+          src={imageUrl}
+          alt={imageAlt}
+          fill
+          unoptimized={imageUrl.startsWith("http")}
+          sizes="(max-width: 1024px) 100vw, 50vw"
+          loading="lazy"
+          onError={() => setImgFailed(true)}
+        />
+      )}
 
       <div className="vshowcase__left">
         <div className="vshowcase__hp animate-in">

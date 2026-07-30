@@ -695,3 +695,33 @@
   font-size: 0.78rem;
   line-height: 1.5;
 }
+
+/* ---- VehicleDetail: separadores diagonales entre columnas de specs
+   (reemplaza los divide-x/divide-y planos de Tailwind) ---- */
+.vdetail-specs__col {
+  position: relative;
+}
+
+/* Móvil: apilado, línea diagonal corta arriba de cada bloque (menos el primero) */
+.vdetail-specs__col:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 8%;
+  width: 84%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-strong) 50%, transparent);
+  transform: skewY(-4deg);
+}
+
+@media (min-width: 768px) {
+  /* Desktop: 4 columnas, línea diagonal vertical entre cada una */
+  .vdetail-specs__col:not(:first-child)::before {
+    top: -6%;
+    left: 0;
+    width: 1px;
+    height: 112%;
+    background: linear-gradient(180deg, transparent, var(--border-strong) 18%, var(--border-strong) 82%, transparent);
+    transform: skewX(-12deg);
+  }
+}
