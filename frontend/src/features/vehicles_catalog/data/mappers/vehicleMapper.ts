@@ -2,7 +2,7 @@
  * Data · Mapper · vehicleMapper
  */
 
-import type { CatalogVehicle } from "../../domain/entities/CatalogVehicle";
+import type { CatalogVehicle, NewCatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import type { CatalogVehicleDTO } from "../models/CatalogVehicleDTO";
 
 export const toCatalogVehicle = (dto: CatalogVehicleDTO): CatalogVehicle => ({
@@ -27,3 +27,22 @@ export const toCatalogVehicle = (dto: CatalogVehicleDTO): CatalogVehicle => ({
 
 export const toCatalogVehicles = (dtos: CatalogVehicleDTO[]): CatalogVehicle[] =>
   dtos.map(toCatalogVehicle);
+
+export const toCatalogVehiclePayload = (input: NewCatalogVehicle) => ({
+  brand: input.brand,
+  model: input.model,
+  year: input.year,
+  price: input.price,
+  tagline: input.tagline,
+  body_type: input.bodyType,
+  fuel_type: input.fuelType,
+  transmission: input.transmission,
+  condition: input.condition,
+  mileage_km: input.mileageKm,
+  horsepower: input.horsepower,
+  seats: input.seats,
+  features: [...input.features],
+  accent_from: input.accentFrom,
+  accent_to: input.accentTo,
+  highlighted: input.highlighted,
+});

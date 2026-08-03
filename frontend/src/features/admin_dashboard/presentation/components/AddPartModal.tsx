@@ -1,7 +1,8 @@
 /**
  * Presentation · Component · AddPartModal
- * Popup para que el administrador dé de alta un vehículo o autoparte en el
- * inventario (nombre, categoría, precio, stock inicial, umbral de reorden).
+ * Popup para dar de alta o editar un conteo de bodega (batería/fusible):
+ * nombre, categoría, precio, stock y umbral de reorden. No es contenido
+ * público — para eso están Vehículos y Autopartes.
  */
 
 "use client";
@@ -12,33 +13,35 @@ import { useTranslation } from "@core/i18n/I18nProvider";
 import { useToast } from "@core/toast/ToastProvider";
 import { Input } from "@ui/atoms/Input";
 import { Button } from "@ui/atoms/Button";
+import { SelectWithAdd } from "@ui/molecules/SelectWithAdd";
 import { useModalA11y } from "@ui/hooks/useModalA11y";
 import type { InventoryItem, NewInventoryItem } from "../../domain/entities/InventoryItem";
 
 type Category = InventoryItem["category"];
 
 export function AddPartModal({
+  item,
   onClose,
   onSubmit,
 }: {
+  item?: InventoryItem;
   onClose: () => void;
   onSubmit: (input: NewInventoryItem) => Promise<boolean>;
 }) {
   const { t } = useTranslation();
   const toast = useToast();
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState<Category>("battery");
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
-  const [reorderLevel, setReorderLevel] = useState("5");
+  const [name, setName] = useState(item?.name ?? "");
+  const [category, setCategory] = useState<Category>(item?.category ?? "battery");
+  const [price, setPrice] = useState(String(item?.price ?? ""));
+  const [stock, setStock] = useState(String(item?.stock ?? ""));
+  const [reorderLevel, setReorderLevel] = useState(String(item?.reorderLevel ?? 5));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const panelRef = useModalA11y<HTMLDivElement>(onClose);
 
-  const categories: { id: Category; label: string }[] = [
-    { id: "vehicle", label: t("admin.categoryVehicle") },
-    { id: "battery", label: t("admin.categoryBattery") },
-    { id: "fuse", label: t("admin.categoryFuse") },
+  const categoryBuiltin = [
+    { value: "battery", label: t("admin.categoryBattery") },
+    { value: "fuse", label: t("admin.categoryFuse") },
   ];
 
   async function handleSubmit(e: FormEvent) {
@@ -54,15 +57,21 @@ export function AddPartModal({
     });
     setSaving(false);
     if (ok) {
-      toast.success(t("admin.addSuccess"));
+      toast.success(item ? t("admin.itemUpdateSuccess") : t("admin.addSuccess"));
       onClose();
     } else {
-      setError(t("auth.loginError"));
+      setError(t("common.saveError"));
     }
   }
 
   return (
-    <div className="addpart-overlay" role="dialog" aria-modal="true" aria-label={t("admin.addPartTitle")} onClick={onClose}>
+    <div
+      className="addpart-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label={item ? t("admin.itemEditTitle") : t("admin.addPartTitle")}
+      onClick={onClose}
+    >
       <div
         ref={panelRef}
         tabIndex={-1}
@@ -73,7 +82,7 @@ export function AddPartModal({
           <X size={18} strokeWidth={1.75} aria-hidden />
         </button>
 
-        <h2 className="addpart-title">{t("admin.addPartTitle")}</h2>
+        <h2 className="addpart-title">{item ? t("admin.itemEditTitle") : t("admin.addPartTitle")}</h2>
         <p className="addpart-subtitle">{t("admin.addPartSubtitle")}</p>
 
         <form className="addpart-form" onSubmit={handleSubmit}>
@@ -84,17 +93,14 @@ export function AddPartModal({
 
           <label className="addpart-field">
             <span>{t("admin.fieldCategory")}</span>
-            <select
-              className="ui-input addpart-select"
+            <SelectWithAdd
+              storageKey="novacar.options.inventory.category"
+              builtin={categoryBuiltin}
               value={category}
-              onChange={(e) => setCategory(e.target.value as Category)}
-            >
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => setCategory(v as Category)}
+              addLabel={t("admin.addOption")}
+              addPlaceholder={t("admin.addOptionPlaceholder")}
+            />
           </label>
 
           <div className="addpart-row">

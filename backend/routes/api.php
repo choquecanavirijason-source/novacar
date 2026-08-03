@@ -28,6 +28,7 @@ Route::get('/marketplace/parts/{id}', [MarketplaceController::class, 'show']);
 
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::get('/inventory', [AdminController::class, 'inventory']);
+    Route::post('/inventory', [AdminController::class, 'store']);
     Route::get('/analytics', [AdminController::class, 'analytics']);
     Route::patch('/inventory/{id}/stock', [AdminController::class, 'updateStock']);
 });

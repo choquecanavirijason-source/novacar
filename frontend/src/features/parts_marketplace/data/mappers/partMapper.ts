@@ -5,6 +5,7 @@
 
 import type {
   MarketplacePart,
+  NewMarketplacePart,
   PartCategory,
   PartCondition,
 } from "../../domain/entities/MarketplacePart";
@@ -35,3 +36,25 @@ export const toMarketplacePart = (dto: MarketplacePartDTO): MarketplacePart => (
 
 export const toMarketplaceParts = (dtos: MarketplacePartDTO[]): MarketplacePart[] =>
   dtos.map(toMarketplacePart);
+
+export const toMarketplacePartPayload = (input: NewMarketplacePart) => ({
+  sku: input.sku,
+  name: input.name,
+  category: input.category,
+  brand: input.brand,
+  condition: input.condition,
+  price: input.price,
+  original_price: input.originalPrice,
+  stock: input.stock,
+  rating: input.rating,
+  reviews: input.reviews,
+  seller: input.seller,
+  free_shipping: input.freeShipping,
+  warranty_months: input.warrantyMonths,
+  compatible_brands: [...input.compatibleBrands],
+  year_from: input.yearFrom,
+  year_to: input.yearTo,
+  specs: [...input.specs],
+  accent_from: input.accentFrom,
+  accent_to: input.accentTo,
+});

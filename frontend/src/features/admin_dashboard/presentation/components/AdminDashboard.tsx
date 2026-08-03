@@ -1,19 +1,24 @@
 /**
  * Presentation · Component · AdminDashboard
- * Layout orquestador: contenido izquierda + sidebar derecha. Carga datos al montar.
+ * Layout orquestador: topbar fija arriba + contenido debajo. Carga datos al montar.
  */
 
 "use client";
 
 import { useEffect } from "react";
+import type { Route } from "next";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@core/auth/AuthProvider";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Button } from "@ui/atoms/Button";
-import { AdminSidebar } from "./AdminSidebar";
+import { AdminTopbar, type AdminPage } from "./AdminTopbar";
 import { AnalyticsPage } from "../pages/AnalyticsPage";
 import { InventoryPage } from "../pages/InventoryPage";
 import { useAdminDashboardStore } from "../store/useAdminDashboardStore";
+import { BannersPage } from "@features/site_banners/presentation/pages/BannersPage";
+import { VehiclesAdminPage } from "@features/vehicles_catalog/presentation/pages/VehiclesAdminPage";
+
+const TABS: AdminPage[] = ["analytics", "vehicles", "inventory", "banners"];
 
 export function AdminDashboard() {
   const { t } = useTranslation();
@@ -22,7 +27,8 @@ export function AdminDashboard() {
   const searchParams = useSearchParams();
   const load = useAdminDashboardStore((s) => s.load);
 
-  const page = searchParams.get("tab") === "inventory" ? "inventory" : "analytics";
+  const tabParam = searchParams.get("tab");
+  const page: AdminPage = TABS.includes(tabParam as AdminPage) ? (tabParam as AdminPage) : "analytics";
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -41,17 +47,20 @@ export function AdminDashboard() {
     );
   }
 
-  function navigate(next: "inventory" | "analytics") {
-    const url = next === "inventory" ? "/admin?tab=inventory" : "/admin";
-    router.push(url);
+  function navigate(next: AdminPage) {
+    const url = next === "analytics" ? "/admin" : `/admin?tab=${next}`;
+    router.push(url as Route);
   }
 
   return (
     <div className="admin-layout">
+      <AdminTopbar active={page} onNavigate={navigate} />
       <main className="admin-layout__main">
-        {page === "analytics" ? <AnalyticsPage /> : <InventoryPage />}
+        {page === "analytics" && <AnalyticsPage />}
+        {page === "vehicles" && <VehiclesAdminPage />}
+        {page === "inventory" && <InventoryPage />}
+        {page === "banners" && <BannersPage />}
       </main>
-      <AdminSidebar active={page} onNavigate={navigate} />
     </div>
   );
 }

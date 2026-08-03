@@ -68,6 +68,9 @@ export interface MarketplacePart {
   readonly accentTo: string;
 }
 
+/** Datos que el administrador captura al crear/editar una autoparte. */
+export type NewMarketplacePart = Omit<MarketplacePart, "id">;
+
 /** Porcentaje de descuento (entero), 0 si no aplica. */
 export const discountPercent = (part: MarketplacePart): number =>
   part.originalPrice && part.originalPrice > part.price

@@ -1,14 +1,21 @@
 /**
  * Data · DataSource · MarketplaceRemoteDataSource
- * Implementación HTTP (REST) lista para producción + MOCK in-memory para correr sin backend.
+ * Implementación HTTP (REST) lista para producción + MOCK persistido en
+ * localStorage (mismo patrón que site_banners / vehicles_catalog) para
+ * correr sin backend.
  */
 
 import type { HttpClient } from "@core/http/HttpClient";
+import type { MarketplacePart, NewMarketplacePart } from "../../domain/entities/MarketplacePart";
 import type { MarketplacePartDTO } from "../models/MarketplacePartDTO";
+import { toMarketplacePartPayload } from "../mappers/partMapper";
 
 export interface MarketplaceRemoteDataSource {
   fetchAll(): Promise<MarketplacePartDTO[]>;
   fetchById(id: string): Promise<MarketplacePartDTO | null>;
+  create(input: NewMarketplacePart): Promise<MarketplacePartDTO>;
+  update(id: string, input: NewMarketplacePart): Promise<MarketplacePartDTO>;
+  remove(id: string): Promise<void>;
 }
 
 /* ---- Implementación HTTP real ---- */
@@ -20,9 +27,18 @@ export class MarketplaceHttpDataSource implements MarketplaceRemoteDataSource {
   fetchById(id: string) {
     return this.http.get<MarketplacePartDTO | null>(`/marketplace/parts/${id}`);
   }
+  create(input: NewMarketplacePart) {
+    return this.http.post<MarketplacePartDTO>("/admin/marketplace/parts", toMarketplacePartPayload(input));
+  }
+  update(id: string, input: NewMarketplacePart) {
+    return this.http.put<MarketplacePartDTO>(`/admin/marketplace/parts/${id}`, toMarketplacePartPayload(input));
+  }
+  remove(id: string) {
+    return this.http.delete<void>(`/admin/marketplace/parts/${id}`);
+  }
 }
 
-/* ---- Dataset mock ---- */
+/* ---- Dataset semilla (primera carga; luego vive en localStorage) ---- */
 const ALL_BRANDS = ["Nissan", "Volkswagen", "Toyota", "Mazda", "Honda", "Chevrolet", "Ford", "Hyundai", "Kia"];
 
 const P = (
@@ -56,8 +72,7 @@ const P = (
   ...extra,
 });
 
-const MOCK: MarketplacePartDTO[] = [
-  // Motores
+const SEED: MarketplacePartDTO[] = [
   P("eng-1", "Motor 1.6L 16v reconstruido", "engine", "Nissan", "reconstruido", 38500, {
     original_price: 45000, stock: 3, rating: 4.7, reviews: 28, warranty_months: 6, accent_from: "#ff6b6b", accent_to: "#ff9b3d",
     compatible_brands: ["Nissan"], specs: [{ label: "Cilindrada", value: "1.6L" }, { label: "Válvulas", value: "16v" }, { label: "Combustible", value: "Gasolina" }],
@@ -66,7 +81,6 @@ const MOCK: MarketplacePartDTO[] = [
     stock: 1, rating: 4.4, reviews: 12, free_shipping: false, warranty_months: 3, accent_from: "#0077b3", accent_to: "#4dc4ff",
     compatible_brands: ["Volkswagen"], specs: [{ label: "Cilindrada", value: "2.0L" }, { label: "Inducción", value: "Turbo TSI" }],
   }),
-  // Llantas
   P("tir-1", "Llanta 205/55 R16 (juego de 4)", "tires", "Michelin", "nuevo", 7600, {
     stock: 24, rating: 4.9, reviews: 210, accent_from: "#00aaff", accent_to: "#0088cc",
     compatible_brands: ALL_BRANDS, specs: [{ label: "Medida", value: "205/55 R16" }, { label: "Piezas", value: "4" }],
@@ -75,7 +89,6 @@ const MOCK: MarketplacePartDTO[] = [
     original_price: 7000, stock: 16, rating: 4.6, reviews: 98, accent_from: "#0088cc", accent_to: "#00aaff",
     compatible_brands: ALL_BRANDS, specs: [{ label: "Medida", value: "195/65 R15" }, { label: "Piezas", value: "4" }],
   }),
-  // Asientos
   P("sea-1", "Asiento delantero de piel", "seats", "OEM", "usado", 4300, {
     stock: 5, rating: 4.2, reviews: 17, free_shipping: false, warranty_months: 0, accent_from: "#9a9c97", accent_to: "#005f8f",
     specs: [{ label: "Material", value: "Piel" }, { label: "Posición", value: "Delantero" }],
@@ -84,7 +97,6 @@ const MOCK: MarketplacePartDTO[] = [
     stock: 2, rating: 4.8, reviews: 34, accent_from: "#ff6b6b", accent_to: "#0077b3",
     specs: [{ label: "Tipo", value: "Deportivo" }, { label: "Piezas", value: "2" }],
   }),
-  // Baterías
   P("bat-1", "Batería LTH Grupo 35 · 600 CCA", "battery", "LTH", "nuevo", 2890, {
     stock: 30, rating: 4.7, reviews: 156, accent_from: "#005f8f", accent_to: "#00aaff",
     specs: [{ label: "Grupo", value: "BCI 35" }, { label: "CCA", value: "600 A" }, { label: "Voltaje", value: "12 V" }],
@@ -93,7 +105,6 @@ const MOCK: MarketplacePartDTO[] = [
     stock: 14, rating: 4.8, reviews: 89, accent_from: "#00aaff", accent_to: "#0077b3",
     specs: [{ label: "Grupo", value: "BCI 42" }, { label: "CCA", value: "700 A" }],
   }),
-  // Fusibles
   P("fus-1", "Kit de fusibles Mini (surtido 120 pzs)", "fuse", "Littelfuse", "nuevo", 320, {
     stock: 200, rating: 4.9, reviews: 320, accent_from: "#0088cc", accent_to: "#00aaff",
     compatible_brands: ALL_BRANDS, specs: [{ label: "Tipo", value: "Mini" }, { label: "Piezas", value: "120" }],
@@ -102,7 +113,6 @@ const MOCK: MarketplacePartDTO[] = [
     stock: 150, rating: 4.7, reviews: 142, accent_from: "#005f8f", accent_to: "#0088cc",
     compatible_brands: ALL_BRANDS, specs: [{ label: "Tipo", value: "Blade" }, { label: "Piezas", value: "80" }],
   }),
-  // Frenos
   P("brk-1", "Balatas cerámicas delanteras", "brakes", "Brembo", "nuevo", 1290, {
     stock: 40, rating: 4.8, reviews: 76, accent_from: "#ff6b6b", accent_to: "#ff9b3d",
     specs: [{ label: "Tipo", value: "Cerámica" }, { label: "Posición", value: "Delantero" }],
@@ -111,7 +121,6 @@ const MOCK: MarketplacePartDTO[] = [
     original_price: 2600, stock: 18, rating: 4.6, reviews: 51, accent_from: "#0077b3", accent_to: "#00aaff",
     specs: [{ label: "Tipo", value: "Ventilado" }, { label: "Piezas", value: "2" }],
   }),
-  // Suspensión
   P("sus-1", "Amortiguadores delanteros (par)", "suspension", "Monroe", "nuevo", 3380, {
     stock: 12, rating: 4.5, reviews: 44, accent_from: "#9a9c97", accent_to: "#005f8f",
     specs: [{ label: "Posición", value: "Delantero" }, { label: "Piezas", value: "2" }],
@@ -120,7 +129,6 @@ const MOCK: MarketplacePartDTO[] = [
     stock: 6, rating: 4.3, reviews: 22, warranty_months: 6, accent_from: "#00aaff", accent_to: "#0077b3",
     specs: [{ label: "Incluye", value: "Horquillas + rótulas" }],
   }),
-  // Aceites
   P("oil-1", "Aceite sintético 5W-30 (4L)", "oil", "Mobil 1", "nuevo", 690, {
     stock: 120, rating: 4.9, reviews: 410, accent_from: "#0088cc", accent_to: "#00aaff",
     compatible_brands: ALL_BRANDS, warranty_months: 0, specs: [{ label: "Viscosidad", value: "5W-30" }, { label: "Volumen", value: "4 L" }],
@@ -129,7 +137,6 @@ const MOCK: MarketplacePartDTO[] = [
     stock: 90, rating: 4.6, reviews: 188, accent_from: "#005f8f", accent_to: "#0088cc",
     compatible_brands: ALL_BRANDS, warranty_months: 0, specs: [{ label: "Viscosidad", value: "10W-40" }, { label: "Volumen", value: "5 L" }],
   }),
-  // Luces
   P("lig-1", "Faro delantero LED (lado izq.)", "lights", "Philips", "nuevo", 2890, {
     stock: 9, rating: 4.5, reviews: 37, accent_from: "#00aaff", accent_to: "#4dc4ff",
     specs: [{ label: "Tecnología", value: "LED" }, { label: "Lado", value: "Izquierdo" }],
@@ -142,7 +149,6 @@ const MOCK: MarketplacePartDTO[] = [
     stock: 10, rating: 4.7, reviews: 41, accent_from: "#ff6b6b", accent_to: "#00aaff",
     compatible_brands: ["Honda", "Yamaha", "Kawasaki"], specs: [{ label: "Tecnología", value: "LED" }, { label: "Uso", value: "Moto" }],
   }),
-  // Filtros
   P("fil-1", "Filtro de aire de alto flujo", "filters", "K&N", "nuevo", 760, {
     stock: 48, rating: 4.7, reviews: 120, accent_from: "#0088cc", accent_to: "#005f8f",
     specs: [{ label: "Tipo", value: "Aire" }, { label: "Reutilizable", value: "Sí" }],
@@ -155,7 +161,6 @@ const MOCK: MarketplacePartDTO[] = [
     stock: 18, rating: 4.8, reviews: 67, accent_from: "#ff6b6b", accent_to: "#ff9b3d",
     compatible_brands: ["Honda", "Yamaha"], specs: [{ label: "Tipo", value: "Aire" }, { label: "Uso", value: "Moto" }],
   }),
-  // Carrocería
   P("bod-1", "Cofre/capó de lámina", "body", "OEM", "usado", 5200, {
     stock: 3, rating: 4.1, reviews: 9, free_shipping: false, warranty_months: 0, accent_from: "#9a9c97", accent_to: "#0077b3",
     specs: [{ label: "Pieza", value: "Cofre" }, { label: "Material", value: "Lámina" }],
@@ -164,7 +169,6 @@ const MOCK: MarketplacePartDTO[] = [
     stock: 11, rating: 4.5, reviews: 26, accent_from: "#0077b3", accent_to: "#00aaff",
     specs: [{ label: "Pieza", value: "Espejo" }, { label: "Lado", value: "Derecho" }],
   }),
-  // Audio
   P("aud-1", "Estéreo Android 9\" CarPlay", "audio", "Pioneer", "nuevo", 4200, {
     original_price: 5100, stock: 15, rating: 4.8, reviews: 175, accent_from: "#00aaff", accent_to: "#0077b3",
     compatible_brands: ALL_BRANDS, specs: [{ label: "Pantalla", value: "9\"" }, { label: "Sistema", value: "Android + CarPlay" }],
@@ -175,14 +179,63 @@ const MOCK: MarketplacePartDTO[] = [
   }),
 ];
 
+const STORAGE_KEY = "novacar.marketplaceParts";
+
+function readStore(): MarketplacePartDTO[] {
+  if (typeof window === "undefined") return SEED;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED));
+      return SEED;
+    }
+    return JSON.parse(raw) as MarketplacePartDTO[];
+  } catch {
+    return SEED;
+  }
+}
+
+function writeStore(parts: MarketplacePartDTO[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(parts));
+}
+
 const delay = <T>(value: T, ms = 240): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(value), ms));
 
 export class MarketplaceMockDataSource implements MarketplaceRemoteDataSource {
   fetchAll() {
-    return delay([...MOCK]);
+    return delay([...readStore()]);
   }
   fetchById(id: string) {
-    return delay(MOCK.find((p) => p.id === id) ?? null);
+    return delay(readStore().find((p) => p.id === id) ?? null);
+  }
+
+  create(input: NewMarketplacePart) {
+    const parts = readStore();
+    const slug = `${input.category}-${input.name}`
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+    const id = parts.some((p) => p.id === slug) ? `${slug}-${Date.now()}` : slug;
+    const dto: MarketplacePartDTO = { id, ...toMarketplacePartPayload(input) };
+    writeStore([dto, ...parts]);
+    return delay(dto);
+  }
+
+  update(id: string, input: NewMarketplacePart) {
+    const parts = readStore();
+    const current = parts.find((p) => p.id === id);
+    if (!current) return Promise.reject(new Error("Autoparte no encontrada."));
+    const updated: MarketplacePartDTO = { id, ...toMarketplacePartPayload(input) };
+    writeStore(parts.map((p) => (p.id === id ? updated : p)));
+    return delay(updated);
+  }
+
+  remove(id: string) {
+    writeStore(readStore().filter((p) => p.id !== id));
+    return delay(undefined);
   }
 }

@@ -8,17 +8,15 @@ import { Skeleton } from "@ui/atoms/Skeleton";
 
 export default function AdminPage() {
   return (
-    <section className="admin-page">
-      <Suspense
-        fallback={
-          <div style={{ display: "grid", gap: 16 }}>
-            <Skeleton height={120} />
-            <Skeleton height={320} />
-          </div>
-        }
-      >
-        <AdminDashboard />
-      </Suspense>
-    </section>
+    <Suspense
+      fallback={
+        <div className="admin-layout__main" style={{ display: "grid", gap: 16 }}>
+          <Skeleton height={120} />
+          <Skeleton height={320} />
+        </div>
+      }
+    >
+      <AdminDashboard />
+    </Suspense>
   );
 }

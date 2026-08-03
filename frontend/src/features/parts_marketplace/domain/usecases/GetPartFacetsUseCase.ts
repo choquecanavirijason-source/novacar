@@ -4,7 +4,7 @@
  * para construir el sidebar de filtros.
  */
 
-import { PART_CATEGORIES, type PartCategory, type PartCondition } from "../entities/MarketplacePart";
+import type { PartCondition } from "../entities/MarketplacePart";
 import type { PartFacets } from "../entities/PartFilters";
 import type { MarketplaceRepository } from "../repositories/MarketplaceRepository";
 
@@ -15,10 +15,12 @@ export class GetPartFacetsUseCase {
     const all = await this.repository.getAll();
     const prices = all.map((p) => p.price);
 
-    const categories = PART_CATEGORIES.map((value: PartCategory) => ({
+    // Derivado de los datos reales (no de la lista fija de 12): así una
+    // categoría que el admin agrega desde el "+" también aparece como filtro.
+    const categories = [...new Set(all.map((p) => p.category))].map((value) => ({
       value,
       count: all.filter((p) => p.category === value).length,
-    })).filter((c) => c.count > 0);
+    }));
 
     const conditions = [...new Set(all.map((p) => p.condition))] as PartCondition[];
     const vehicleBrands = [...new Set(all.flatMap((p) => p.compatibleBrands))].sort();

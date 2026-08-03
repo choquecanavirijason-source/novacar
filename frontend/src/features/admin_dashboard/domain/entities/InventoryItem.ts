@@ -1,13 +1,16 @@
 /**
  * Domain · Entity · InventoryItem
- * Ítem de inventario gestionable desde el panel.
+ * Conteo interno de bodega (baterías/fusibles físicos en almacén) para
+ * alertas de reorden. No es contenido público: eso lo maneja el catálogo
+ * de Vehículos (`vehicles_catalog`) y el marketplace de Autopartes
+ * (`parts_marketplace`), que son independientes de este stock interno.
  */
 
 export interface InventoryItem {
   readonly id: string;
   readonly sku: string;
   readonly name: string;
-  readonly category: "vehicle" | "battery" | "fuse";
+  readonly category: "battery" | "fuse";
   readonly stock: number;
   readonly price: number;
   readonly reorderLevel: number; // umbral de alerta de stock bajo

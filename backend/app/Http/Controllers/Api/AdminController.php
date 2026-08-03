@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\InventoryItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
@@ -15,6 +16,31 @@ class AdminController extends Controller
             InventoryItem::query()->orderBy('category')->orderBy('name')->get()
                 ->map(fn ($i) => $this->itemPayload($i))
         );
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string', 'in:vehicle,battery,fuse'],
+            'price' => ['required', 'integer', 'min:0'],
+            'stock' => ['required', 'integer', 'min:0'],
+            'reorder_level' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $prefix = ['vehicle' => 'VH', 'battery' => 'BAT', 'fuse' => 'FUS'][$data['category']];
+
+        $item = InventoryItem::create([
+            'id' => (string) Str::uuid(),
+            'sku' => sprintf('%s-%04d', $prefix, random_int(1000, 9999)),
+            'name' => $data['name'],
+            'category' => $data['category'],
+            'price' => $data['price'],
+            'stock' => $data['stock'],
+            'reorder_level' => $data['reorder_level'],
+        ]);
+
+        return response()->json($this->itemPayload($item), 201);
     }
 
     public function analytics(): JsonResponse

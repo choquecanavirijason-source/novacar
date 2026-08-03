@@ -16,7 +16,7 @@ import { marketplaceUseCases } from "../../di";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Eyebrow } from "@ui/atoms/Eyebrow";
 import { useModalA11y } from "@ui/hooks/useModalA11y";
-import { categoryIcon, categoryKey } from "../partPresentation";
+import { resolveCategoryIcon, resolveCategoryLabel } from "../partPresentation";
 import "../styles/marketplace.css";
 
 export function CategoriesBento() {
@@ -84,7 +84,7 @@ export function CategoriesBento() {
             ) : (
               <div className="bento bento--stacked">
                 {cats.map((c, i) => {
-                  const CategoryIcon = categoryIcon[c.value];
+                  const CategoryIcon = resolveCategoryIcon(c.value);
                   return (
                     <Link
                       key={c.value}
@@ -98,7 +98,7 @@ export function CategoriesBento() {
                           <CategoryIcon size={24} strokeWidth={1.5} aria-hidden />
                         </span>
                         <div className="bento__meta">
-                          <div className="bento__name">{t(categoryKey(c.value))}</div>
+                          <div className="bento__name">{resolveCategoryLabel(c.value, t)}</div>
                           <div className="bento__count">
                             {c.count} {t("home.items")}
                           </div>

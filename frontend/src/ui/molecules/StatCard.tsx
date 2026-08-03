@@ -16,6 +16,13 @@ const ACCENTS: Record<Accent, string> = {
   success: "var(--success)",
 };
 
+const ACCENTS_SOFT: Record<Accent, string> = {
+  primary: "var(--primary-soft)",
+  neon: "var(--accent-soft)",
+  danger: "var(--danger-soft)",
+  success: "var(--success-soft)",
+};
+
 interface StatCardProps {
   label: string;
   value: string | number;
@@ -26,6 +33,7 @@ interface StatCardProps {
 
 export function StatCard({ label, value, icon, hint, accent = "primary" }: StatCardProps) {
   const color = ACCENTS[accent];
+  const soft = ACCENTS_SOFT[accent];
   return (
     <Card animate tilt3d style={{ padding: 20, position: "relative", overflow: "hidden" }}>
       <div
@@ -33,13 +41,29 @@ export function StatCard({ label, value, icon, hint, accent = "primary" }: StatC
         style={{
           position: "absolute",
           inset: 0,
-          background: `radial-gradient(120% 80% at 100% 0%, ${color}22, transparent 60%)`,
+          background: `radial-gradient(120% 80% at 100% 0%, ${soft}, transparent 60%)`,
         }}
       />
       <div style={{ position: "relative" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <span style={{ color: "var(--text-secondary)", fontSize: "0.84rem" }}>{label}</span>
-          {icon && <span style={{ color, display: "inline-flex" }}>{icon}</span>}
+          {icon && (
+            <span
+              style={{
+                color,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 34,
+                height: 34,
+                borderRadius: "var(--radius-md)",
+                background: soft,
+                flexShrink: 0,
+              }}
+            >
+              {icon}
+            </span>
+          )}
         </div>
         <div style={{ fontSize: "1.9rem", fontWeight: 800, color, marginTop: 8 }}>{value}</div>
         {hint && (

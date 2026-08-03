@@ -1,13 +1,20 @@
 /**
  * Data · DataSource · CatalogRemoteDataSource
+ * El MOCK persiste en localStorage: mientras no haya backend, los autos que
+ * el admin crea/edita/borra sobreviven a recargas de página en este navegador.
  */
 
 import type { HttpClient } from "@core/http/HttpClient";
+import type { NewCatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import type { CatalogVehicleDTO } from "../models/CatalogVehicleDTO";
+import { toCatalogVehiclePayload } from "../mappers/vehicleMapper";
 
 export interface CatalogRemoteDataSource {
   fetchAll(): Promise<CatalogVehicleDTO[]>;
   fetchById(id: string): Promise<CatalogVehicleDTO | null>;
+  create(input: NewCatalogVehicle): Promise<CatalogVehicleDTO>;
+  update(id: string, input: NewCatalogVehicle): Promise<CatalogVehicleDTO>;
+  remove(id: string): Promise<void>;
 }
 
 export class CatalogHttpDataSource implements CatalogRemoteDataSource {
@@ -22,9 +29,21 @@ export class CatalogHttpDataSource implements CatalogRemoteDataSource {
       .get<CatalogVehicleDTO>(`/catalog/vehicles/${id}`)
       .catch(() => null);
   }
+
+  create(input: NewCatalogVehicle) {
+    return this.http.post<CatalogVehicleDTO>("/admin/catalog/vehicles", toCatalogVehiclePayload(input));
+  }
+
+  update(id: string, input: NewCatalogVehicle) {
+    return this.http.put<CatalogVehicleDTO>(`/admin/catalog/vehicles/${id}`, toCatalogVehiclePayload(input));
+  }
+
+  remove(id: string) {
+    return this.http.delete<void>(`/admin/catalog/vehicles/${id}`);
+  }
 }
 
-const MOCK: CatalogVehicleDTO[] = [
+const SEED: CatalogVehicleDTO[] = [
   {
     id: "nissan-versa-2021", brand: "Nissan", model: "Versa Sense", year: 2021, price: 289000,
     tagline: "Sedán eficiente, confiable y con bajo consumo.", body_type: "sedan", fuel_type: "gasolina",
@@ -63,14 +82,66 @@ const MOCK: CatalogVehicleDTO[] = [
   },
 ];
 
+const STORAGE_KEY = "novacar.catalogVehicles";
+
+function readStore(): CatalogVehicleDTO[] {
+  if (typeof window === "undefined") return SEED;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED));
+      return SEED;
+    }
+    return JSON.parse(raw) as CatalogVehicleDTO[];
+  } catch {
+    return SEED;
+  }
+}
+
+function writeStore(vehicles: CatalogVehicleDTO[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(vehicles));
+}
+
 const delay = <T>(value: T, ms = 220): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(value), ms));
 
 export class CatalogMockDataSource implements CatalogRemoteDataSource {
   fetchAll() {
-    return delay([...MOCK]);
+    return delay([...readStore()]);
   }
+
   fetchById(id: string) {
-    return delay(MOCK.find((v) => v.id === id) ?? null);
+    return delay(readStore().find((v) => v.id === id) ?? null);
+  }
+
+  create(input: NewCatalogVehicle) {
+    const vehicles = readStore();
+    const slug = `${input.brand}-${input.model}-${input.year}`
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+    const dto: CatalogVehicleDTO = {
+      id: vehicles.some((v) => v.id === slug) ? `${slug}-${Date.now()}` : slug,
+      ...toCatalogVehiclePayload(input),
+    };
+    writeStore([dto, ...vehicles]);
+    return delay(dto);
+  }
+
+  update(id: string, input: NewCatalogVehicle) {
+    const vehicles = readStore();
+    const current = vehicles.find((v) => v.id === id);
+    if (!current) return Promise.reject(new Error("Vehículo no encontrado."));
+    const updated: CatalogVehicleDTO = { id, ...toCatalogVehiclePayload(input) };
+    writeStore(vehicles.map((v) => (v.id === id ? updated : v)));
+    return delay(updated);
+  }
+
+  remove(id: string) {
+    writeStore(readStore().filter((v) => v.id !== id));
+    return delay(undefined);
   }
 }

@@ -1,17 +1,18 @@
 /**
  * Presentation · State (Zustand) · useAdminDashboardStore
- * ViewModel del panel: carga analíticas/inventario e invoca los use cases.
+ * ViewModel del panel: carga inventario e invoca los use cases. Las
+ * analíticas del panel (AnalyticsPage) se agregan del lado del cliente a
+ * partir de los datos reales de este store + vehicles_catalog +
+ * parts_marketplace + site_banners, no de un endpoint de "resumen" aparte.
  */
 
 "use client";
 
 import { create } from "zustand";
-import type { AnalyticsSummary } from "../../domain/entities/DashboardStats";
 import type { InventoryItem, NewInventoryItem } from "../../domain/entities/InventoryItem";
 import { adminUseCases } from "../../di";
 
 interface AdminDashboardState {
-  summary: AnalyticsSummary | null;
   inventory: InventoryItem[];
   loading: boolean;
   error: string | null;
@@ -19,10 +20,11 @@ interface AdminDashboardState {
   load: () => Promise<void>;
   updateStock: (itemId: string, newStock: number) => Promise<void>;
   addItem: (input: NewInventoryItem) => Promise<boolean>;
+  updateItem: (itemId: string, input: NewInventoryItem) => Promise<boolean>;
+  removeItem: (itemId: string) => Promise<void>;
 }
 
 export const useAdminDashboardStore = create<AdminDashboardState>((set, get) => ({
-  summary: null,
   inventory: [],
   loading: false,
   error: null,
@@ -30,11 +32,8 @@ export const useAdminDashboardStore = create<AdminDashboardState>((set, get) => 
   load: async () => {
     set({ loading: true, error: null });
     try {
-      const [summary, inventory] = await Promise.all([
-        adminUseCases.getAnalyticsSummary.execute(),
-        adminUseCases.getInventory(),
-      ]);
-      set({ summary, inventory, loading: false });
+      const inventory = await adminUseCases.getInventory();
+      set({ inventory, loading: false });
     } catch (e) {
       set({ loading: false, error: (e as Error).message });
     }
@@ -59,6 +58,26 @@ export const useAdminDashboardStore = create<AdminDashboardState>((set, get) => 
     } catch (e) {
       set({ error: (e as Error).message });
       return false;
+    }
+  },
+
+  updateItem: async (itemId, input) => {
+    try {
+      const updated = await adminUseCases.updateInventoryItem.execute(itemId, input);
+      set({ inventory: get().inventory.map((i) => (i.id === itemId ? updated : i)) });
+      return true;
+    } catch (e) {
+      set({ error: (e as Error).message });
+      return false;
+    }
+  },
+
+  removeItem: async (itemId) => {
+    try {
+      await adminUseCases.deleteInventoryItem.execute(itemId);
+      set({ inventory: get().inventory.filter((i) => i.id !== itemId) });
+    } catch (e) {
+      set({ error: (e as Error).message });
     }
   },
 }));

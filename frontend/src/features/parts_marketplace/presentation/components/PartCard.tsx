@@ -12,13 +12,13 @@ import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { RatingStars } from "@ui/atoms/RatingStars";
 import { ProductCard } from "@ui/molecules/ProductCard";
-import { categoryIcon, categoryKey, conditionKey, partPhotoUrl } from "../partPresentation";
+import { resolveCategoryIcon, resolveCategoryLabel, conditionKey, partPhotoUrl } from "../partPresentation";
 import { ProductInquiryModal } from "./ProductInquiryModal";
 
 export function PartCard({ part, index = 0 }: { part: MarketplacePart; index?: number }) {
   const { t, locale } = useTranslation();
   const off = discountPercent(part);
-  const CategoryIcon = categoryIcon[part.category];
+  const CategoryIcon = resolveCategoryIcon(part.category);
   const [inquiryOpen, setInquiryOpen] = useState(false);
 
   const shippingFeature = part.freeShipping
@@ -55,7 +55,7 @@ export function PartCard({ part, index = 0 }: { part: MarketplacePart; index?: n
           </>
         }
         features={[
-          t(categoryKey(part.category)),
+          resolveCategoryLabel(part.category, t),
           <RatingStars key="rating" value={part.rating} reviews={part.reviews} />,
           shippingFeature,
         ]}

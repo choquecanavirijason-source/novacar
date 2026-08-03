@@ -1,9 +1,17 @@
 services:
   api:
-    image: php:8.4-cli
+    build:
+      context: .
+      dockerfile: Dockerfile
     working_dir: /var/www/html
     volumes:
       - .:/var/www/html
+      - vendor:/var/www/html/vendor
     ports:
       - "8002:8000"
+    env_file:
+      - .env
     command: php artisan serve --host=0.0.0.0 --port=8000
+
+volumes:
+  vendor:

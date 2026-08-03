@@ -12,7 +12,7 @@ import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePartsMarketplaceStore } from "../store/usePartsMarketplaceStore";
 import { useTranslation } from "@core/i18n/I18nProvider";
-import { categoryIcon, categoryKey } from "../partPresentation";
+import { resolveCategoryIcon, resolveCategoryLabel } from "../partPresentation";
 import type { PartCategory } from "../../domain/entities/MarketplacePart";
 
 export function CategoryTabs() {
@@ -86,7 +86,7 @@ export function CategoryTabs() {
           {t("market.all")}
         </button>
         {facets.categories.map((c) => {
-          const CategoryIcon = categoryIcon[c.value];
+          const CategoryIcon = resolveCategoryIcon(c.value);
           return (
             <button
               key={c.value}
@@ -97,7 +97,7 @@ export function CategoryTabs() {
               onClick={() => selectCategory(c.value)}
             >
               <CategoryIcon size={15} strokeWidth={1.75} aria-hidden />
-              {t(categoryKey(c.value))}
+              {resolveCategoryLabel(c.value, t)}
               <span className="mk-tab__count">{c.count}</span>
             </button>
           );

@@ -5,7 +5,6 @@
  */
 
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { Playfair_Display, Inter } from "next/font/google";
 import localFont from "next/font/local";
 import "@theme/globals.css";
@@ -14,11 +13,8 @@ import { I18nProvider } from "@core/i18n/I18nProvider";
 import { AuthProvider } from "@core/auth/AuthProvider";
 import { ToastProvider } from "@core/toast/ToastProvider";
 import { SmoothScroll } from "@core/motion/SmoothScroll";
-import { PageTransition } from "@core/motion/PageTransition";
+import { SiteChrome } from "@core/layout/SiteChrome";
 import { SkipLink } from "@ui/atoms/SkipLink";
-import { Navbar } from "@ui/organisms/Navbar";
-import { UserTopPanel } from "@ui/organisms/UserTopPanel";
-import { Footer } from "@ui/organisms/Footer";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -59,19 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <SmoothScroll />
               <div className="grain-overlay" aria-hidden />
               <SkipLink />
-              <Navbar />
-              <Suspense fallback={null}>
-                <UserTopPanel />
-              </Suspense>
-              <main
-                id="main-content"
-                tabIndex={-1}
-                className="container"
-                style={{ minHeight: "calc(100vh - 72px)", outline: "none" }}
-              >
-                <PageTransition>{children}</PageTransition>
-              </main>
-              <Footer />
+              <SiteChrome>{children}</SiteChrome>
             </ToastProvider>
           </AuthProvider>
         </I18nProvider>

@@ -17,8 +17,10 @@ import {
   Filter,
   DoorOpen,
   Volume2,
+  Wrench,
 } from "lucide-react";
-import type { PartCategory, PartCondition } from "../domain/entities/MarketplacePart";
+import { PART_CATEGORIES, type PartCategory, type PartCondition } from "../domain/entities/MarketplacePart";
+import { prettifySlug } from "@core/format/prettifySlug";
 
 export const categoryIcon: Record<PartCategory, LucideIcon> = {
   engine: Cog,
@@ -37,6 +39,23 @@ export const categoryIcon: Record<PartCategory, LucideIcon> = {
 
 export const categoryKey = (c: PartCategory): string => `partCat.${c}`;
 export const conditionKey = (c: PartCondition): string => `cond.${c}`;
+
+const KNOWN_CATEGORIES: readonly string[] = PART_CATEGORIES;
+
+/**
+ * Ícono por categoría, con respaldo genérico (llave inglesa) para
+ * categorías que el admin agregó desde el "+" del formulario y no tienen
+ * ícono propio — sin esto, una categoría custom tira la tarjeta/filtro
+ * abajo (`undefined` no es un componente React válido).
+ */
+export function resolveCategoryIcon(value: string): LucideIcon {
+  return (categoryIcon as Record<string, LucideIcon>)[value] ?? Wrench;
+}
+
+/** Etiqueta traducida para categorías fijas; slug legible para las custom. */
+export function resolveCategoryLabel(value: string, t: (key: string) => string): string {
+  return KNOWN_CATEGORIES.includes(value) ? t(`partCat.${value}`) : prettifySlug(value);
+}
 
 const categoryPhotoKeyword: Record<PartCategory, string> = {
   engine: "engine",
@@ -65,6 +84,7 @@ export const partPhotoUrl = (
   size: { w: number; h: number } = { w: 480, h: 360 },
 ): string => {
   const seed = Array.from(id).reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  const keywords = encodeURIComponent(`autoparts,${categoryPhotoKeyword[category]}`);
+  const keyword = (categoryPhotoKeyword as Record<string, string>)[category] ?? "autopart";
+  const keywords = encodeURIComponent(`autoparts,${keyword}`);
   return `https://loremflickr.com/${size.w}/${size.h}/${keywords}?lock=${seed}`;
 };

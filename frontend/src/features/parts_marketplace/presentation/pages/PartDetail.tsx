@@ -15,7 +15,7 @@ import { Button } from "@ui/atoms/Button";
 import { Badge } from "@ui/atoms/Badge";
 import { Breadcrumbs } from "@ui/molecules/Breadcrumbs";
 import { RatingStars } from "@ui/atoms/RatingStars";
-import { categoryKey, conditionKey, partPhotoUrl } from "../partPresentation";
+import { resolveCategoryLabel, conditionKey, partPhotoUrl } from "../partPresentation";
 import "../styles/marketplace.css";
 
 export function PartDetail({ part }: { part: MarketplacePart }) {
@@ -49,7 +49,7 @@ export function PartDetail({ part }: { part: MarketplacePart }) {
               />
             )}
           </div>
-          <span className="mk-detail__badge">{t(categoryKey(part.category))}</span>
+          <span className="mk-detail__badge">{resolveCategoryLabel(part.category, t)}</span>
         </div>
 
         <div>

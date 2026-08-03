@@ -10,7 +10,7 @@ import type { ReactNode } from "react";
 import { Truck, ShieldCheck, PackageCheck } from "lucide-react";
 import { usePartsMarketplaceStore } from "../store/usePartsMarketplaceStore";
 import { useTranslation } from "@core/i18n/I18nProvider";
-import { categoryIcon, categoryKey, conditionKey } from "../partPresentation";
+import { resolveCategoryIcon, resolveCategoryLabel, conditionKey } from "../partPresentation";
 import { Input } from "@ui/atoms/Input";
 
 function Toggle({ on, label, onClick }: { on: boolean; label: ReactNode; onClick: () => void }) {
@@ -51,7 +51,7 @@ export function PartsFilters() {
         <div className="mk-group__title">{t("market.category")}</div>
         {facets.categories.map((c) => {
           const on = filters.categories.includes(c.value);
-          const CategoryIcon = categoryIcon[c.value];
+          const CategoryIcon = resolveCategoryIcon(c.value);
           return (
             <button
               key={c.value}
@@ -64,7 +64,7 @@ export function PartsFilters() {
               <span className="mk-check__icon">
                 <CategoryIcon size={16} strokeWidth={1.75} aria-hidden />
               </span>
-              <span>{t(categoryKey(c.value))}</span>
+              <span>{resolveCategoryLabel(c.value, t)}</span>
               <span className="mk-check__count">{c.count}</span>
             </button>
           );

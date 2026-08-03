@@ -23,7 +23,17 @@ export function PageTransition({ children }: { children: ReactNode }) {
     gsap.fromTo(
       el,
       { opacity: 0, y: 16 },
-      { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.55,
+        ease: "power3.out",
+        // GSAP deja un `transform` inline aunque termine en 0, y cualquier
+        // transform crea un containing block nuevo — eso rompe el centrado
+        // de todo overlay `position: fixed` (modales) montado dentro de
+        // este wrapper. clearProps lo saca al terminar la animación.
+        clearProps: "transform",
+      },
     );
   }, [pathname]);
 

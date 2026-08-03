@@ -33,6 +33,9 @@ export interface CatalogVehicle {
   readonly highlighted: boolean;  // destacado en landing
 }
 
+/** Datos que el administrador captura al crear/editar un auto del catálogo. */
+export type NewCatalogVehicle = Omit<CatalogVehicle, "id">;
+
 /** Opciones disponibles para construir los filtros de la UI. */
 export interface CatalogFilterOptions {
   readonly brands: string[];
