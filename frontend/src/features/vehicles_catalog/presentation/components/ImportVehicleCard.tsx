@@ -14,23 +14,39 @@ import { FileText } from "lucide-react";
 import type { CatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
+import { CountUp } from "@ui/atoms/CountUp";
+import { TypewriterText } from "@ui/atoms/TypewriterText";
 import { fuelKey, transmissionKey, vehiclePhotoUrl } from "../vehiclePresentation";
 import { ImportQuoteModal } from "./ImportQuoteModal";
 
 const vehicleCutoutUrl = (brand: string) => `/vehicles/${brand}.png`;
 
-export function ImportVehicleCard({ vehicle, index = 0 }: { vehicle: CatalogVehicle; index?: number }) {
+export function ImportVehicleCard({ vehicle }: { vehicle: CatalogVehicle }) {
   const { t, locale } = useTranslation();
   const [quoteOpen, setQuoteOpen] = useState(false);
   const [cutoutFailed, setCutoutFailed] = useState(false);
 
+  // Los specs numéricos (potencia, kilometraje) entran como contador rápido;
+  // los de texto (combustible, transmisión) letra por letra, como si cargaran.
   const specs = [
-    { label: t("featured.specPower"), value: t("showcase.hp", { n: vehicle.horsepower }) },
-    { label: t("featured.specFuel"), value: t(fuelKey[vehicle.fuelType]) },
-    { label: t("featured.specTransmission"), value: t(transmissionKey[vehicle.transmission]) },
+    {
+      label: t("featured.specPower"),
+      node: <CountUp value={vehicle.horsepower} duration={0.9} format={(n) => t("showcase.hp", { n: Math.round(n) })} />,
+    },
+    { label: t("featured.specFuel"), node: <TypewriterText text={t(fuelKey[vehicle.fuelType])} /> },
+    { label: t("featured.specTransmission"), node: <TypewriterText text={t(transmissionKey[vehicle.transmission])} /> },
     {
       label: t("featured.specMileage"),
-      value: vehicle.mileageKm === 0 ? t("common.new") : `${vehicle.mileageKm.toLocaleString(locale)} km`,
+      node:
+        vehicle.mileageKm === 0 ? (
+          <TypewriterText text={t("common.new")} />
+        ) : (
+          <CountUp
+            value={vehicle.mileageKm}
+            duration={0.9}
+            format={(n) => `${Math.round(n).toLocaleString(locale)} km`}
+          />
+        ),
     },
   ];
 
@@ -38,7 +54,6 @@ export function ImportVehicleCard({ vehicle, index = 0 }: { vehicle: CatalogVehi
     <>
       <div
         className="relative flex flex-col overflow-hidden rounded-[28px] border border-(--border) bg-(--bg-base) p-8 transition-colors duration-300 hover:border-(--accent-neon) lg:flex-row lg:p-16"
-        style={{ animationDelay: `${index * 60}ms` }}
       >
         {/* Marca de agua decorativa */}
         <span
@@ -64,7 +79,7 @@ export function ImportVehicleCard({ vehicle, index = 0 }: { vehicle: CatalogVehi
               <div key={spec.label} className="flex flex-col gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-(--accent-neon)" aria-hidden />
                 <span className="text-xs font-medium uppercase tracking-wide text-gray-400">{spec.label}</span>
-                <span className="font-semibold text-white">{spec.value}</span>
+                <span className="font-semibold text-white">{spec.node}</span>
               </div>
             ))}
           </div>
@@ -110,7 +125,9 @@ export function ImportVehicleCard({ vehicle, index = 0 }: { vehicle: CatalogVehi
           <span className="text-[0.65rem] uppercase tracking-wide text-gray-400">
             {t("featured.priceCaption")}
           </span>
-          <p className="mt-0.5 text-lg font-bold text-white">{formatCurrency(vehicle.price, locale)}</p>
+          <p className="mt-0.5 text-lg font-bold text-white">
+            <CountUp value={vehicle.price} duration={1.1} format={(n) => formatCurrency(Math.round(n), locale)} />
+          </p>
           <div className="my-2 h-px bg-white/10" />
           <p className="line-clamp-2 text-[0.7rem] leading-relaxed text-gray-300">{vehicle.tagline}</p>
         </div>

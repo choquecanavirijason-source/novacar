@@ -12,6 +12,7 @@ import type { CatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import { catalogUseCases } from "../../di";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Eyebrow } from "@ui/atoms/Eyebrow";
+import { ScrollReveal } from "@ui/atoms/ScrollReveal";
 import { Skeleton } from "@ui/atoms/Skeleton";
 import { ImportVehicleCard } from "../components/ImportVehicleCard";
 
@@ -40,7 +41,9 @@ export function ImportsPage() {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           {vehicles.map((vehicle, i) => (
-            <ImportVehicleCard key={vehicle.id} vehicle={vehicle} index={i} />
+            <ScrollReveal key={vehicle.id} delay={(i % 3) * 100}>
+              <ImportVehicleCard vehicle={vehicle} />
+            </ScrollReveal>
           ))}
         </div>
       )}

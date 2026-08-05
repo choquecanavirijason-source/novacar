@@ -34,6 +34,8 @@ const isActiveLink = (pathname: string, href: string) =>
 export function Navbar() {
   const { t } = useTranslation();
   const { isAuthenticated, user } = useAuth();
+  const isStaff = user?.role === "admin" || user?.role === "operator";
+  const accountHref = isAuthenticated ? (isStaff ? "/admin" : "/cuenta") : "/login";
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -76,7 +78,7 @@ export function Navbar() {
           <LanguageSwitcher />
 
           <Link
-            href={isAuthenticated ? "/admin" : "/login"}
+            href={accountHref}
             className="nav__avatar"
             aria-label={isAuthenticated ? t("nav.account") : t("nav.login")}
           >

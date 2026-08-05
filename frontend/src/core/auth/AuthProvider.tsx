@@ -16,12 +16,23 @@ import {
 } from "react";
 import { createApiClient } from "@core/http/createApiClient";
 import { getAuthToken, setAuthToken } from "./token";
+import { createUser, emailIsTaken, findUserByCredentials } from "./mockUsersStore";
 import type { AuthUser } from "./types";
+
+export interface RegisterInput {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+}
 
 interface AuthContextValue {
   user: AuthUser | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  /** Devuelve el usuario autenticado (null si las credenciales no son válidas). */
+  login: (email: string, password: string) => Promise<AuthUser | null>;
+  /** Devuelve el usuario creado, o "email-taken" si el correo ya está registrado. */
+  register: (input: RegisterInput) => Promise<AuthUser | "email-taken">;
   logout: () => void;
 }
 
@@ -69,19 +80,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    if (!email.trim()) return false;
+    if (!email.trim() || !password) return null;
 
     if (!useApi) {
-      const session: AuthUser = {
-        id: "1",
-        name: "Admin NOVACAR",
-        email: email.trim(),
-        role: "admin",
-      };
-      setUser(session);
-      persistUser(session);
+      const found = findUserByCredentials(email, password);
+      if (!found) return null;
+      setUser(found);
+      persistUser(found);
       setAuthToken("mock-token");
-      return true;
+      return found;
     }
 
     try {
@@ -92,9 +99,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(res.user);
       persistUser(res.user);
       setAuthToken(res.token);
-      return true;
+      return res.user;
     } catch {
-      return false;
+      return null;
+    }
+  }, []);
+
+  const register = useCallback(async (input: RegisterInput) => {
+    if (!useApi) {
+      if (emailIsTaken(input.email)) return "email-taken" as const;
+      const created = createUser(input);
+      setUser(created);
+      persistUser(created);
+      setAuthToken("mock-token");
+      return created;
+    }
+
+    try {
+      const res = await createApiClient().post<AuthResponse, RegisterInput>("/auth/register", input);
+      setUser(res.user);
+      persistUser(res.user);
+      setAuthToken(res.token);
+      return res.user;
+    } catch {
+      return "email-taken" as const;
     }
   }, []);
 
@@ -112,9 +140,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: ready ? user : null,
       isAuthenticated: ready && user !== null,
       login,
+      register,
       logout,
     }),
-    [user, ready, login, logout],
+    [user, ready, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

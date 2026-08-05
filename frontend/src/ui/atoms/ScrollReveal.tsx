@@ -11,9 +11,12 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 export function ScrollReveal({
   children,
   className = "",
+  delay = 0,
 }: {
   children: ReactNode;
   className?: string;
+  /** Retraso en ms antes de animar, útil para escalonar listas de tarjetas. */
+  delay?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -37,7 +40,11 @@ export function ScrollReveal({
   }, []);
 
   return (
-    <div ref={ref} className={`scroll-reveal ${visible ? "scroll-reveal--visible" : ""} ${className}`.trim()}>
+    <div
+      ref={ref}
+      className={`scroll-reveal ${visible ? "scroll-reveal--visible" : ""} ${className}`.trim()}
+      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+    >
       {children}
     </div>
   );

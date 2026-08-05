@@ -321,6 +321,38 @@ h3,
   color: var(--text-muted);
 }
 
+/* ---- PasswordInput: input + botón de mostrar/ocultar superpuesto ---- */
+.password-input {
+  position: relative;
+}
+
+.password-input__field {
+  padding-right: 44px;
+}
+
+.password-input__toggle {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.password-input__toggle:hover {
+  color: var(--text-primary);
+}
+
 .card {
   background: var(--gradient-surface);
   border: 1px solid var(--border);
@@ -399,6 +431,18 @@ h3,
 @keyframes float3d {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  margin-left: 1px;
+  color: var(--accent-neon);
+  animation: typewriter-blink 0.8s step-end infinite;
+}
+
+@keyframes typewriter-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 .animate-in {
@@ -1568,6 +1612,22 @@ body:has(.admin-shell) {
 .login-page__error {
   color: var(--danger);
   font-size: 0.86rem;
+}
+
+.login-page__switch {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+}
+
+.login-page__switch a {
+  color: var(--accent-neon);
+  font-weight: 700;
+}
+
+.login-page__switch a:hover {
+  text-decoration: underline;
 }
 
 /* ---- Language switcher: dropdown (bandera + nombre) ---- */

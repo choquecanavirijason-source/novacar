@@ -23,27 +23,43 @@ const TABS: AdminPage[] = ["analytics", "vehicles", "inventory", "banners", "quo
 
 export function AdminDashboard() {
   const { t } = useTranslation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const load = useAdminDashboardStore((s) => s.load);
 
   const tabParam = searchParams.get("tab");
   const page: AdminPage = TABS.includes(tabParam as AdminPage) ? (tabParam as AdminPage) : "analytics";
+  // Los clientes (rol "customer") pueden loguearse en el sitio, pero el panel
+  // sigue siendo solo para staff (admin/operador).
+  const isStaff = user?.role === "admin" || user?.role === "operator";
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace("/login");
       return;
     }
+    if (!isStaff) {
+      router.replace("/");
+      return;
+    }
     void load();
-  }, [isAuthenticated, load, router]);
+  }, [isAuthenticated, isStaff, load, router]);
 
   if (!isAuthenticated) {
     return (
       <div className="admin-guard">
         <p>{t("auth.required")}</p>
         <Button href="/login">{t("auth.signIn")}</Button>
+      </div>
+    );
+  }
+
+  if (!isStaff) {
+    return (
+      <div className="admin-guard">
+        <p>{t("auth.staffOnly")}</p>
+        <Button href="/">{t("common.back")}</Button>
       </div>
     );
   }
