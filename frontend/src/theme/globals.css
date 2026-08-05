@@ -418,7 +418,11 @@ h3,
 
 .scroll-reveal--visible {
   opacity: 1;
-  transform: translateY(0);
+  /* none, no translateY(0): un transform no-"none" (aunque sea visualmente
+     idéntico) crea un containing block nuevo para descendientes
+     position:fixed, atrapando cualquier modal abierto dentro de la sección
+     en vez de flotar sobre toda la página. */
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1064,8 +1068,13 @@ body:has(.admin-shell) {
   max-width: 480px;
   max-height: 90vh;
   overflow-y: auto;
+  scrollbar-width: none;
   padding: 32px;
   border-radius: var(--radius-lg);
+}
+
+.addpart-panel::-webkit-scrollbar {
+  display: none;
 }
 
 .addpart-panel::before {
@@ -1930,8 +1939,13 @@ body:has(.admin-shell) {
   55% { opacity: 1; }
   100% {
     opacity: 1;
-    transform: perspective(900px) rotateX(0deg) translateY(0) scale(1);
-    filter: blur(0);
+    /* none (no perspective(900px) rotateX(0) scale(1)/blur(0)) a propósito:
+       cualquier transform/filter no-"none", aunque sea visualmente idéntico,
+       crea un containing block nuevo para descendientes position:fixed —
+       eso atrapaba los modales abiertos dentro de esta sección (mismo bug
+       que PageTransition, ver core/motion/PageTransition.tsx). */
+    transform: none;
+    filter: none;
   }
 }
 

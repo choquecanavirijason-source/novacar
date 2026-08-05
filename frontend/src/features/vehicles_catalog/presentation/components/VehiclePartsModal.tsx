@@ -24,6 +24,7 @@ import {
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Badge } from "@ui/atoms/Badge";
 import { Button } from "@ui/atoms/Button";
+import { ModalPortal } from "@ui/atoms/ModalPortal";
 import { useModalA11y } from "@ui/hooks/useModalA11y";
 import "../styles/vehicle-parts-modal.css";
 
@@ -65,13 +66,14 @@ export function VehiclePartsModal({ onClose }: { onClose: () => void }) {
   const panelRef = useModalA11y<HTMLDivElement>(onClose);
 
   return (
-    <div
-      className="vparts-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-label={t("vehicleParts.title")}
-      onClick={onClose}
-    >
+    <ModalPortal>
+      <div
+        className="vparts-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("vehicleParts.title")}
+        onClick={onClose}
+      >
       <div
         ref={panelRef}
         tabIndex={-1}
@@ -129,7 +131,8 @@ export function VehiclePartsModal({ onClose }: { onClose: () => void }) {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </ModalPortal>
   );
 }
 

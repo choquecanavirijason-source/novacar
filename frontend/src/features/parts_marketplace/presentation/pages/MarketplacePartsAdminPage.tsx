@@ -16,7 +16,7 @@ import { useToast } from "@core/toast/ToastProvider";
 import { Badge } from "@ui/atoms/Badge";
 import { Skeleton } from "@ui/atoms/Skeleton";
 import { formatCurrency } from "@core/format/formatters";
-import { DataTable, type Column } from "@features/admin_dashboard/presentation/components/DataTable";
+import { DataTable, type Column } from "@ui/organisms/DataTable";
 import { useMarketplacePartAdminStore } from "../store/useMarketplacePartAdminStore";
 import { MarketplacePartFormModal } from "../components/MarketplacePartFormModal";
 import { resolveCategoryLabel } from "../partPresentation";

@@ -10,7 +10,7 @@
 import { useMemo, useState } from "react";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { useAdminDashboardStore } from "../store/useAdminDashboardStore";
-import { DataTable, type Column } from "../components/DataTable";
+import { DataTable, type Column } from "@ui/organisms/DataTable";
 import { AddPartModal } from "../components/AddPartModal";
 import { isLowStock, type InventoryItem, type NewInventoryItem } from "../../domain/entities/InventoryItem";
 import { formatCurrency } from "@core/format/formatters";
@@ -18,8 +18,7 @@ import { useTranslation } from "@core/i18n/I18nProvider";
 import { Skeleton } from "@ui/atoms/Skeleton";
 import { Button } from "@ui/atoms/Button";
 import { Badge } from "@ui/atoms/Badge";
-import { MarketplacePartsAdminPage } from "@features/parts_marketplace/presentation/pages/MarketplacePartsAdminPage";
-import type { MarketplacePart } from "@features/parts_marketplace/domain/entities/MarketplacePart";
+import { MarketplacePartsAdminPage, type MarketplacePart } from "@features/parts_marketplace";
 import { prettifySlug } from "@core/format/prettifySlug";
 
 type SubTab = "parts" | "marketplace";

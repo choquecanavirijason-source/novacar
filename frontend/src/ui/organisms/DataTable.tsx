@@ -1,7 +1,8 @@
 /**
- * Presentation · Component · DataTable
+ * Organism · DataTable
  * Tabla genérica tipada para listados administrativos, con paginación
  * incorporada (misma tabla para Inventario, Vehículos, Autopartes, Banners).
+ * Vive en `@ui` (no en un feature) porque varios módulos la comparten.
  */
 
 "use client";

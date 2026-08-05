@@ -1,5 +1,5 @@
 /* ============================================================
-   BrandTicker · franja de marcas (marquee) bajo el Hero
+   BrandTicker · franja de marcas — autoscroll continuo + arrastrable
    ============================================================ */
 
 .brand-ticker {
@@ -8,7 +8,7 @@
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   overflow: hidden;
-  background: #1a1a1a;
+  background: #141414;
   border-block: 1px solid var(--border);
   padding-block: 20px;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
@@ -18,43 +18,47 @@
 .brand-ticker__track {
   display: flex;
   align-items: center;
-  gap: 64px;
+  gap: 14px;
   width: max-content;
-  animation: brand-ticker-scroll 28s linear infinite;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  will-change: transform;
 }
 
-.brand-ticker:hover .brand-ticker__track {
-  animation-play-state: paused;
+.brand-ticker__track:active {
+  cursor: grabbing;
 }
 
 .brand-ticker__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
+  padding: 9px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
   font-family: var(--font-serif);
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+  color: var(--text-secondary);
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.brand-ticker__icon {
   color: var(--text-muted);
-  opacity: 0.75;
-  transition: color var(--transition-fast), opacity var(--transition-fast);
+  transition: color var(--transition-fast);
 }
 
 .brand-ticker__item:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-neon);
+  background: var(--accent-soft);
+}
+
+.brand-ticker__item:hover .brand-ticker__icon {
   color: var(--accent-neon);
-  opacity: 1;
-}
-
-@keyframes brand-ticker-scroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .brand-ticker__track {
-    animation: none;
-  }
 }

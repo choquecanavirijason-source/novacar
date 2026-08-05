@@ -28,10 +28,9 @@ import { Skeleton } from "@ui/atoms/Skeleton";
 import { formatCurrency } from "@core/format/formatters";
 import { prettifySlug } from "@core/format/prettifySlug";
 import { isLowStock } from "../../domain/entities/InventoryItem";
-import { useVehicleAdminStore } from "@features/vehicles_catalog/presentation/store/useVehicleAdminStore";
-import { useMarketplacePartAdminStore } from "@features/parts_marketplace/presentation/store/useMarketplacePartAdminStore";
-import { resolveCategoryLabel } from "@features/parts_marketplace/presentation/partPresentation";
-import { useBannerStore } from "@features/site_banners/presentation/store/useBannerStore";
+import { useVehicleAdminStore } from "@features/vehicles_catalog";
+import { useMarketplacePartAdminStore, resolveCategoryLabel } from "@features/parts_marketplace";
+import { useBannerStore } from "@features/site_banners";
 
 export function AnalyticsPage() {
   const { t, locale } = useTranslation();

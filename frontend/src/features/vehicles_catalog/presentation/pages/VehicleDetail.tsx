@@ -1,10 +1,10 @@
 /**
  * Presentation · Component · VehicleDetail (client)
- * "Ver más" de un auto: hero "Broken Grid" (tríptico de fondo con crops del
- * mismo vehículo en tratamiento técnico/desaturado + la foto real del auto
- * en primer plano, rompiendo las columnas vía z-index) con acentos
- * brutalistas (decals, retículas, VIN), seguido de la tarjeta de precio de
- * lista y el grid de especificaciones técnicas. Tailwind + tokens del
+ * "Ver más" de un auto: galería clásica (foto grande + tira de miniaturas
+ * scrollable debajo, clic para cambiar) en vez del tríptico anterior fijo a
+ * 3 encuadres — así escala igual con 3 fotos que con 10 cuando el catálogo
+ * tenga más de una foto real por vehículo. Seguida de la tarjeta de precio
+ * de lista y el grid de especificaciones técnicas. Tailwind + tokens del
  * proyecto vía sintaxis `bg-(--token)`. Recibe la entidad ya resuelta
  * (server) y la traduce.
  */
@@ -13,12 +13,14 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Maximize2, X } from "lucide-react";
 import type { CatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Button } from "@ui/atoms/Button";
 import { CountUp } from "@ui/atoms/CountUp";
+import { ModalPortal } from "@ui/atoms/ModalPortal";
+import { useModalA11y } from "@ui/hooks/useModalA11y";
 import { Breadcrumbs } from "@ui/molecules/Breadcrumbs";
 import {
   bodyTypeKey,
@@ -29,16 +31,26 @@ import {
 } from "../vehiclePresentation";
 import "../styles/catalog.css";
 
-/** Crops del tríptico: mismo vehículo, tres encuadres distintos (efecto "detalle técnico"). */
-const TRIPTYCH_COLUMNS = [
+/**
+ * Encuadres de la galería: hoy son crops de la misma foto (todavía no hay
+ * varias fotos reales por vehículo), pero el componente ya soporta
+ * cualquier cantidad — el día que el admin suba fotos reales, esto se
+ * reemplaza por `vehicle.photos.map(...)` sin tocar el layout.
+ */
+const GALLERY_SHOTS = [
   { key: "ext", label: "01 / EXTERIOR", position: "12% 35%" },
-  { key: "chs", label: "02 / CHASIS", position: "52% 55%" },
-  { key: "det", label: "03 / DETALLE", position: "88% 30%" },
+  { key: "prf", label: "02 / PERFIL", position: "50% 45%" },
+  { key: "tra", label: "03 / TRASERA", position: "85% 40%" },
+  { key: "int", label: "04 / INTERIOR", position: "35% 60%" },
+  { key: "det", label: "05 / DETALLE", position: "88% 30%" },
 ] as const;
 
 export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
   const { t, locale } = useTranslation();
   const [photoFailed, setPhotoFailed] = useState(false);
+  const [activeShot, setActiveShot] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const lightboxPanelRef = useModalA11y<HTMLDivElement>(() => setLightboxOpen(false));
 
   const specColumns = [
     {
@@ -75,10 +87,9 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
 
   return (
     <>
-      {/* Bloque 1: Hero "Broken Grid" — tríptico técnico de fondo + auto real en primer plano */}
-      <section className="vdetail-hero relative ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] w-screen overflow-hidden">
+      {/* Bloque 1: encabezado + galería clásica (foto grande + miniaturas) */}
+      <section className="vdetail-gallery-section">
         <Breadcrumbs
-          className="vdetail-hero__crumbs"
           items={[
             { label: t("nav.home"), href: "/" },
             { label: t("nav.catalog"), href: "/catalogo" },
@@ -86,54 +97,127 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
           ]}
         />
 
-        {/* Tríptico de fondo: 3 columnas, mismo vehículo con encuadres distintos */}
-        <div className="vdetail-triptych" aria-hidden>
-          {!photoFailed &&
-            TRIPTYCH_COLUMNS.map((col) => (
-              <div key={col.key} className="vdetail-triptych__col">
-                <Image
-                  className="vdetail-triptych__img"
-                  src={photoUrl}
-                  alt=""
-                  fill
-                  unoptimized={photoUrl.startsWith("http")}
-                  sizes="33vw"
-                  style={{ objectPosition: col.position }}
-                  loading="eager"
-                  onError={() => setPhotoFailed(true)}
-                />
-                <span className="vdetail-decal">{col.label}</span>
-              </div>
-            ))}
+        <div className="vdetail-heading">
+          <span className="vdetail-hero__brand">{vehicle.brand}</span>
+          <h1 className="vdetail-hero__title">{vehicle.model}</h1>
         </div>
 
-        {/* Acentos brutalistas: retícula + VIN corrido */}
-        <span className="vdetail-crosshair vdetail-crosshair--br" aria-hidden />
-        <span className="vdetail-vin" aria-hidden>
-          {vehicle.id.toUpperCase().replace(/-/g, " · ")}
-        </span>
+        <div className="vdetail-gallery">
+          <button
+            type="button"
+            className="vdetail-gallery__main"
+            onClick={() => setLightboxOpen(true)}
+            aria-label={t("detail.expandPhoto")}
+          >
+            {!photoFailed && (
+              <Image
+                src={photoUrl}
+                alt={`${vehicle.brand} ${vehicle.model} — ${GALLERY_SHOTS[activeShot].label}`}
+                fill
+                unoptimized={photoUrl.startsWith("http")}
+                sizes="(max-width: 720px) 100vw, 900px"
+                style={{ objectPosition: GALLERY_SHOTS[activeShot].position }}
+                loading="eager"
+                onError={() => setPhotoFailed(true)}
+              />
+            )}
+            <span className="vdetail-gallery__badge">
+              {vehicle.condition === "nuevo" ? t("common.new") : t("common.used")}
+            </span>
+            <span className="vdetail-gallery__expand">
+              <Maximize2 size={15} strokeWidth={2} aria-hidden />
+              {t("detail.expandPhoto")}
+            </span>
+          </button>
 
-        {/* Auto real: rompe la cuadrícula del tríptico, capa superior */}
-        <div className="vdetail-breakout">
           {!photoFailed && (
-            <Image
-              className="vdetail-breakout__img"
-              src={photoUrl}
-              alt={`${vehicle.brand} ${vehicle.model}`}
-              fill
-              unoptimized={photoUrl.startsWith("http")}
-              sizes="(max-width: 720px) 84vw, 88vw"
-              loading="eager"
-              onError={() => setPhotoFailed(true)}
-            />
+            <div className="vdetail-gallery__thumbs" role="tablist" aria-label={t("detail.gallery")}>
+              {GALLERY_SHOTS.map((shot, i) => (
+                <button
+                  key={shot.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === activeShot}
+                  className={`vdetail-gallery__thumb ${i === activeShot ? "vdetail-gallery__thumb--active" : ""}`}
+                  onClick={() => setActiveShot(i)}
+                >
+                  <Image
+                    src={photoUrl}
+                    alt=""
+                    fill
+                    unoptimized={photoUrl.startsWith("http")}
+                    sizes="120px"
+                    style={{ objectPosition: shot.position }}
+                  />
+                  <span className="vdetail-gallery__thumb-label">{shot.label}</span>
+                </button>
+              ))}
+            </div>
           )}
-
-          <div className="vdetail-hero__copy">
-            <span className="vdetail-hero__brand">{vehicle.brand}</span>
-            <h1 className="vdetail-hero__title">{vehicle.model}</h1>
-          </div>
         </div>
       </section>
+
+      {lightboxOpen && !photoFailed && (
+        <ModalPortal>
+          <div
+            className="vdetail-lightbox-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("detail.expandPhoto")}
+            onClick={() => setLightboxOpen(false)}
+          >
+            <div
+              ref={lightboxPanelRef}
+              tabIndex={-1}
+              className="vdetail-lightbox-panel"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="vdetail-lightbox__close"
+                onClick={() => setLightboxOpen(false)}
+                aria-label={t("productInquiry.close")}
+              >
+                <X size={20} strokeWidth={1.75} aria-hidden />
+              </button>
+
+              <div className="vdetail-lightbox__img">
+                <Image
+                  src={photoUrl}
+                  alt={`${vehicle.brand} ${vehicle.model} — ${GALLERY_SHOTS[activeShot].label}`}
+                  fill
+                  unoptimized={photoUrl.startsWith("http")}
+                  sizes="90vw"
+                  style={{ objectPosition: GALLERY_SHOTS[activeShot].position }}
+                />
+              </div>
+
+              <div className="vdetail-gallery__thumbs vdetail-lightbox__thumbs" role="tablist" aria-label={t("detail.gallery")}>
+                {GALLERY_SHOTS.map((shot, i) => (
+                  <button
+                    key={shot.key}
+                    type="button"
+                    role="tab"
+                    aria-selected={i === activeShot}
+                    className={`vdetail-gallery__thumb ${i === activeShot ? "vdetail-gallery__thumb--active" : ""}`}
+                    onClick={() => setActiveShot(i)}
+                  >
+                    <Image
+                      src={photoUrl}
+                      alt=""
+                      fill
+                      unoptimized={photoUrl.startsWith("http")}
+                      sizes="120px"
+                      style={{ objectPosition: shot.position }}
+                    />
+                    <span className="vdetail-gallery__thumb-label">{shot.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </ModalPortal>
+      )}
 
       {/* Tarjeta única: precio de lista + especificaciones */}
       <section className="relative ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] w-screen bg-(--bg-base)">

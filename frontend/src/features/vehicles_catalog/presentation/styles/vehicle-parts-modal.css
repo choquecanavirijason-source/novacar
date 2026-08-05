@@ -20,8 +20,13 @@
   width: min(100%, 560px);
   max-height: min(88vh, 680px);
   overflow-y: auto;
+  scrollbar-width: none;
   padding: 32px;
   border-radius: var(--radius-lg);
+}
+
+.vparts-panel::-webkit-scrollbar {
+  display: none;
 }
 
 .vparts-close {

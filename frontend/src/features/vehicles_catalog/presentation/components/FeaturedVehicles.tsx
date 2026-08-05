@@ -10,9 +10,10 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import gsap from "gsap";
 import { ArrowUpRight } from "lucide-react";
 import type { CatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import { catalogUseCases } from "../../di";
@@ -33,6 +34,8 @@ export function FeaturedVehicles() {
   const [vehicles, setVehicles] = useState<CatalogVehicle[] | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [cutoutFailed, setCutoutFailed] = useState(false);
+  const textRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     void catalogUseCases.getFeaturedVehicles.execute().then(setVehicles);
@@ -41,6 +44,34 @@ export function FeaturedVehicles() {
   useEffect(() => {
     setCutoutFailed(false);
   }, [activeIndex]);
+
+  const vehicle = vehicles?.[activeIndex];
+
+  // Al cambiar de auto (autoplay o click en los puntos), el auto "entra"
+  // deslizándose desde el costado (derecha, como si llegara manejando) y la
+  // ficha técnica entra desde la izquierda — animación de entrada, no del
+  // scroll de página, por eso vive en su propio div (nunca comparte
+  // elemento con el <Parallax> que ya anima yPercent por scroll).
+  useEffect(() => {
+    if (!vehicle) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    if (textRef.current) {
+      gsap.fromTo(
+        textRef.current,
+        { opacity: 0, x: -36 },
+        { opacity: 1, x: 0, duration: 1.1, ease: "power2.out", clearProps: "transform" },
+      );
+    }
+    if (imageRef.current) {
+      gsap.fromTo(
+        imageRef.current,
+        { opacity: 0, x: 90 },
+        { opacity: 1, x: 0, duration: 1.3, ease: "power2.out", clearProps: "transform" },
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vehicle?.id]);
 
   useEffect(() => {
     if (!vehicles || vehicles.length <= 1) return;
@@ -51,8 +82,6 @@ export function FeaturedVehicles() {
 
     return () => window.clearInterval(timer);
   }, [vehicles]);
-
-  const vehicle = vehicles?.[activeIndex];
 
   const specs = vehicle
     ? [
@@ -99,7 +128,10 @@ export function FeaturedVehicles() {
             </Parallax>
 
             {/* Columna izquierda: ficha técnica */}
-            <div className="relative z-10 flex w-full flex-col justify-center space-y-10 text-left lg:w-1/2 lg:space-y-12">
+            <div
+              ref={textRef}
+              className="relative z-10 flex w-full flex-col justify-center space-y-10 text-left lg:w-1/2 lg:space-y-12"
+            >
               <div>
                 <h3 className="text-3xl font-bold text-white sm:text-4xl">
                   {vehicle.brand} {vehicle.model}
@@ -139,6 +171,7 @@ export function FeaturedVehicles() {
             {/* Columna derecha: auto (capa en primer plano, se mueve un poco más rápido) */}
             <div className="relative z-10 mt-12 min-h-[280px] w-full lg:mt-0 lg:min-h-0 lg:w-1/2">
               <Parallax speed={0.1} className="pointer-events-none absolute inset-0">
+                <div ref={imageRef} className="absolute inset-0">
                 <Image
                   key={vehicle.id}
                   className="absolute top-1/2 right-0 w-[120%] max-w-none -translate-y-1/2 object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)] lg:-right-10 lg:drop-shadow-[0_30px_50px_rgba(0,0,0,0.6)]"
@@ -154,6 +187,7 @@ export function FeaturedVehicles() {
                   loading="lazy"
                   onError={() => setCutoutFailed(true)}
                 />
+                </div>
               </Parallax>
             </div>
 

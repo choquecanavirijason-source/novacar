@@ -12,7 +12,7 @@ import { useTranslation } from "@core/i18n/I18nProvider";
 import { useToast } from "@core/toast/ToastProvider";
 import { Button } from "@ui/atoms/Button";
 import { Skeleton } from "@ui/atoms/Skeleton";
-import { DataTable, type Column } from "@features/admin_dashboard/presentation/components/DataTable";
+import { DataTable, type Column } from "@ui/organisms/DataTable";
 import { useBannerStore } from "../store/useBannerStore";
 import { BannerFormModal } from "../components/BannerFormModal";
 import type { Banner, NewBanner } from "../../domain/entities/Banner";

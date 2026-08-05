@@ -16,6 +16,20 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Instancia global expuesta para poder suspenderla mientras un modal está
+// abierto (ver useModalA11y): Lenis intercepta la rueda del mouse en TODO
+// el documento, así que un panel con overflow-y:auto anidado (un modal)
+// nunca recibe el evento a menos que Lenis se detenga temporalmente.
+let activeLenis: Lenis | null = null;
+
+export function stopLenis() {
+  activeLenis?.stop();
+}
+
+export function startLenis() {
+  activeLenis?.start();
+}
+
 export function SmoothScroll() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -25,6 +39,7 @@ export function SmoothScroll() {
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
+    activeLenis = lenis;
 
     lenis.on("scroll", ScrollTrigger.update);
 
@@ -35,6 +50,7 @@ export function SmoothScroll() {
     return () => {
       gsap.ticker.remove(tick);
       lenis.destroy();
+      activeLenis = null;
     };
   }, []);
 

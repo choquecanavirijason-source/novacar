@@ -22,7 +22,7 @@ import { PartCard } from "../components/PartCard";
 import { FeaturedCategoryBlocks } from "../components/FeaturedCategoryBlocks";
 import { TrustBar } from "../components/TrustBar";
 import { CategoryTabs } from "../components/CategoryTabs";
-import { DiscountBanners } from "@features/vehicles_catalog/presentation/components/DiscountBanners";
+import { DiscountBanners } from "@features/vehicles_catalog";
 import { Section } from "@ui/templates/Section";
 import { ScrollReveal } from "@ui/atoms/ScrollReveal";
 import "../styles/marketplace.css";

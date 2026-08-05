@@ -13,7 +13,9 @@ import Image from "next/image";
 import { Play, Send, X } from "lucide-react";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { useToast } from "@core/toast/ToastProvider";
+import { ModalPortal } from "@ui/atoms/ModalPortal";
 import { useModalA11y } from "@ui/hooks/useModalA11y";
+import { useQuoteRequestStore } from "@features/quote_requests";
 import "../styles/product-inquiry-modal.css";
 
 const INQUIRY_MEDIA_URL = "https://loremflickr.com/900/900/car,workshop?lock=21";
@@ -27,26 +29,37 @@ export function ProductInquiryModal({
 }) {
   const { t } = useTranslation();
   const toast = useToast();
+  const createQuoteRequest = useQuoteRequestStore((s) => s.create);
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [mediaFailed, setMediaFailed] = useState(false);
   const panelRef = useModalA11y<HTMLDivElement>(onClose);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-    setSent(true);
-    toast.success(t("productInquiry.success"));
+    const ok = await createQuoteRequest({
+      source: "inquiry",
+      customerEmail: email.trim(),
+      subject: productName,
+      details: t("productInquiry.desc", { name: productName }),
+      amount: null,
+    });
+    if (ok) {
+      setSent(true);
+      toast.success(t("productInquiry.success"));
+    }
   };
 
   return (
-    <div
-      className="pinquiry-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-label={t("productInquiry.title")}
-      onClick={onClose}
-    >
+    <ModalPortal>
+      <div
+        className="pinquiry-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("productInquiry.title")}
+        onClick={onClose}
+      >
       <div ref={panelRef} tabIndex={-1} className="pinquiry" onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
@@ -103,6 +116,7 @@ export function ProductInquiryModal({
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </ModalPortal>
   );
 }

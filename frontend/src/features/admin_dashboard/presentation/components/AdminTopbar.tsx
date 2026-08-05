@@ -6,13 +6,13 @@
 
 "use client";
 
-import { ArrowLeft, Car, Image, LayoutDashboard, LogOut, Package, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Car, Image, LayoutDashboard, LogOut, MessageSquareText, Package, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@core/auth/AuthProvider";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Logo } from "@ui/atoms/Logo";
 
-export type AdminPage = "analytics" | "vehicles" | "inventory" | "banners";
+export type AdminPage = "analytics" | "vehicles" | "inventory" | "banners" | "quotes";
 
 interface AdminTopbarProps {
   active: AdminPage;
@@ -34,6 +34,7 @@ export function AdminTopbar({ active, onNavigate }: AdminTopbarProps) {
     { id: "vehicles", Icon: Car, label: t("admin.vehicles") },
     { id: "inventory", Icon: Package, label: t("admin.inventory") },
     { id: "banners", Icon: Image, label: t("admin.banners") },
+    { id: "quotes", Icon: MessageSquareText, label: t("admin.quotes") },
   ];
 
   function handleLogout() {

@@ -11,6 +11,7 @@ import { useTranslation } from "@core/i18n/I18nProvider";
 import { useToast } from "@core/toast/ToastProvider";
 import { Input } from "@ui/atoms/Input";
 import { Button } from "@ui/atoms/Button";
+import { ModalPortal } from "@ui/atoms/ModalPortal";
 import { useModalA11y } from "@ui/hooks/useModalA11y";
 import type { Banner, NewBanner } from "../../domain/entities/Banner";
 
@@ -61,13 +62,14 @@ export function BannerFormModal({
   }
 
   return (
-    <div
-      className="addpart-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-label={banner ? t("admin.bannerEditTitle") : t("admin.bannerAddTitle")}
-      onClick={onClose}
-    >
+    <ModalPortal>
+      <div
+        className="addpart-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-label={banner ? t("admin.bannerEditTitle") : t("admin.bannerAddTitle")}
+        onClick={onClose}
+      >
       <div ref={panelRef} tabIndex={-1} className="addpart-panel glass-panel" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="addpart-close" onClick={onClose} aria-label={t("admin.cancel")}>
           <X size={18} strokeWidth={1.75} aria-hidden />
@@ -139,6 +141,7 @@ export function BannerFormModal({
           </div>
         </form>
       </div>
-    </div>
+      </div>
+    </ModalPortal>
   );
 }

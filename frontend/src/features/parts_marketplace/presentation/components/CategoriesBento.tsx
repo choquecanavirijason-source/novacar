@@ -15,6 +15,7 @@ import type { PartFacets } from "../../domain/entities/PartFilters";
 import { marketplaceUseCases } from "../../di";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Eyebrow } from "@ui/atoms/Eyebrow";
+import { ModalPortal } from "@ui/atoms/ModalPortal";
 import { useModalA11y } from "@ui/hooks/useModalA11y";
 import { resolveCategoryIcon, resolveCategoryLabel } from "../partPresentation";
 import "../styles/marketplace.css";
@@ -51,67 +52,69 @@ export function CategoriesBento() {
       </button>
 
       {open && (
-        <div
-          className="categories-modal-overlay"
-          role="dialog"
-          aria-modal="true"
-          aria-label={t("home.categoriesModalTitle")}
-          onClick={() => setOpen(false)}
-        >
+        <ModalPortal>
           <div
-            ref={panelRef}
-            tabIndex={-1}
-            className="categories-modal glass-panel"
-            onClick={(e) => e.stopPropagation()}
+            className="categories-modal-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("home.categoriesModalTitle")}
+            onClick={() => setOpen(false)}
           >
-            <button
-              type="button"
-              className="categories-modal__close"
-              onClick={() => setOpen(false)}
-              aria-label={t("productInquiry.close")}
+            <div
+              ref={panelRef}
+              tabIndex={-1}
+              className="categories-modal glass-panel"
+              onClick={(e) => e.stopPropagation()}
             >
-              <X size={18} strokeWidth={1.75} aria-hidden />
-            </button>
+              <button
+                type="button"
+                className="categories-modal__close"
+                onClick={() => setOpen(false)}
+                aria-label={t("productInquiry.close")}
+              >
+                <X size={18} strokeWidth={1.75} aria-hidden />
+              </button>
 
-            <h3 className="categories-modal__title">{t("home.categoriesModalTitle")}</h3>
+              <h3 className="categories-modal__title">{t("home.categoriesModalTitle")}</h3>
 
-            {!facets ? (
-              <div className="bento bento--stacked">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="skeleton bento__item" style={{ minHeight: 90 }} />
-                ))}
-              </div>
-            ) : (
-              <div className="bento bento--stacked">
-                {cats.map((c, i) => {
-                  const CategoryIcon = resolveCategoryIcon(c.value);
-                  return (
-                    <Link
-                      key={c.value}
-                      href={`/autopartes?cat=${c.value}`}
-                      className="bento__item bento__item--row"
-                      style={{ animationDelay: `${i * 35}ms` }}
-                      onClick={() => setOpen(false)}
-                    >
-                      <div className="bento__row-main">
-                        <span className="bento__icon bento__icon--row">
-                          <CategoryIcon size={24} strokeWidth={1.5} aria-hidden />
-                        </span>
-                        <div className="bento__meta">
-                          <div className="bento__name">{resolveCategoryLabel(c.value, t)}</div>
-                          <div className="bento__count">
-                            {c.count} {t("home.items")}
+              {!facets ? (
+                <div className="bento bento--stacked">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="skeleton bento__item" style={{ minHeight: 90 }} />
+                  ))}
+                </div>
+              ) : (
+                <div className="bento bento--stacked">
+                  {cats.map((c, i) => {
+                    const CategoryIcon = resolveCategoryIcon(c.value);
+                    return (
+                      <Link
+                        key={c.value}
+                        href={`/autopartes?cat=${c.value}`}
+                        className="bento__item bento__item--row"
+                        style={{ animationDelay: `${i * 35}ms` }}
+                        onClick={() => setOpen(false)}
+                      >
+                        <div className="bento__row-main">
+                          <span className="bento__icon bento__icon--row">
+                            <CategoryIcon size={24} strokeWidth={1.5} aria-hidden />
+                          </span>
+                          <div className="bento__meta">
+                            <div className="bento__name">{resolveCategoryLabel(c.value, t)}</div>
+                            <div className="bento__count">
+                              {c.count} {t("home.items")}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <span className="bento__cta">{t("home.bentoCta")} →</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
+                        <span className="bento__cta">{t("home.bentoCta")} →</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
     </section>
   );

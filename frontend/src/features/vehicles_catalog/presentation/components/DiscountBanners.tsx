@@ -7,7 +7,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useBannerStore } from "@features/site_banners/presentation/store/useBannerStore";
+import { useBannerStore } from "@features/site_banners";
 import { Button } from "@ui/atoms/Button";
 
 export function DiscountBanners() {

@@ -14,6 +14,7 @@ import { useToast } from "@core/toast/ToastProvider";
 import { Input } from "@ui/atoms/Input";
 import { Button } from "@ui/atoms/Button";
 import { SelectWithAdd } from "@ui/molecules/SelectWithAdd";
+import { ModalPortal } from "@ui/atoms/ModalPortal";
 import { useModalA11y } from "@ui/hooks/useModalA11y";
 import type { InventoryItem, NewInventoryItem } from "../../domain/entities/InventoryItem";
 
@@ -65,13 +66,14 @@ export function AddPartModal({
   }
 
   return (
-    <div
-      className="addpart-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-label={item ? t("admin.itemEditTitle") : t("admin.addPartTitle")}
-      onClick={onClose}
-    >
+    <ModalPortal>
+      <div
+        className="addpart-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-label={item ? t("admin.itemEditTitle") : t("admin.addPartTitle")}
+        onClick={onClose}
+      >
       <div
         ref={panelRef}
         tabIndex={-1}
@@ -134,6 +136,7 @@ export function AddPartModal({
           </div>
         </form>
       </div>
-    </div>
+      </div>
+    </ModalPortal>
   );
 }

@@ -14,7 +14,7 @@ import { Button } from "@ui/atoms/Button";
 import { Badge } from "@ui/atoms/Badge";
 import { Skeleton } from "@ui/atoms/Skeleton";
 import { formatCurrency } from "@core/format/formatters";
-import { DataTable, type Column } from "@features/admin_dashboard/presentation/components/DataTable";
+import { DataTable, type Column } from "@ui/organisms/DataTable";
 import { useVehicleAdminStore } from "../store/useVehicleAdminStore";
 import { VehicleFormModal } from "../components/VehicleFormModal";
 import type { CatalogVehicle, NewCatalogVehicle } from "../../domain/entities/CatalogVehicle";

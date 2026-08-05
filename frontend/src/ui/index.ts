@@ -33,6 +33,8 @@ export { Pagination } from "./molecules/Pagination";
 export { Navbar } from "./organisms/Navbar";
 export { UserTopPanel } from "./organisms/UserTopPanel";
 export { Footer } from "./organisms/Footer";
+export { DataTable } from "./organisms/DataTable";
+export type { Column } from "./organisms/DataTable";
 
 // templates
 export { PageShell } from "./templates/PageShell";
