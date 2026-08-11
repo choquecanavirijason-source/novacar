@@ -1,113 +1,117 @@
 /* ============================================================
-   HeroShowcase · Hero cinematográfico (estilo Brator)
-   Lienzo negro full-bleed (.hero3) con degradado radial + "suelo" simulado.
-   El contenido real vive en .hero3__inner, que reutiliza .container
-   (mismo max-width + centrado que .nav__inner) para que el texto quede
-   siempre alineado con el logo del Navbar, en cualquier ancho de pantalla.
-   Mobile-first: columna apilada por defecto, fila 50/50 desde 960px.
-   Se monta pegado bajo el Navbar fijo/transparente (margin-top negativo
-   cancela el padding-top del body). Usa tokens :root (negro + oro).
+   HeroShowcase · "Scrollytelling" con video escrubeado por GSAP
+   ScrollTrigger (pin + scrub) — ver HeroShowcase.tsx para la mecánica.
+   El texto vive en .hero-scrub__inner, que reutiliza .container (mismo
+   max-width + centrado que .nav__inner) para quedar alineado con el logo
+   del Navbar. Se monta pegado bajo el Navbar fijo/transparente
+   (margin-top negativo cancela el padding-top del body).
    ============================================================ */
 
-.hero3 {
+.hero-scrub {
   position: relative;
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   margin-top: -72px; /* Cancela el padding-top del body */
+  height: 100vh;
+  min-height: 560px;
   overflow: hidden;
   background: #0d0d0d;
   isolation: isolate;
 }
 
-/* Degradado radial sutil en el centro + degradado/textura inferior (suelo) */
-.hero3__bg {
+/* ---- Capa de video: ambos clips superpuestos, el 2 se funde encima del 1 ---- */
+.hero-scrub__video-layer {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background:
-    radial-gradient(ellipse 65% 55% at 50% 32%, rgba(0, 170, 255, 0.12) 0%, transparent 68%),
-    linear-gradient(180deg, transparent 0%, transparent 52%, rgba(0, 0, 0, 0.6) 80%, #050505 100%);
 }
 
-.hero3__bg::after {
-  content: "";
+.hero-scrub__video {
   position: absolute;
-  inset: auto 0 0 0;
-  height: 22%;
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.02) 0px,
-    rgba(255, 255, 255, 0.02) 1px,
-    transparent 1px,
-    transparent 44px
-  );
-  mask-image: linear-gradient(180deg, transparent, #000 65%);
-  -webkit-mask-image: linear-gradient(180deg, transparent, #000 65%);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* El clip nativo es 16:9; en monitores anchos el cover recorta ~20% de
+     alto. Sesgamos el recorte hacia abajo (que se coma el piso/sombra, no
+     el techo del auto) para conservar aire arriba y que no choque con el
+     título superpuesto. */
+  object-position: 50% 30%;
+}
+
+.hero-scrub__video--2 {
+  opacity: 0;
+}
+
+/* Degradado para legibilidad del texto: oscurece la izquierda (donde vive
+   el copy) y funde el borde inferior con el negro base del sitio. */
+.hero-scrub__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.35) 42%, transparent 68%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, transparent 22%, transparent 78%, rgba(5, 5, 5, 0.85) 100%);
+  pointer-events: none;
 }
 
 /* ---- Contenedor de contenido: mismo box model que .nav__inner ---- */
-.hero3__inner {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 80vh;
-  padding-block: 140px 56px; /* Deja espacio real bajo el Navbar fijo (72px) en mobile */
-  gap: 32px;
-}
-
-.hero3__copy {
+.hero-scrub__inner {
   position: relative;
   z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 96px 64px;
+}
+
+.hero-scrub__copy {
+  position: relative;
   width: 100%;
+  max-width: 720px;
   display: flex;
   flex-direction: column;
   text-align: left;
+  will-change: opacity, transform;
 }
 
-.hero3__title {
+.hero-scrub__title {
   display: flex;
   flex-direction: column;
   font-weight: 900;
   text-transform: uppercase;
-  line-height: 0.98;
-  letter-spacing: -0.02em;
+  line-height: 1.04;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
-.hero3__title-line {
-  font-size: clamp(2.4rem, 6.2vw, 5.5rem);
+.hero-scrub__title-line {
+  font-size: clamp(2.4rem, 7vw, 6rem);
 }
 
-.hero3__title-line--metal {
-  background: linear-gradient(
-    135deg,
-    var(--text-primary) 0%,
-    var(--text-muted) 45%,
-    var(--text-secondary) 65%,
-    var(--text-primary) 100%
-  );
+.hero-scrub__title-line--metal {
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-muted) 45%, var(--text-secondary) 65%, var(--text-primary) 100%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
 }
 
-.hero3__title-line--accent {
+.hero-scrub__title-line--accent {
   color: var(--accent-neon);
   text-shadow: var(--text-glow, none);
 }
 
-.hero3__desc {
+.hero-scrub__desc {
   color: var(--text-secondary);
   font-size: 1.02rem;
   line-height: 1.65;
-  max-width: 520px;
+  max-width: 480px;
   margin-top: 22px;
 }
 
-.hero3__gauge {
+.hero-scrub__gauge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -125,108 +129,205 @@
   letter-spacing: 0.03em;
 }
 
-.hero3__actions {
+.hero-scrub__actions {
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
   margin-top: 30px;
 }
 
-/* ---- El auto: PNG transparente ---- */
-.hero3__car-slot {
-  position: relative;
+/* ---- Copy de cierre: aparece sobre el frame final del clip 2 ---- */
+.hero-scrub__outro {
+  position: absolute;
+  inset: 0;
   z-index: 3;
-  width: 100%;
-  height: 300px; /* Un poco más de altura en mobile */
   display: flex;
-  align-items: flex-end; /* Alinea abajo en mobile */
-  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-inline: 24px;
+  padding-bottom: 15%;
+  opacity: 0;
   pointer-events: none;
-  margin-top: auto; /* Empuja hacia abajo si hay espacio en mobile */
+  will-change: opacity, transform;
 }
 
-.hero3__car-img {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: auto; /* Ancho automático para mantener proporción */
-  height: 100%; /* Ocupa el alto del slot */
-  object-fit: contain;
-  object-position: bottom; /* Centrado abajo */
-  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7)); /* Sombra más sutil */
+.hero-scrub__outro > * {
+  pointer-events: auto;
 }
 
-/* Sombra de contacto en el "suelo" bajo el auto */
-.hero3__car-shadow {
+.hero-scrub__outro-eyebrow {
+  position: relative;
+  display: block;
+  margin-bottom: 14px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--accent-neon);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Halo ambiental "respirando" sobre el frame final (loop de descanso) —
+   puramente decorativo, le da vida al resting frame sin nuevo metraje. */
+.hero-scrub__outro-glow {
   position: absolute;
-  bottom: 4%;
+  top: 50%;
+  right: 6%;
+  z-index: -1;
+  width: 48%;
+  height: 72%;
+  transform: translateY(-50%);
+  background: radial-gradient(ellipse at center, rgba(0, 170, 255, 0.22), transparent 70%);
+  pointer-events: none;
+  animation: hero-ambient-breathe 3.4s ease-in-out infinite;
+}
+
+@keyframes hero-ambient-breathe {
+  0%, 100% { opacity: 0.5; transform: translateY(-50%) scale(1); }
+  50% { opacity: 0.9; transform: translateY(-50%) scale(1.08); }
+}
+
+/* ---- Hint de scroll: se desvanece en cuanto el usuario empieza a bajar ---- */
+.hero-scrub__hint {
+  position: absolute;
+  z-index: 3;
+  bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
-  width: 70%;
-  height: 20px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.6) 0%, transparent 72%);
-  filter: blur(3px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  pointer-events: none;
+  animation: hero-hint-bob 1.8s ease-in-out infinite;
+}
+
+@keyframes hero-hint-bob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
+}
+
+@media (max-width: 720px) {
+  .hero-scrub__copy {
+    max-width: 100%;
+  }
+
+  .hero-scrub__scrim {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.25) 30%, transparent 55%, rgba(5, 5, 5, 0.9) 100%);
+  }
+
+  .hero-scrub__outro {
+    padding-inline: 16px;
+    padding-bottom: 22%;
+  }
 }
 
 /* ============================================================
-   Desktop Layout (960px+)
-   Cambia a flex-row para poner texto e imagen lado a lado.
+   Loader "arranque de carreras": cubre el hero mientras los dos clips
+   terminan de bufferizar. Bandera a cuadros arriba/abajo + tacómetro con
+   progreso real (bytes bufferizados / duración de cada video).
    ============================================================ */
-@media (min-width: 960px) {
-  .hero3 {
-    margin-top: -72px; /* Mantiene pegado al Navbar */
-  }
+.hero-scrub__loader {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(5, 5, 5, 0.95);
+}
 
-  .hero3__inner {
-    flex-direction: row; /* Texto e imagen lado a lado */
-    align-items: center; /* Centrado vertical perfecto de ambas columnas */
-    padding-block: 96px 40px; /* Garantiza espacio real bajo el Navbar, no solo el centrado */
-    gap: 0; /* Usamos flex:50% en los hijos, no hace falta gap */
-    height: calc(100vh - 72px); /* Alto completo de pantalla menos Navbar */
-    min-height: 650px; /* Altura mínima para no colapsar */
-  }
+.hero-scrub__loader-flag {
+  width: 100%;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.32;
+  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.6) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.6) 75%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.6) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.6) 75%);
+  background-size: 14px 14px;
+  background-position: 0 0, 7px 7px;
+}
 
-  .hero3__copy {
-    flex: 0 0 50%; /* Ocupa exactamente la mitad */
-    width: 50%;
-    padding-right: 40px; /* Espacio para que no pegue con el auto */
-    padding-bottom: 50px; /* Pequeño ajuste visual hacia arriba */
-  }
+.hero-scrub__loader-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+}
 
-  .hero3__car-slot {
-    flex: 0 0 50%; /* Ocupa la otra mitad */
-    width: 50%;
-    height: 100%;
-    align-self: stretch;
-    align-items: center; /* Centrado vertical interno para el absoluto */
-    justify-content: flex-start; /* Empieza desde la izquierda del slot */
-    margin-top: 0;
-  }
+.hero-scrub__loader-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.4em;
+  color: var(--accent-neon);
+  text-transform: uppercase;
+}
 
-  .hero3__car-img {
-    position: absolute;
-    /* --- EL CAMBIO CLAVE ESTÁ AQUÍ --- */
-    top: 50%; /* Lo alinea al 50% de la altura del hero */
-    transform: translateY(-50%) translateX(-46%); /* Centrado vertical matemático y ajuste horizontal (-46% = auto movido hacia el centro) */
-    bottom: auto; /* Cancela la alineación inferior de mobile */
-    left: 30%; /* Empieza centrado horizontalmente */
-    
-    width: 140%; /* Un poco más grande para superponer texto */
-    max-width: 950px; /* Tamaño máximo mayor */
-    height: auto; /* Mantener proporción */
-    object-position: center; /* Centrado interno de la imagen */
-    filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.6)); /* Sombra de contacto */
-  }
+.hero-scrub__loader-title {
+  margin-top: 12px;
+  font-size: clamp(1.5rem, 4vw, 2.3rem);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  transform: skewX(-8deg);
+}
 
-  .hero3__car-shadow {
-    bottom: auto; /* Cancela mobile */
-    top: calc(50% + 20% + 20px); /* Posición calculada para quedar bajo el auto centrado */
-    transform: translateX(-50%) translateY(-50%);
-    width: 70%;
-    height: 30px;
-    left: 50%;
-    filter: blur(5px);
-  }
+.hero-scrub__loader-tacho {
+  position: relative;
+  width: min(380px, 78vw);
+  height: 10px;
+  margin-top: 26px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-strong);
+}
+
+.hero-scrub__loader-tacho-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary-glow), var(--accent-neon));
+  box-shadow: var(--glow-accent);
+  transition: width 200ms linear;
+}
+
+.hero-scrub__loader-tacho-ticks {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.45) 0,
+    rgba(0, 0, 0, 0.45) 1px,
+    transparent 1px,
+    transparent 12%
+  );
+}
+
+.hero-scrub__loader-meta {
+  display: flex;
+  justify-content: space-between;
+  width: min(380px, 78vw);
+  margin-top: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.hero-scrub__loader-pct {
+  color: var(--accent-neon);
+  font-variant-numeric: tabular-nums;
 }
