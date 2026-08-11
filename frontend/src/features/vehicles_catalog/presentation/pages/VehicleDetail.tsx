@@ -83,7 +83,7 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
     },
   ];
 
-  const photoUrl = vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 1920, h: 1080 });
+  const photoUrl = vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 1920, h: 1080 }, vehicle.imageUrl);
 
   return (
     <>

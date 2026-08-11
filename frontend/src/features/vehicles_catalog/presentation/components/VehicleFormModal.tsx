@@ -12,6 +12,7 @@ import { useToast } from "@core/toast/ToastProvider";
 import { Input } from "@ui/atoms/Input";
 import { Button } from "@ui/atoms/Button";
 import { SelectWithAdd } from "@ui/molecules/SelectWithAdd";
+import { ImageUrlField } from "@ui/molecules/ImageUrlField";
 import { ModalPortal } from "@ui/atoms/ModalPortal";
 import { useModalA11y } from "@ui/hooks/useModalA11y";
 import type {
@@ -52,6 +53,7 @@ export function VehicleFormModal({
   const [horsepower, setHorsepower] = useState(String(vehicle?.horsepower ?? ""));
   const [seats, setSeats] = useState(String(vehicle?.seats ?? 5));
   const [features, setFeatures] = useState(vehicle?.features.join(", ") ?? "");
+  const [imageUrl, setImageUrl] = useState(vehicle?.imageUrl ?? "");
   const [accentFrom, setAccentFrom] = useState(vehicle?.accentFrom ?? "#005f8f");
   const [accentTo, setAccentTo] = useState(vehicle?.accentTo ?? "#00aaff");
   const [highlighted, setHighlighted] = useState(vehicle?.highlighted ?? false);
@@ -85,6 +87,7 @@ export function VehicleFormModal({
       horsepower: Number(horsepower),
       seats: Number(seats),
       features: features.split(",").map((f) => f.trim()).filter(Boolean),
+      imageUrl: imageUrl.trim() || undefined,
       accentFrom,
       accentTo,
       highlighted,
@@ -116,6 +119,13 @@ export function VehicleFormModal({
         <p className="addpart-subtitle">{t("admin.vehicleAddSubtitle")}</p>
 
         <form className="addpart-form" onSubmit={handleSubmit}>
+          <ImageUrlField
+            label={t("admin.vehicleFieldImage")}
+            value={imageUrl}
+            onChange={setImageUrl}
+            uploadLabel={t("admin.uploadFromDevice")}
+          />
+
           <div className="addpart-row">
             <label className="addpart-field">
               <span>{t("admin.vehicleFieldBrand")}</span>

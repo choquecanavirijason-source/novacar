@@ -41,7 +41,7 @@ export function ImportQuoteModal({
 
   const taxes = Math.round(vehicle.price * IMPORT_TAX_RATE);
   const total = vehicle.price + taxes + SHIPPING_ESTIMATE;
-  const photoUrl = vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 200, h: 150 });
+  const photoUrl = vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 200, h: 150 }, vehicle.imageUrl);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

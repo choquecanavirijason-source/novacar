@@ -17,6 +17,7 @@ export interface CatalogVehicleDTO {
   horsepower: number;
   seats: number;
   features: string[];
+  image_url?: string;
   accent_from: string;
   accent_to: string;
   highlighted: boolean;

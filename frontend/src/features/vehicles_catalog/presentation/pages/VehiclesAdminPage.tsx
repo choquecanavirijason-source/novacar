@@ -17,6 +17,7 @@ import { formatCurrency } from "@core/format/formatters";
 import { DataTable, type Column } from "@ui/organisms/DataTable";
 import { useVehicleAdminStore } from "../store/useVehicleAdminStore";
 import { VehicleFormModal } from "../components/VehicleFormModal";
+import { vehiclePhotoUrl } from "../vehiclePresentation";
 import type { CatalogVehicle, NewCatalogVehicle } from "../../domain/entities/CatalogVehicle";
 
 export function VehiclesAdminPage() {
@@ -55,11 +56,21 @@ export function VehiclesAdminPage() {
       key: "vehicle",
       header: t("admin.vehicleFieldModel"),
       render: (v) => (
-        <div>
-          <strong>
-            {v.brand} {v.model}
-          </strong>
-          <div style={{ color: "var(--text-muted)", fontSize: "0.78rem" }}>{v.year}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <img
+            className="admin-thumb"
+            src={vehiclePhotoUrl(v.id, v.brand, v.bodyType, { w: 128, h: 84 }, v.imageUrl)}
+            alt=""
+            onError={(e) => {
+              e.currentTarget.style.visibility = "hidden";
+            }}
+          />
+          <div style={{ minWidth: 0 }}>
+            <strong>
+              {v.brand} {v.model}
+            </strong>
+            <div style={{ color: "var(--text-muted)", fontSize: "0.78rem" }}>{v.year}</div>
+          </div>
         </div>
       ),
     },

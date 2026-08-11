@@ -27,7 +27,7 @@ export function VehicleShowcaseSlide({
   return (
     <ScrollReveal>
       <VehicleShowcaseCard
-        imageUrl={vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 1600, h: 1000 })}
+        imageUrl={vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 1600, h: 1000 }, vehicle.imageUrl)}
         imageAlt={`${vehicle.brand} ${vehicle.model}`}
         hpLabel={t("showcase.hp", { n: vehicle.horsepower })}
         techLabel={`${t(fuelKey[vehicle.fuelType])} · ${t(transmissionKey[vehicle.transmission])}`}

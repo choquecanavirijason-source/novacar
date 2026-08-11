@@ -177,7 +177,7 @@ export function FeaturedVehicles() {
                   className="absolute top-1/2 right-0 w-[120%] max-w-none -translate-y-1/2 object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)] lg:-right-10 lg:drop-shadow-[0_30px_50px_rgba(0,0,0,0.6)]"
                   src={
                     cutoutFailed
-                      ? vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 900, h: 900 })
+                      ? vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 900, h: 900 }, vehicle.imageUrl)
                       : vehicleCutoutUrl(vehicle.brand)
                   }
                   alt={`${vehicle.brand} ${vehicle.model}`}

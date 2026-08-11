@@ -1,7 +1,9 @@
 /**
  * Domain · Entity · MarketplacePart
  * Refacción/autoparte publicada en el marketplace. Modelo puro y rico para
- * alimentar tarjetas tipo e-commerce, filtros largos y página de detalle.
+ * alimentar tarjetas tipo e-commerce, filtros largos, página de detalle y el
+ * inventario interno del panel admin (stock/reorden). Único modelo para
+ * "Piezas" y "Autopartes" — antes eran dos entidades separadas.
  */
 
 export type PartCategory =
@@ -48,9 +50,13 @@ export interface MarketplacePart {
   readonly brand: string;
   readonly condition: PartCondition;
 
-  readonly price: number;
-  readonly originalPrice?: number; // si hay descuento
+  readonly price: number; // precio base, antes de descuento
+  readonly discountPercent: number; // 0–100, 0 = sin descuento
   readonly stock: number;
+  readonly reorderLevel: number; // umbral de alerta de stock bajo
+
+  /** URL de foto real (pegada por el admin). Si falta, se usa un placeholder. */
+  readonly imageUrl?: string;
 
   readonly rating: number; // 0–5
   readonly reviews: number;
@@ -68,11 +74,13 @@ export interface MarketplacePart {
   readonly accentTo: string;
 }
 
-/** Datos que el administrador captura al crear/editar una autoparte. */
+/** Datos que el administrador captura al crear/editar una pieza/autoparte. */
 export type NewMarketplacePart = Omit<MarketplacePart, "id">;
 
-/** Porcentaje de descuento (entero), 0 si no aplica. */
-export const discountPercent = (part: MarketplacePart): number =>
-  part.originalPrice && part.originalPrice > part.price
-    ? Math.round((1 - part.price / part.originalPrice) * 100)
-    : 0;
+/** Precio final ya aplicado el descuento. */
+export const finalPrice = (part: Pick<MarketplacePart, "price" | "discountPercent">): number =>
+  Math.round(part.price * (1 - part.discountPercent / 100));
+
+/** Regla de negocio reutilizable: stock en o por debajo del umbral de reorden. */
+export const isLowStock = (part: Pick<MarketplacePart, "stock" | "reorderLevel">): boolean =>
+  part.stock <= part.reorderLevel;

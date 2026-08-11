@@ -8,4 +8,5 @@
 export { MarketplacePartsAdminPage } from "./presentation/pages/MarketplacePartsAdminPage";
 export { useMarketplacePartAdminStore } from "./presentation/store/useMarketplacePartAdminStore";
 export { resolveCategoryLabel, resolveCategoryIcon } from "./presentation/partPresentation";
+export { isLowStock, finalPrice } from "./domain/entities/MarketplacePart";
 export type { MarketplacePart, NewMarketplacePart } from "./domain/entities/MarketplacePart";

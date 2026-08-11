@@ -14,7 +14,6 @@ import { Button } from "@ui/atoms/Button";
 import { AdminTopbar, type AdminPage } from "./AdminTopbar";
 import { AnalyticsPage } from "../pages/AnalyticsPage";
 import { InventoryPage } from "../pages/InventoryPage";
-import { useAdminDashboardStore } from "../store/useAdminDashboardStore";
 import { BannersPage } from "@features/site_banners";
 import { VehiclesAdminPage } from "@features/vehicles_catalog";
 import { QuoteRequestsAdminPage } from "@features/quote_requests";
@@ -26,7 +25,6 @@ export function AdminDashboard() {
   const { isAuthenticated, user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const load = useAdminDashboardStore((s) => s.load);
 
   const tabParam = searchParams.get("tab");
   const page: AdminPage = TABS.includes(tabParam as AdminPage) ? (tabParam as AdminPage) : "analytics";
@@ -43,8 +41,7 @@ export function AdminDashboard() {
       router.replace("/");
       return;
     }
-    void load();
-  }, [isAuthenticated, isStaff, load, router]);
+  }, [isAuthenticated, isStaff, router]);
 
   if (!isAuthenticated) {
     return (

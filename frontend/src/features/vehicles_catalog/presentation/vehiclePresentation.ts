@@ -49,17 +49,21 @@ const VEHICLE_PHOTO_OVERRIDES: Record<string, string> = {
 };
 
 /**
- * URL de foto del vehículo: usa el asset real propio si existe (ver
- * VEHICLE_PHOTO_OVERRIDES); si no, cae al placeholder externo vía keyword
- * (marca + carrocería), con semilla estable por id para que la misma
- * tarjeta muestre siempre la misma imagen.
+ * URL de foto del vehículo: prioriza la imagen real cargada por el admin
+ * (`imageUrl`); si falta, usa el asset propio de VEHICLE_PHOTO_OVERRIDES; si
+ * tampoco existe, cae al placeholder externo vía keyword (marca +
+ * carrocería), con semilla estable por id para que la misma tarjeta
+ * muestre siempre la misma imagen.
  */
 export const vehiclePhotoUrl = (
   id: string,
   brand: string,
   bodyType: BodyType,
   size: { w: number; h: number } = { w: 640, h: 480 },
+  imageUrl?: string,
 ): string => {
+  if (imageUrl) return imageUrl;
+
   const override = VEHICLE_PHOTO_OVERRIDES[id];
   if (override) return override;
 

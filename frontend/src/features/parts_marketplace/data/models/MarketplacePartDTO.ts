@@ -11,8 +11,10 @@ export interface MarketplacePartDTO {
   brand: string;
   condition: string;
   price: number;
-  original_price?: number;
+  discount_percent: number;
   stock: number;
+  reorder_level: number;
+  image_url?: string;
   rating: number;
   reviews: number;
   seller: string;

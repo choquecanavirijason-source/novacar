@@ -6,7 +6,7 @@
  */
 
 import type { HttpClient } from "@core/http/HttpClient";
-import type { MarketplacePart, NewMarketplacePart } from "../../domain/entities/MarketplacePart";
+import type { NewMarketplacePart } from "../../domain/entities/MarketplacePart";
 import type { MarketplacePartDTO } from "../models/MarketplacePartDTO";
 import { toMarketplacePartPayload } from "../mappers/partMapper";
 
@@ -57,7 +57,9 @@ const P = (
   brand,
   condition,
   price,
+  discount_percent: 0,
   stock: 8,
+  reorder_level: 5,
   rating: 4.5,
   reviews: 40,
   seller: "NOVACAR Oficial",
@@ -74,7 +76,7 @@ const P = (
 
 const SEED: MarketplacePartDTO[] = [
   P("eng-1", "Motor 1.6L 16v reconstruido", "engine", "Nissan", "reconstruido", 38500, {
-    original_price: 45000, stock: 3, rating: 4.7, reviews: 28, warranty_months: 6, accent_from: "#ff6b6b", accent_to: "#ff9b3d",
+    discount_percent: 14, stock: 3, rating: 4.7, reviews: 28, warranty_months: 6, accent_from: "#ff6b6b", accent_to: "#ff9b3d",
     compatible_brands: ["Nissan"], specs: [{ label: "Cilindrada", value: "1.6L" }, { label: "Válvulas", value: "16v" }, { label: "Combustible", value: "Gasolina" }],
   }),
   P("eng-2", "Motor 2.0 TSI turbo seminuevo", "engine", "Volkswagen", "usado", 64900, {
@@ -86,7 +88,7 @@ const SEED: MarketplacePartDTO[] = [
     compatible_brands: ALL_BRANDS, specs: [{ label: "Medida", value: "205/55 R16" }, { label: "Piezas", value: "4" }],
   }),
   P("tir-2", "Llanta 195/65 R15 (juego de 4)", "tires", "Goodyear", "nuevo", 6200, {
-    original_price: 7000, stock: 16, rating: 4.6, reviews: 98, accent_from: "#0088cc", accent_to: "#00aaff",
+    discount_percent: 11, stock: 16, rating: 4.6, reviews: 98, accent_from: "#0088cc", accent_to: "#00aaff",
     compatible_brands: ALL_BRANDS, specs: [{ label: "Medida", value: "195/65 R15" }, { label: "Piezas", value: "4" }],
   }),
   P("sea-1", "Asiento delantero de piel", "seats", "OEM", "usado", 4300, {
@@ -118,7 +120,7 @@ const SEED: MarketplacePartDTO[] = [
     specs: [{ label: "Tipo", value: "Cerámica" }, { label: "Posición", value: "Delantero" }],
   }),
   P("brk-2", "Discos de freno ventilados (par)", "brakes", "ATE", "nuevo", 2150, {
-    original_price: 2600, stock: 18, rating: 4.6, reviews: 51, accent_from: "#0077b3", accent_to: "#00aaff",
+    discount_percent: 17, stock: 18, rating: 4.6, reviews: 51, accent_from: "#0077b3", accent_to: "#00aaff",
     specs: [{ label: "Tipo", value: "Ventilado" }, { label: "Piezas", value: "2" }],
   }),
   P("sus-1", "Amortiguadores delanteros (par)", "suspension", "Monroe", "nuevo", 3380, {
@@ -170,7 +172,7 @@ const SEED: MarketplacePartDTO[] = [
     specs: [{ label: "Pieza", value: "Espejo" }, { label: "Lado", value: "Derecho" }],
   }),
   P("aud-1", "Estéreo Android 9\" CarPlay", "audio", "Pioneer", "nuevo", 4200, {
-    original_price: 5100, stock: 15, rating: 4.8, reviews: 175, accent_from: "#00aaff", accent_to: "#0077b3",
+    discount_percent: 18, stock: 15, rating: 4.8, reviews: 175, accent_from: "#00aaff", accent_to: "#0077b3",
     compatible_brands: ALL_BRANDS, specs: [{ label: "Pantalla", value: "9\"" }, { label: "Sistema", value: "Android + CarPlay" }],
   }),
   P("aud-2", "Bocinas 6.5\" 2 vías (par)", "audio", "JBL", "nuevo", 1290, {

@@ -8,7 +8,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Truck, ShieldCheck, ShoppingCart } from "lucide-react";
-import { discountPercent, type MarketplacePart } from "../../domain/entities/MarketplacePart";
+import { finalPrice, type MarketplacePart } from "../../domain/entities/MarketplacePart";
 import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Button } from "@ui/atoms/Button";
@@ -20,7 +20,8 @@ import "../styles/marketplace.css";
 
 export function PartDetail({ part }: { part: MarketplacePart }) {
   const { t, locale } = useTranslation();
-  const off = discountPercent(part);
+  const off = part.discountPercent;
+  const price = finalPrice(part);
   const [photoFailed, setPhotoFailed] = useState(false);
 
   return (
@@ -39,7 +40,7 @@ export function PartDetail({ part }: { part: MarketplacePart }) {
             {!photoFailed && (
               <Image
                 className="mk-detail__real-img"
-                src={partPhotoUrl(part.id, part.category, { w: 900, h: 700 })}
+                src={partPhotoUrl(part.id, part.category, { w: 900, h: 700 }, part.imageUrl)}
                 alt={part.name}
                 width={900}
                 height={700}
@@ -65,12 +66,12 @@ export function PartDetail({ part }: { part: MarketplacePart }) {
 
           <div style={{ display: "flex", alignItems: "baseline", gap: 12, margin: "12px 0" }}>
             <span className="text-gradient" style={{ fontSize: "2.4rem", fontWeight: 900 }}>
-              {formatCurrency(part.price, locale)}
+              {formatCurrency(price, locale)}
             </span>
-            {part.originalPrice && (
+            {off > 0 && (
               <>
-                <span className="mk-card__old" style={{ fontSize: "1rem" }}>{formatCurrency(part.originalPrice, locale)}</span>
-                {off > 0 && <span className="mk-discount" style={{ position: "static" }}>-{off}%</span>}
+                <span className="mk-card__old" style={{ fontSize: "1rem" }}>{formatCurrency(part.price, locale)}</span>
+                <span className="mk-discount" style={{ position: "static" }}>-{off}%</span>
               </>
             )}
           </div>

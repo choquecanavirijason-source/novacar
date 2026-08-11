@@ -19,7 +19,7 @@ import { formatCurrency } from "@core/format/formatters";
 import { DataTable, type Column } from "@ui/organisms/DataTable";
 import { useMarketplacePartAdminStore } from "../store/useMarketplacePartAdminStore";
 import { MarketplacePartFormModal } from "../components/MarketplacePartFormModal";
-import { resolveCategoryLabel } from "../partPresentation";
+import { partPhotoUrl, resolveCategoryLabel } from "../partPresentation";
 import type { MarketplacePart, NewMarketplacePart } from "../../domain/entities/MarketplacePart";
 
 export function MarketplacePartsAdminPage({
@@ -67,10 +67,20 @@ export function MarketplacePartsAdminPage({
       key: "part",
       header: t("admin.colProduct"),
       render: (p) => (
-        <div>
-          <strong>{p.name}</strong>
-          <div style={{ color: "var(--text-muted)", fontSize: "0.78rem" }}>
-            {p.sku} · {p.brand}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <img
+            className="admin-thumb"
+            src={partPhotoUrl(p.id, p.category, { w: 128, h: 84 }, p.imageUrl)}
+            alt=""
+            onError={(e) => {
+              e.currentTarget.style.visibility = "hidden";
+            }}
+          />
+          <div style={{ minWidth: 0 }}>
+            <strong>{p.name}</strong>
+            <div style={{ color: "var(--text-muted)", fontSize: "0.78rem" }}>
+              {p.sku} · {p.brand}
+            </div>
           </div>
         </div>
       ),

@@ -12,6 +12,7 @@ import { useToast } from "@core/toast/ToastProvider";
 import { Input } from "@ui/atoms/Input";
 import { Button } from "@ui/atoms/Button";
 import { ModalPortal } from "@ui/atoms/ModalPortal";
+import { ImageUrlField } from "@ui/molecules/ImageUrlField";
 import { useModalA11y } from "@ui/hooks/useModalA11y";
 import type { Banner, NewBanner } from "../../domain/entities/Banner";
 
@@ -79,6 +80,14 @@ export function BannerFormModal({
         <p className="addpart-subtitle">{t("admin.bannerAddSubtitle")}</p>
 
         <form className="addpart-form" onSubmit={handleSubmit}>
+          <ImageUrlField
+            label={t("admin.bannerFieldImage")}
+            value={imageUrl}
+            onChange={setImageUrl}
+            uploadLabel={t("admin.uploadFromDevice")}
+            required
+          />
+
           <label className="addpart-field">
             <span>{t("admin.bannerFieldTitle")}</span>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
@@ -87,16 +96,6 @@ export function BannerFormModal({
           <label className="addpart-field">
             <span>{t("admin.bannerFieldSubtitle")}</span>
             <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} />
-          </label>
-
-          <label className="addpart-field">
-            <span>{t("admin.bannerFieldImage")}</span>
-            <Input
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="/car-azul-hero.png"
-              required
-            />
           </label>
 
           <div className="addpart-row">

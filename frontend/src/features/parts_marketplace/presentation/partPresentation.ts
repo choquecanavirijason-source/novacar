@@ -73,7 +73,8 @@ const categoryPhotoKeyword: Record<PartCategory, string> = {
 };
 
 /**
- * URL de foto real de placeholder (a reemplazar por assets propios), con
+ * URL de foto de la pieza: prioriza la imagen real cargada por el admin
+ * (`imageUrl`); si falta, cae al placeholder externo por categoría, con
  * semilla estable por id para que la misma tarjeta muestre siempre la misma
  * imagen. Da a las tarjetas de autopartes el mismo tratamiento visual
  * (pop-out de imagen real) que las tarjetas de autos.
@@ -82,7 +83,10 @@ export const partPhotoUrl = (
   id: string,
   category: PartCategory,
   size: { w: number; h: number } = { w: 480, h: 360 },
+  imageUrl?: string,
 ): string => {
+  if (imageUrl) return imageUrl;
+
   const seed = Array.from(id).reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const keyword = (categoryPhotoKeyword as Record<string, string>)[category] ?? "autopart";
   const keywords = encodeURIComponent(`autoparts,${keyword}`);

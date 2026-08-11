@@ -12,15 +12,18 @@ import { useToast } from "@core/toast/ToastProvider";
 import { Input } from "@ui/atoms/Input";
 import { Button } from "@ui/atoms/Button";
 import { SelectWithAdd } from "@ui/molecules/SelectWithAdd";
+import { ImageUrlField } from "@ui/molecules/ImageUrlField";
 import { ModalPortal } from "@ui/atoms/ModalPortal";
 import { useModalA11y } from "@ui/hooks/useModalA11y";
 import {
   PART_CATEGORIES,
+  finalPrice,
   type MarketplacePart,
   type NewMarketplacePart,
   type PartCategory,
   type PartCondition,
 } from "../../domain/entities/MarketplacePart";
+import { formatCurrency } from "@core/format/formatters";
 
 const CONDITIONS: PartCondition[] = ["nuevo", "usado", "reconstruido"];
 
@@ -44,7 +47,7 @@ export function MarketplacePartFormModal({
   onClose: () => void;
   onSubmit: (input: NewMarketplacePart) => Promise<boolean>;
 }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const toast = useToast();
   const [sku, setSku] = useState(part?.sku ?? "");
   const [name, setName] = useState(part?.name ?? "");
@@ -52,13 +55,15 @@ export function MarketplacePartFormModal({
   const [category, setCategory] = useState<PartCategory>(part?.category ?? "engine");
   const [condition, setCondition] = useState<PartCondition>(part?.condition ?? "nuevo");
   const [price, setPrice] = useState(String(part?.price ?? ""));
-  const [originalPrice, setOriginalPrice] = useState(part?.originalPrice ? String(part.originalPrice) : "");
+  const [discountPercent, setDiscountPercent] = useState(String(part?.discountPercent ?? 0));
   const [stock, setStock] = useState(String(part?.stock ?? ""));
+  const [reorderLevel, setReorderLevel] = useState(String(part?.reorderLevel ?? 5));
   const [rating, setRating] = useState(String(part?.rating ?? 4.5));
   const [warrantyMonths, setWarrantyMonths] = useState(String(part?.warrantyMonths ?? 12));
   const [freeShipping, setFreeShipping] = useState(part?.freeShipping ?? true);
   const [compatibleBrands, setCompatibleBrands] = useState(part?.compatibleBrands.join(", ") ?? "");
   const [specs, setSpecs] = useState(part?.specs.map((s) => `${s.label}: ${s.value}`).join(", ") ?? "");
+  const [imageUrl, setImageUrl] = useState(part?.imageUrl ?? "");
   const [accentFrom, setAccentFrom] = useState(part?.accentFrom ?? "#005f8f");
   const [accentTo, setAccentTo] = useState(part?.accentTo ?? "#00aaff");
   const [saving, setSaving] = useState(false);
@@ -79,8 +84,9 @@ export function MarketplacePartFormModal({
       category,
       condition,
       price: Number(price),
-      originalPrice: originalPrice ? Number(originalPrice) : undefined,
+      discountPercent: Number(discountPercent) || 0,
       stock: Number(stock),
+      reorderLevel: Number(reorderLevel),
       rating: Number(rating),
       reviews: part?.reviews ?? 0,
       seller: part?.seller ?? "NOVACAR Oficial",
@@ -90,6 +96,7 @@ export function MarketplacePartFormModal({
       yearFrom: part?.yearFrom ?? 2012,
       yearTo: part?.yearTo ?? new Date().getFullYear(),
       specs: parseSpecs(specs),
+      imageUrl: imageUrl.trim() || undefined,
       accentFrom,
       accentTo,
     });
@@ -120,6 +127,13 @@ export function MarketplacePartFormModal({
         <p className="addpart-subtitle">{t("admin.partAddSubtitle")}</p>
 
         <form className="addpart-form" onSubmit={handleSubmit}>
+          <ImageUrlField
+            label={t("admin.partFieldImage")}
+            value={imageUrl}
+            onChange={setImageUrl}
+            uploadLabel={t("admin.uploadFromDevice")}
+          />
+
           <div className="addpart-row">
             <label className="addpart-field">
               <span>{t("admin.fieldName")}</span>
@@ -170,12 +184,34 @@ export function MarketplacePartFormModal({
               <Input type="number" min={1} value={price} onChange={(e) => setPrice(e.target.value)} required />
             </label>
             <label className="addpart-field">
-              <span>{t("admin.partFieldOriginalPrice")}</span>
-              <Input type="number" min={0} value={originalPrice} onChange={(e) => setOriginalPrice(e.target.value)} placeholder={t("admin.partOriginalPricePlaceholder")} />
+              <span>{t("admin.partFieldDiscountPercent")}</span>
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                value={discountPercent}
+                onChange={(e) => setDiscountPercent(e.target.value)}
+                placeholder="0"
+              />
             </label>
+            <label className="addpart-field">
+              <span>{t("admin.partFieldFinalPrice")}</span>
+              <Input
+                value={formatCurrency(finalPrice({ price: Number(price) || 0, discountPercent: Number(discountPercent) || 0 }), locale)}
+                readOnly
+                disabled
+              />
+            </label>
+          </div>
+
+          <div className="addpart-row">
             <label className="addpart-field">
               <span>{t("admin.fieldStock")}</span>
               <Input type="number" min={0} value={stock} onChange={(e) => setStock(e.target.value)} required />
+            </label>
+            <label className="addpart-field">
+              <span>{t("admin.fieldReorder")}</span>
+              <Input type="number" min={0} value={reorderLevel} onChange={(e) => setReorderLevel(e.target.value)} required />
             </label>
           </div>
 

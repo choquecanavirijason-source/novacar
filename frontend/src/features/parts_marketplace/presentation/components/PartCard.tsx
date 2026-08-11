@@ -7,7 +7,7 @@
 "use client";
 
 import { useState } from "react";
-import { discountPercent, type MarketplacePart } from "../../domain/entities/MarketplacePart";
+import { finalPrice, type MarketplacePart } from "../../domain/entities/MarketplacePart";
 import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { RatingStars } from "@ui/atoms/RatingStars";
@@ -17,7 +17,8 @@ import { ProductInquiryModal } from "./ProductInquiryModal";
 
 export function PartCard({ part, index = 0 }: { part: MarketplacePart; index?: number }) {
   const { t, locale } = useTranslation();
-  const off = discountPercent(part);
+  const off = part.discountPercent;
+  const price = finalPrice(part);
   const CategoryIcon = resolveCategoryIcon(part.category);
   const [inquiryOpen, setInquiryOpen] = useState(false);
 
@@ -36,7 +37,7 @@ export function PartCard({ part, index = 0 }: { part: MarketplacePart; index?: n
         accentFrom="#252525"
         accentTo="#252525"
         photoHeight={220}
-        imageUrl={partPhotoUrl(part.id, part.category)}
+        imageUrl={partPhotoUrl(part.id, part.category, undefined, part.imageUrl)}
         imageAlt={part.name}
         photoIcon={<CategoryIcon size={48} strokeWidth={1.5} aria-hidden />}
         photoTopSlot={
@@ -48,9 +49,9 @@ export function PartCard({ part, index = 0 }: { part: MarketplacePart; index?: n
         title={part.name}
         subtitle={
           <>
-            <span className="mk-price-badge">{formatCurrency(part.price, locale)}</span>
-            {part.originalPrice && (
-              <s style={{ marginLeft: 8, color: "var(--text-muted)" }}>{formatCurrency(part.originalPrice, locale)}</s>
+            <span className="mk-price-badge">{formatCurrency(price, locale)}</span>
+            {off > 0 && (
+              <s style={{ marginLeft: 8, color: "var(--text-muted)" }}>{formatCurrency(part.price, locale)}</s>
             )}
           </>
         }

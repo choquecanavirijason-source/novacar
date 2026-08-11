@@ -1,7 +1,7 @@
 /**
  * Presentation · Page · AnalyticsPage
- * Resumen ejecutivo del panel: agrega datos reales de los 4 módulos
- * (Vehículos, Inventario, Autopartes, Banners) — nada de cifras inventadas.
+ * Resumen ejecutivo del panel: agrega datos reales de los 3 módulos
+ * (Vehículos, Piezas/Autopartes, Banners) — nada de cifras inventadas.
  */
 
 "use client";
@@ -17,7 +17,6 @@ import {
   Plus,
   Wallet,
 } from "lucide-react";
-import { useAdminDashboardStore } from "../store/useAdminDashboardStore";
 import { BarChart } from "../components/BarChart";
 import { DonutChart } from "../components/DonutChart";
 import { useTranslation } from "@core/i18n/I18nProvider";
@@ -26,47 +25,32 @@ import { Badge } from "@ui/atoms/Badge";
 import { Button } from "@ui/atoms/Button";
 import { Skeleton } from "@ui/atoms/Skeleton";
 import { formatCurrency } from "@core/format/formatters";
-import { prettifySlug } from "@core/format/prettifySlug";
-import { isLowStock } from "../../domain/entities/InventoryItem";
 import { useVehicleAdminStore } from "@features/vehicles_catalog";
-import { useMarketplacePartAdminStore, resolveCategoryLabel } from "@features/parts_marketplace";
+import { useMarketplacePartAdminStore, resolveCategoryLabel, isLowStock, finalPrice } from "@features/parts_marketplace";
 import { useBannerStore } from "@features/site_banners";
 
 export function AnalyticsPage() {
   const { t, locale } = useTranslation();
-  const { inventory, loading: invLoading, load: loadInventory } = useAdminDashboardStore();
   const { vehicles, loading: vehLoading, load: loadVehicles } = useVehicleAdminStore();
   const { parts, loading: partsLoading, load: loadParts } = useMarketplacePartAdminStore();
   const { banners, loading: bannersLoading, loadAll: loadBanners } = useBannerStore();
 
   useEffect(() => {
-    void loadInventory();
     void loadVehicles();
     void loadParts();
     void loadBanners();
-  }, [loadInventory, loadVehicles, loadParts, loadBanners]);
+  }, [loadVehicles, loadParts, loadBanners]);
 
-  const loading = invLoading || vehLoading || partsLoading || bannersLoading;
+  const loading = vehLoading || partsLoading || bannersLoading;
 
   const lowStockItems = useMemo(
     () =>
-      [...inventory]
+      [...parts]
         .filter(isLowStock)
         .sort((a, b) => a.stock - a.reorderLevel - (b.stock - b.reorderLevel))
         .slice(0, 5),
-    [inventory],
+    [parts],
   );
-
-  const inventoryByCategory = useMemo(() => {
-    const knownLabel: Record<string, string> = {
-      battery: t("admin.categoryBattery"),
-      fuse: t("admin.categoryFuse"),
-    };
-    return [...new Set(inventory.map((i) => i.category))].map((c) => ({
-      label: knownLabel[c] ?? prettifySlug(c),
-      value: inventory.filter((i) => i.category === c).length,
-    }));
-  }, [inventory, t]);
 
   const partsByCategory = useMemo(
     () =>
@@ -78,20 +62,19 @@ export function AnalyticsPage() {
   );
 
   const inventoryValue = useMemo(
-    () => inventory.reduce((sum, i) => sum + i.stock * i.price, 0),
-    [inventory],
+    () => parts.reduce((sum, p) => sum + p.stock * finalPrice(p), 0),
+    [parts],
   );
 
   const catalogComposition = useMemo(
     () => [
       { label: t("admin.vehicles"), value: vehicles.length, color: "#3987e5" },
       { label: t("admin.kpiParts"), value: parts.length, color: "#d95926" },
-      { label: t("admin.inventoryTabParts"), value: inventory.length, color: "#199e70" },
     ],
-    [vehicles, parts, inventory, t],
+    [vehicles, parts, t],
   );
 
-  if (loading && inventory.length === 0) {
+  if (loading && parts.length === 0) {
     return (
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
         {Array.from({ length: 4 }).map((_, i) => (
@@ -178,24 +161,13 @@ export function AnalyticsPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-        <div className="card" style={{ padding: 24 }}>
-          <h2 style={{ fontWeight: 700, marginBottom: 18 }}>{t("admin.inventoryByCategory")}</h2>
-          {inventoryByCategory.some((d) => d.value > 0) ? (
-            <BarChart data={inventoryByCategory} unit={` ${t("admin.units")}`} />
-          ) : (
-            <p style={{ color: "var(--text-muted)" }}>{t("admin.noData")}</p>
-          )}
-        </div>
-
-        <div className="card" style={{ padding: 24 }}>
-          <h2 style={{ fontWeight: 700, marginBottom: 18 }}>{t("admin.partsByCategory")}</h2>
-          {partsByCategory.length > 0 ? (
-            <BarChart data={partsByCategory} unit={` ${t("admin.units")}`} />
-          ) : (
-            <p style={{ color: "var(--text-muted)" }}>{t("admin.noData")}</p>
-          )}
-        </div>
+      <div className="card" style={{ padding: 24 }}>
+        <h2 style={{ fontWeight: 700, marginBottom: 18 }}>{t("admin.partsByCategory")}</h2>
+        {partsByCategory.length > 0 ? (
+          <BarChart data={partsByCategory} unit={` ${t("admin.units")}`} />
+        ) : (
+          <p style={{ color: "var(--text-muted)" }}>{t("admin.noData")}</p>
+        )}
       </div>
 
       <div className="card" style={{ padding: 24 }}>

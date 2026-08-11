@@ -27,6 +27,8 @@ export interface CatalogVehicle {
   readonly seats: number;
 
   readonly features: ReadonlyArray<string>;
+  /** URL de foto real (pegada por el admin). Si falta, se usa un placeholder. */
+  readonly imageUrl?: string;
   /** Colores para la "foto" generada (gradiente), evita depender de assets. */
   readonly accentFrom: string;
   readonly accentTo: string;
