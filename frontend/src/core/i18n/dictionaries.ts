@@ -136,6 +136,10 @@ const es = {
     seg2: "Chasis de fibra de carbono",
     seg4: "Suspensión adaptativa",
     seg5: "Frenado regenerativo",
+    scrollHint: "Desliza para explorar",
+    outroEyebrow: "Listo para manejarlo",
+    loaderTitle: "Arrancando motor",
+    loaderHint: "Cargando secuencia",
   },
   vehicleParts: {
     title: "Estado de las autopartes",
@@ -689,6 +693,10 @@ const en = {
     seg2: "Carbon Fiber Chassis",
     seg4: "Adaptive Suspension",
     seg5: "Regenerative Braking",
+    scrollHint: "Scroll to explore",
+    outroEyebrow: "Ready to drive it",
+    loaderTitle: "Starting engine",
+    loaderHint: "Loading sequence",
   },
   vehicleParts: {
     title: "Auto Parts Status",
