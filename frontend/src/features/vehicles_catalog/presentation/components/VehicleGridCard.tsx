@@ -21,8 +21,8 @@ export function VehicleGridCard({ vehicle, index = 0 }: { vehicle: CatalogVehicl
     <ProductCard
       href={`/catalogo/${vehicle.id}`}
       index={index}
-      accentFrom={vehicle.accentFrom}
-      accentTo={vehicle.accentTo}
+      accentFrom="#1c1c1c"
+      accentTo="#0a0a0a"
       photoHeight={210}
       imageUrl={vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 640, h: 480 }, vehicle.imageUrl)}
       imageAlt={`${vehicle.brand} ${vehicle.model}`}

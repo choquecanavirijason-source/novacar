@@ -5,7 +5,7 @@
 
 export interface QuoteRequestDTO {
   id: string;
-  source: "import" | "inquiry";
+  source: "import" | "inquiry" | "test_drive";
   customer_email: string;
   subject: string;
   details: string;

@@ -1,15 +1,18 @@
 /**
  * Presentation · State (Zustand) · useSearchWizardState
  *
- * ViewModel del buscador por pasos. Mantiene el estado de la UI e invoca los
- * Use Cases del dominio (vía el composition root `di.ts`). No contiene lógica
- * de negocio ni accede a datos directamente.
+ * ViewModel del buscador por pasos. Carga una vez el catálogo real de
+ * vehículos (`vehicles_catalog`) y el inventario real de autopartes
+ * (`parts_marketplace`), y usa los Use Cases puros del dominio de este
+ * módulo para derivar opciones y filtrar compatibilidad — sin datos
+ * inventados ni desconectados del panel admin.
  */
 
 "use client";
 
 import { create } from "zustand";
-import type { Part, PartCategory } from "../../domain/entities/Part";
+import { catalogUseCases, type CatalogVehicle } from "@features/vehicles_catalog";
+import { marketplaceUseCases, type MarketplacePart, type PartCategory } from "@features/parts_marketplace";
 import { searchUseCases } from "../../di";
 
 export type WizardStep = 0 | 1 | 2 | 3; // marca, modelo, año, categoría
@@ -22,22 +25,25 @@ interface SearchWizardState {
   year: number | null;
   category: PartCategory | null;
 
-  // opciones cargadas reactivamente
+  // catálogo real, cargado una vez
+  vehicles: CatalogVehicle[];
+  allParts: MarketplacePart[];
+
+  // opciones derivadas reactivamente
   brands: string[];
   models: string[];
   years: number[];
 
   // resultados
-  parts: Part[];
+  parts: MarketplacePart[];
   loading: boolean;
   error: string | null;
 
-  // acciones
   init: () => Promise<void>;
-  selectBrand: (brand: string) => Promise<void>;
-  selectModel: (model: string) => Promise<void>;
+  selectBrand: (brand: string) => void;
+  selectModel: (model: string) => void;
   selectYear: (year: number) => void;
-  selectCategory: (category: PartCategory) => Promise<void>;
+  selectCategory: (category: PartCategory) => void;
   goTo: (step: WizardStep) => void;
   reset: () => void;
 }
@@ -48,6 +54,8 @@ export const useSearchWizardState = create<SearchWizardState>((set, get) => ({
   model: null,
   year: null,
   category: null,
+  vehicles: [],
+  allParts: [],
   brands: [],
   models: [],
   years: [],
@@ -58,48 +66,43 @@ export const useSearchWizardState = create<SearchWizardState>((set, get) => ({
   init: async () => {
     set({ loading: true, error: null });
     try {
-      const brands = await searchUseCases.getVehicleOptions.getBrands();
-      set({ brands, loading: false });
+      const [vehicles, allParts] = await Promise.all([
+        catalogUseCases.getAllVehicles(),
+        marketplaceUseCases.getAllParts(),
+      ]);
+      const brands = searchUseCases.deriveVehicleOptions.getBrands(vehicles);
+      set({ vehicles, allParts, brands, loading: false });
     } catch (e) {
       set({ loading: false, error: (e as Error).message });
     }
   },
 
-  selectBrand: async (brand) => {
-    set({ brand, model: null, year: null, category: null, models: [], years: [], parts: [], loading: true });
-    try {
-      const models = await searchUseCases.getVehicleOptions.getModels(brand);
-      set({ models, step: 1, loading: false });
-    } catch (e) {
-      set({ loading: false, error: (e as Error).message });
-    }
+  selectBrand: (brand) => {
+    const { vehicles } = get();
+    const models = searchUseCases.deriveVehicleOptions.getModels(vehicles, brand);
+    set({ brand, model: null, year: null, category: null, models, years: [], parts: [], step: 1 });
   },
 
-  selectModel: async (model) => {
-    const { brand } = get();
-    set({ model, year: null, category: null, years: [], parts: [], loading: true });
-    try {
-      const years = await searchUseCases.getVehicleOptions.getYears(brand!, model);
-      set({ years, step: 2, loading: false });
-    } catch (e) {
-      set({ loading: false, error: (e as Error).message });
-    }
+  selectModel: (model) => {
+    const { vehicles, brand } = get();
+    const years = searchUseCases.deriveVehicleOptions.getYears(vehicles, brand ?? "", model);
+    set({ model, year: null, category: null, years, parts: [], step: 2 });
   },
 
   selectYear: (year) => set({ year, category: null, parts: [], step: 3 }),
 
-  selectCategory: async (category) => {
-    const { brand, model, year } = get();
-    if (!brand || !model || !year) return;
-    set({ category, loading: true, error: null });
+  selectCategory: (category) => {
+    const { brand, model, year, allParts } = get();
+    if (!brand || !year) return;
     try {
-      const result = await searchUseCases.getCompatibleParts.execute({
-        vehicle: { brand, model, year },
+      const parts = searchUseCases.getCompatibleParts.execute({
+        parts: allParts,
+        vehicle: { brand, model: model ?? "", year },
         category,
       });
-      set({ parts: [...result.compatibleParts], loading: false });
+      set({ category, parts, error: null });
     } catch (e) {
-      set({ loading: false, error: (e as Error).message });
+      set({ error: (e as Error).message });
     }
   },
 

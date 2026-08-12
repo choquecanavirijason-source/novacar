@@ -6,7 +6,9 @@
  */
 
 export { MarketplacePartsAdminPage } from "./presentation/pages/MarketplacePartsAdminPage";
+export { PartCard } from "./presentation/components/PartCard";
 export { useMarketplacePartAdminStore } from "./presentation/store/useMarketplacePartAdminStore";
 export { resolveCategoryLabel, resolveCategoryIcon } from "./presentation/partPresentation";
-export { isLowStock, finalPrice } from "./domain/entities/MarketplacePart";
-export type { MarketplacePart, NewMarketplacePart } from "./domain/entities/MarketplacePart";
+export { isLowStock, finalPrice, PART_CATEGORIES } from "./domain/entities/MarketplacePart";
+export { marketplaceUseCases } from "./di";
+export type { MarketplacePart, NewMarketplacePart, PartCategory } from "./domain/entities/MarketplacePart";

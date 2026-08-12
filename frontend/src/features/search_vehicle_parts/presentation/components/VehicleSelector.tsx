@@ -1,7 +1,8 @@
 /**
  * Presentation · Component · VehicleSelector
- * Renderiza un grupo de opciones (marca / modelo / año) como chips seleccionables.
- * Es "tonto" (presentational): recibe datos y callbacks, no conoce el store.
+ * Desplegable (marca / modelo / año): evita que crezca en tarjetas sueltas a
+ * medida que el admin agrega más marcas/modelos al catálogo. "Tonto"
+ * (presentational): recibe datos y callbacks, no conoce el store.
  */
 
 "use client";
@@ -10,6 +11,7 @@ interface VehicleSelectorProps<T extends string | number> {
   options: T[];
   selected: T | null;
   onSelect: (value: T) => void;
+  placeholder?: string;
   emptyLabel?: string;
 }
 
@@ -17,6 +19,7 @@ export function VehicleSelector<T extends string | number>({
   options,
   selected,
   onSelect,
+  placeholder = "Selecciona una opción",
   emptyLabel = "No hay opciones disponibles.",
 }: VehicleSelectorProps<T>) {
   if (options.length === 0) {
@@ -24,18 +27,19 @@ export function VehicleSelector<T extends string | number>({
   }
 
   return (
-    <div className="option-grid">
+    <select
+      className="wizard-select"
+      value={selected ?? ""}
+      onChange={(e) => onSelect((typeof options[0] === "number" ? Number(e.target.value) : e.target.value) as T)}
+    >
+      <option value="" disabled>
+        {placeholder}
+      </option>
       {options.map((option) => (
-        <button
-          key={String(option)}
-          type="button"
-          className={`option-chip ${selected === option ? "option-chip--selected" : ""}`}
-          onClick={() => onSelect(option)}
-          aria-pressed={selected === option}
-        >
+        <option key={String(option)} value={option}>
           {option}
-        </button>
+        </option>
       ))}
-    </div>
+    </select>
   );
 }

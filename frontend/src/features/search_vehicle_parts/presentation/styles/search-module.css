@@ -79,46 +79,72 @@
   margin-top: 4px;
 }
 
-/* ---- Grid de opciones (chips) ---- */
-.option-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 12px;
-}
-
-.option-chip {
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
+/* ---- Selector desplegable (marca / modelo / año) ---- */
+.wizard-select {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-base);
   color: var(--text-primary);
+  font-size: 0.95rem;
   font-weight: 600;
-  text-align: left;
-  transition: transform var(--transition-fast), border-color var(--transition-smooth),
-    box-shadow var(--transition-smooth);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2300aaff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
-.option-chip:hover {
-  transform: translateY(-3px);
+.wizard-select:focus {
   border-color: var(--accent-neon);
   box-shadow: var(--glow-accent);
 }
 
-.option-chip--selected {
-  border-color: var(--primary-glow);
-  background: var(--primary-soft);
-  box-shadow: var(--glow-primary);
+.wizard-select option {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
 }
 
-/* ---- Selector de categoría destacado ---- */
+/* ---- Selector de categoría destacado: carrusel horizontal (con flechas)
+   en vez de grid multi-fila, así no acumula filas sin fin por más
+   categorías que agregue el admin. ---- */
+.category-carousel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .category-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
   gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  padding: 4px 2px 10px;
+  cursor: grab;
+  user-select: none;
+}
+
+.category-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.category-grid--dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+}
+
+.category-grid--dragging .category-card {
+  pointer-events: none;
 }
 
 .category-card {
-  padding: 22px;
+  flex: 0 0 140px;
+  scroll-snap-align: start;
+  padding: 18px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background: var(--bg-elevated);
@@ -149,103 +175,9 @@
   margin-top: 8px;
 }
 
-.category-card__desc {
-  color: var(--text-secondary);
-  font-size: 0.86rem;
-  margin-top: 4px;
-}
-
-/* ---- Búsqueda predictiva ---- */
-.predictive {
-  position: relative;
-  margin-bottom: 20px;
-}
-
-.predictive__input {
-  width: 100%;
-  padding: 14px 18px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-strong);
-  background: var(--bg-base);
-  color: var(--text-primary);
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
-}
-
-.predictive__input:focus {
-  border-color: var(--accent-neon);
-  box-shadow: var(--glow-accent);
-}
-
-.predictive__list {
-  position: absolute;
-  z-index: 20;
-  left: 0;
-  right: 0;
-  margin-top: 8px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  box-shadow: var(--shadow-soft);
-}
-
-.predictive__item {
-  width: 100%;
-  text-align: left;
-  padding: 12px 18px;
-  color: var(--text-secondary);
-  background: transparent;
-  transition: background var(--transition-fast), color var(--transition-fast);
-}
-
-.predictive__item:hover {
-  background: var(--primary-soft);
-  color: var(--text-primary);
-}
-
-/* ---- Resultados ---- */
-.results {
+/* ---- Resultados: reusan .mk-grid / PartCard de parts_marketplace ---- */
+.mk-grid {
   margin-top: 28px;
-  display: grid;
-  gap: 14px;
-}
-
-.part-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px 20px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
-  transition: border-color var(--transition-smooth), transform var(--transition-fast);
-}
-
-.part-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--primary-glow);
-}
-
-.part-card__name {
-  font-weight: 700;
-}
-
-.part-card__meta {
-  color: var(--text-secondary);
-  font-size: 0.84rem;
-  margin-top: 4px;
-}
-
-.part-card__price {
-  font-size: 1.15rem;
-  font-weight: 800;
-  background: var(--gradient-brand);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 .badge {

@@ -8,4 +8,5 @@
 export { VehiclesAdminPage } from "./presentation/pages/VehiclesAdminPage";
 export { DiscountBanners } from "./presentation/components/DiscountBanners";
 export { useVehicleAdminStore } from "./presentation/store/useVehicleAdminStore";
+export { catalogUseCases } from "./di";
 export type { CatalogVehicle, NewCatalogVehicle } from "./domain/entities/CatalogVehicle";

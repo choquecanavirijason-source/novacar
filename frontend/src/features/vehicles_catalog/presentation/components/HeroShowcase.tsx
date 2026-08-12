@@ -60,6 +60,10 @@ const SCROLL_VH_MULTIPLIER = 3;
 const REST_LOOP_WINDOW = 1.6;
 const REST_LOOP_CYCLE_MS = 2600;
 const REST_IDLE_DELAY_MS = 500;
+/** El loader (tacómetro + bandera a cuadros) siempre se ve al menos esto,
+ *  aunque los videos ya estén listos — así la animación de marca alcanza a
+ *  apreciarse incluso en banda ancha, en vez de ser un flash de 100ms. */
+const MIN_LOADER_MS = 900;
 
 export function HeroShowcase() {
   const { t } = useTranslation();
@@ -74,7 +78,8 @@ export function HeroShowcase() {
   const [videosReady, setVideosReady] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [showLoader, setShowLoader] = useState(false);
+  const [loaderElapsed, setLoaderElapsed] = useState(false);
+  const heroReady = videosReady && loaderElapsed;
 
   useEffect(() => {
     setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -83,49 +88,51 @@ export function HeroShowcase() {
   // El video arranca por defecto en su frame 0 (la toma ancha) — lo saltamos a
   // PART1_START para que el reposo inicial ya muestre el plano cerrado. Un
   // video local puede terminar de cargar (y disparar loadedmetadata) antes de
-  // que React hidrate y llegue a engancharse, así que en vez de depender de un
-  // único evento, reafirmamos el seek por unos instantes hasta que se sostenga.
+  // que React hidrate y llegue a engancharse, así que sondeamos hasta que
+  // haya metadata (readyState >= 1) para recién ahí pedir el seek — UNA sola
+  // vez: reasignar `currentTime` en cada tick (aunque sea al mismo valor)
+  // reinicia el seek en curso una y otra vez y el video nunca termina de
+  // asentarse.
   useEffect(() => {
     const v1 = video1Ref.current;
     if (!v1) return;
-    let settled = false;
+    let done = false;
     const trySeek = () => {
-      if (settled || v1.currentTime >= PART1_START) {
-        settled = true;
-        return;
-      }
-      if (v1.readyState >= 1) v1.currentTime = PART1_START;
+      if (done || v1.readyState < 1) return;
+      done = true;
+      v1.currentTime = PART1_START;
     };
     trySeek();
     const id = window.setInterval(trySeek, 60);
-    const stop = window.setTimeout(() => {
-      settled = true;
-      window.clearInterval(id);
-    }, 2000);
+    const stop = window.setTimeout(() => window.clearInterval(id), 2000);
     return () => {
       window.clearInterval(id);
       window.clearTimeout(stop);
     };
   }, []);
 
-  // El loader solo debe verse si la carga tarda de verdad — en local/banda ancha
-  // los clips están listos casi al instante y mostrarlo igual sería un flash
-  // molesto tapando el primer frame del hero. Se retrasa su aparición; si
-  // videosReady llega antes, nunca llega a montarse.
+  // Tiempo mínimo de marca: el loader se ve al menos MIN_LOADER_MS aunque
+  // los videos carguen casi al instante (ver heroReady = videosReady && loaderElapsed).
   useEffect(() => {
-    if (reducedMotion || videosReady) return;
-    const id = setTimeout(() => setShowLoader(true), 350);
+    if (reducedMotion) return;
+    const id = setTimeout(() => setLoaderElapsed(true), MIN_LOADER_MS);
     return () => clearTimeout(id);
-  }, [reducedMotion, videosReady]);
+  }, [reducedMotion]);
 
   // Carga + progreso real (bytes bufferizados / duración) para el loader.
+  // Sondea `readyState` en vez de escuchar `loadeddata`: ese evento dispara
+  // una sola vez para la posición de reproducción inicial, y el seek del
+  // efecto anterior (saltar a PART1_START) puede hacer que el navegador no
+  // vuelva a dispararlo nunca para la nueva posición — con el listener nos
+  // quedábamos esperando un evento que ya no llegaba y el loader se trababa
+  // en 0% para siempre. Sondear el estado directamente es inmune a eso.
   useEffect(() => {
     if (reducedMotion) return;
     const videos = [video1Ref.current, video2Ref.current].filter((v): v is HTMLVideoElement => v != null);
     if (videos.length < 2) return;
 
     const perVideo = [0, 0];
-    let loadedCount = 0;
+    const loaded = videos.map(() => false);
     const cleanups: Array<() => void> = [];
 
     const reportProgress = (i: number, v: HTMLVideoElement) => {
@@ -139,34 +146,30 @@ export function HeroShowcase() {
       }
     };
 
-    const markLoaded = () => {
-      loadedCount += 1;
-      if (loadedCount >= videos.length) {
-        setLoadProgress(100);
-        setVideosReady(true);
-      }
-    };
-
     videos.forEach((v, i) => {
       const onProgress = () => reportProgress(i, v);
       v.addEventListener("progress", onProgress);
       cleanups.push(() => v.removeEventListener("progress", onProgress));
-
-      if (v.readyState >= 2) {
-        markLoaded();
-      } else {
-        const onReady = () => markLoaded();
-        v.addEventListener("loadeddata", onReady);
-        cleanups.push(() => v.removeEventListener("loadeddata", onReady));
-      }
     });
+
+    const pollId = window.setInterval(() => {
+      videos.forEach((v, i) => {
+        if (!loaded[i] && v.readyState >= 2) loaded[i] = true;
+      });
+      if (loaded.every(Boolean)) {
+        setLoadProgress(100);
+        setVideosReady(true);
+        window.clearInterval(pollId);
+      }
+    }, 120);
+    cleanups.push(() => window.clearInterval(pollId));
 
     return () => cleanups.forEach((fn) => fn());
   }, [reducedMotion]);
 
   useGSAP(
     () => {
-      if (!videosReady || reducedMotion) return;
+      if (!heroReady || reducedMotion) return;
       const section = sectionRef.current;
       const v1 = video1Ref.current;
       const v2 = video2Ref.current;
@@ -175,6 +178,16 @@ export function HeroShowcase() {
       v1.pause();
       v2.pause();
       v2.style.opacity = "0";
+
+      // Reasignar `currentTime` fuerza al navegador a re-decodificar, aunque
+      // el cambio sea de una fracción de frame — con el scroll disparando
+      // muchos más updates por segundo que los ~30fps del video, la mayoría
+      // de esos seeks son redundantes y generan tirones. Saltarlos por
+      // debajo de 1 frame evita el trabajo sin perder fluidez visual.
+      const MIN_SEEK_DELTA = 1 / 30;
+      const seekTo = (v: HTMLVideoElement, time: number) => {
+        if (Math.abs(v.currentTime - time) >= MIN_SEEK_DELTA) v.currentTime = time;
+      };
 
       const stopRestLoop = () => {
         if (restRaf.current !== null) {
@@ -189,10 +202,18 @@ export function HeroShowcase() {
         const beginTs = performance.now();
 
         const tick = (now: number) => {
+          // Si el usuario ya scrolleó lejos del hero (se despinneó), `onUpdate`
+          // no vuelve a disparar para detener el loop — sin este chequeo, el
+          // video seguía "respirando" para siempre aunque la sección ya no
+          // estuviera pineada ni a la vista.
+          if (!trigger.isActive) {
+            stopRestLoop();
+            return;
+          }
           const elapsed = (now - beginTs) % REST_LOOP_CYCLE_MS;
           // Onda coseno 0→1→0: mecido suave, sin corte brusco en los extremos.
           const wave = (1 - Math.cos((elapsed / REST_LOOP_CYCLE_MS) * Math.PI * 2)) / 2;
-          v2.currentTime = loopStart + wave * REST_LOOP_WINDOW;
+          seekTo(v2, loopStart + wave * REST_LOOP_WINDOW);
           restRaf.current = requestAnimationFrame(tick);
         };
         restRaf.current = requestAnimationFrame(tick);
@@ -204,7 +225,11 @@ export function HeroShowcase() {
         end: () => `+=${window.innerHeight * SCROLL_VH_MULTIPLIER}`,
         pin: true,
         anticipatePin: 1,
-        scrub: 0.6,
+        // El scroll ya llega suavizado por Lenis (ver core/motion/SmoothScroll) —
+        // agregar otra capa de scrub con retardo aquí encima duplica el
+        // suavizado y se siente lagueado, sobre todo en video (muy sensible a
+        // cualquier delay). `true` sigue 1:1 la posición ya suavizada.
+        scrub: true,
         onUpdate: (self) => {
           const p = self.progress;
 
@@ -212,11 +237,11 @@ export function HeroShowcase() {
           if (restTimeout.current) clearTimeout(restTimeout.current);
 
           if (p <= SPLIT) {
-            v1.currentTime = PART1_START + (p / SPLIT) * PART1_USABLE;
+            seekTo(v1, PART1_START + (p / SPLIT) * PART1_USABLE);
             v2.style.opacity = "0";
           } else {
             const localP = Math.min((p - SPLIT) / (1 - SPLIT), 1);
-            v2.currentTime = localP * PART2_DURATION;
+            seekTo(v2, localP * PART2_DURATION);
             v2.style.opacity = String(Math.min((p - SPLIT) / 0.03, 1));
 
             // Llegamos al final del recorrido: si el usuario se queda quieto
@@ -251,7 +276,7 @@ export function HeroShowcase() {
         trigger.kill();
       };
     },
-    { scope: sectionRef, dependencies: [videosReady, reducedMotion] },
+    { scope: sectionRef, dependencies: [heroReady, reducedMotion] },
   );
 
   return (
@@ -312,7 +337,7 @@ export function HeroShowcase() {
         </div>
       )}
 
-      {!reducedMotion && showLoader && !videosReady && (
+      {!reducedMotion && !heroReady && (
         <div className="hero-scrub__loader" role="status" aria-live="polite">
           <div className="hero-scrub__loader-flag hero-scrub__loader-flag--top" aria-hidden />
 

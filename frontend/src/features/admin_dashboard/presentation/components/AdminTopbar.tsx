@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@core/auth/AuthProvider";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Logo } from "@ui/atoms/Logo";
+import { LanguageSwitcher } from "@ui/molecules/LanguageSwitcher";
 
 export type AdminPage = "analytics" | "vehicles" | "inventory" | "banners" | "quotes";
 
@@ -64,6 +65,8 @@ export function AdminTopbar({ active, onNavigate }: AdminTopbarProps) {
         </nav>
 
         <div className="admin-topbar__actions">
+          <LanguageSwitcher />
+
           <a href="/" className="admin-topbar__back">
             <ArrowLeft size={15} strokeWidth={1.75} aria-hidden />
             {t("admin.backToSite")}

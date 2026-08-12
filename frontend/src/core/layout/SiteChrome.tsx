@@ -33,7 +33,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         id="main-content"
         tabIndex={-1}
         className="container"
-        style={{ minHeight: "calc(100vh - 72px)", outline: "none" }}
+        style={{ outline: "none" }}
       >
         <PageTransition>{children}</PageTransition>
       </main>

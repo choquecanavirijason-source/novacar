@@ -29,6 +29,7 @@ import {
   mileageText,
   vehiclePhotoUrl,
 } from "../vehiclePresentation";
+import { TestDriveModal } from "../components/TestDriveModal";
 import "../styles/catalog.css";
 
 /**
@@ -50,6 +51,7 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
   const [photoFailed, setPhotoFailed] = useState(false);
   const [activeShot, setActiveShot] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [testDriveOpen, setTestDriveOpen] = useState(false);
   const lightboxPanelRef = useModalA11y<HTMLDivElement>(() => setLightboxOpen(false));
 
   const specColumns = [
@@ -60,10 +62,7 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
     },
     {
       title: t("detail.specPerformance"),
-      items: [
-        t(transmissionKey[vehicle.transmission]),
-        vehicle.condition === "nuevo" ? t("common.new") : t("common.used"),
-      ],
+      items: [t(transmissionKey[vehicle.transmission])],
       isTech: false,
     },
     {
@@ -247,7 +246,7 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
             </div>
 
             <div className="vdetail-pricecard__actions">
-              <Button>{t("detail.testDrive")}</Button>
+              <Button onClick={() => setTestDriveOpen(true)}>{t("detail.testDrive")}</Button>
               <Button href="/buscador" variant="ghost">
                 {t("detail.findParts")}
               </Button>
@@ -277,6 +276,8 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
           </div>
         </div>
       </section>
+
+      {testDriveOpen && <TestDriveModal vehicle={vehicle} onClose={() => setTestDriveOpen(false)} />}
     </>
   );
 }

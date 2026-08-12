@@ -767,6 +767,76 @@
   font-size: 0.9rem;
 }
 
+/* ---- ImportVehicleCard: el auto entra deslizándose desde la derecha
+   cuando la tarjeta se revela (ScrollReveal, en el padre, agrega la clase
+   .scroll-reveal--visible al contenedor una sola vez al entrar al viewport). ---- */
+.import-vehicle-image {
+  opacity: 0;
+  transform: translateX(130px);
+  transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1) 150ms,
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1) 150ms;
+}
+
+.scroll-reveal--visible .import-vehicle-image {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ---- TestDriveModal: formulario de varios campos apilados (a diferencia
+   de .import-quote-form, pensado para un único input tipo barra) ---- */
+.test-drive-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.test-drive-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.test-drive-input {
+  width: 100%;
+  padding: 13px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color var(--transition-smooth);
+}
+
+.test-drive-input::placeholder {
+  color: var(--text-muted);
+}
+
+.test-drive-input:focus {
+  border-color: var(--accent-neon);
+}
+
+.test-drive-submit {
+  width: 100%;
+  padding: 13px 18px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-brand);
+  color: var(--on-brand);
+  font-weight: 700;
+  font-size: 0.92rem;
+  transition: transform var(--transition-spring);
+}
+
+.test-drive-submit:hover {
+  transform: scale(1.02);
+}
+
+.test-drive-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 /* ---- VehicleDetail: separadores diagonales entre columnas de specs
    (reemplaza los divide-x/divide-y planos de Tailwind) ---- */
 .vdetail-specs__col {

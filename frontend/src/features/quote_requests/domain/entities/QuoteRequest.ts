@@ -4,7 +4,7 @@
  * información de una autoparte) que llega a la bandeja del panel admin.
  */
 
-export type QuoteSource = "import" | "inquiry";
+export type QuoteSource = "import" | "inquiry" | "test_drive";
 export type QuoteStatus = "new" | "contacted" | "closed";
 
 export interface QuoteRequest {

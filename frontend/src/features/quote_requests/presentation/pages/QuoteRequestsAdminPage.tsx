@@ -8,7 +8,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Car, MessageSquareText, Trash2 } from "lucide-react";
+import { Car, CalendarCheck, MessageSquareText, Trash2 } from "lucide-react";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { useToast } from "@core/toast/ToastProvider";
 import { formatCurrency } from "@core/format/formatters";
@@ -18,7 +18,13 @@ import { DataTable, type Column } from "@ui/organisms/DataTable";
 import { useQuoteRequestStore } from "../store/useQuoteRequestStore";
 import type { QuoteRequest, QuoteStatus } from "../../domain/entities/QuoteRequest";
 
-type SourceFilter = "all" | "import" | "inquiry";
+type SourceFilter = "all" | "import" | "inquiry" | "test_drive";
+
+const SOURCE_ICON = {
+  import: Car,
+  inquiry: MessageSquareText,
+  test_drive: CalendarCheck,
+} as const;
 
 const STATUS_TONE: Record<QuoteStatus, "neon" | "low" | "in"> = {
   new: "neon",
@@ -53,16 +59,21 @@ export function QuoteRequestsAdminPage() {
     {
       key: "source",
       header: t("admin.quoteColSource"),
-      render: (r) => (
-        <span style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--text-secondary)" }}>
-          {r.source === "import" ? (
-            <Car size={16} strokeWidth={1.75} aria-hidden />
-          ) : (
-            <MessageSquareText size={16} strokeWidth={1.75} aria-hidden />
-          )}
-          {r.source === "import" ? t("admin.quoteSourceImport") : t("admin.quoteSourceInquiry")}
-        </span>
-      ),
+      render: (r) => {
+        const SourceIcon = SOURCE_ICON[r.source];
+        const label =
+          r.source === "import"
+            ? t("admin.quoteSourceImport")
+            : r.source === "test_drive"
+              ? t("admin.quoteSourceTestDrive")
+              : t("admin.quoteSourceInquiry");
+        return (
+          <span style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--text-secondary)" }}>
+            <SourceIcon size={16} strokeWidth={1.75} aria-hidden />
+            {label}
+          </span>
+        );
+      },
     },
     {
       key: "subject",
@@ -175,6 +186,13 @@ export function QuoteRequestsAdminPage() {
           onClick={() => setSourceFilter("inquiry")}
         >
           {t("admin.quoteSourceInquiry")}
+        </button>
+        <button
+          type="button"
+          className={`admin-subtabs__item ${sourceFilter === "test_drive" ? "admin-subtabs__item--active" : ""}`}
+          onClick={() => setSourceFilter("test_drive")}
+        >
+          {t("admin.quoteSourceTestDrive")}
         </button>
       </div>
 

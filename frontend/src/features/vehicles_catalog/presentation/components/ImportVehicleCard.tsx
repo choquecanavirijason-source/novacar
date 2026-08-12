@@ -102,7 +102,7 @@ export function ImportVehicleCard({ vehicle }: { vehicle: CatalogVehicle }) {
 
         {/* Columna derecha: auto */}
         <div className="relative z-10 mt-12 min-h-[280px] w-full lg:mt-0 lg:min-h-0 lg:w-1/2">
-          <div className="pointer-events-none absolute inset-0">
+          <div className="pointer-events-none absolute inset-0 import-vehicle-image">
             <Image
               className="absolute top-1/2 right-0 w-[120%] max-w-none -translate-y-1/2 object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)] lg:-right-10 lg:drop-shadow-[0_30px_50px_rgba(0,0,0,0.6)]"
               src={

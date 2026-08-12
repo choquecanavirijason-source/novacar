@@ -1,26 +1,16 @@
 /**
  * Composition Root del módulo `search_vehicle_parts`.
+ * Sin datasource/repositorio propios: los datos reales (vehículos y
+ * autopartes) vienen de `vehicles_catalog` y `parts_marketplace` — este
+ * módulo solo aporta la lógica pura de derivación/filtrado de compatibilidad.
  */
 
-import { createApiClient } from "@core/http/createApiClient";
+import { DeriveVehicleOptionsUseCase } from "./domain/usecases/DeriveVehicleOptionsUseCase";
 import { GetCompatiblePartsUseCase } from "./domain/usecases/GetCompatiblePartsUseCase";
-import { GetVehicleOptionsUseCase } from "./domain/usecases/GetVehicleOptionsUseCase";
 import { CalculateBatteryAmperageUseCase } from "./domain/usecases/CalculateBatteryAmperageUseCase";
-import { SearchRepositoryImpl } from "./data/repositories/SearchRepositoryImpl";
-import {
-  SearchHttpDataSource,
-  SearchMockDataSource,
-} from "./data/datasources/SearchRemoteDataSource";
-
-const useHttp = process.env.NEXT_PUBLIC_USE_API === "true";
-const dataSource = useHttp
-  ? new SearchHttpDataSource(createApiClient())
-  : new SearchMockDataSource();
-
-const repository = new SearchRepositoryImpl(dataSource);
 
 export const searchUseCases = {
-  getCompatibleParts: new GetCompatiblePartsUseCase(repository),
-  getVehicleOptions: new GetVehicleOptionsUseCase(repository),
+  deriveVehicleOptions: new DeriveVehicleOptionsUseCase(),
+  getCompatibleParts: new GetCompatiblePartsUseCase(),
   calculateBatteryAmperage: new CalculateBatteryAmperageUseCase(),
 } as const;

@@ -76,7 +76,7 @@ export function PartDetail({ part }: { part: MarketplacePart }) {
             )}
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 14, marginBottom: 16 }}>
             {part.freeShipping && (
               <span className="mk-card__ship" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                 <Truck size={14} strokeWidth={2} aria-hidden /> {t("market.free")}
@@ -87,7 +87,7 @@ export function PartDetail({ part }: { part: MarketplacePart }) {
                 <ShieldCheck size={14} strokeWidth={2} aria-hidden /> {t("market.warrantyShort", { n: part.warrantyMonths })}
               </span>
             )}
-            <span className="mk-card__meta">{t("market.seller")}: {part.seller} · {part.brand} · SKU {part.sku}</span>
+            <span className="mk-card__meta">{part.brand} · SKU {part.sku}</span>
           </div>
 
           {part.specs.length > 0 && (

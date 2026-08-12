@@ -59,8 +59,12 @@ export function MarketplacePartFormModal({
   const [stock, setStock] = useState(String(part?.stock ?? ""));
   const [reorderLevel, setReorderLevel] = useState(String(part?.reorderLevel ?? 5));
   const [rating, setRating] = useState(String(part?.rating ?? 4.5));
+  const [reviews, setReviews] = useState(String(part?.reviews ?? 0));
   const [warrantyMonths, setWarrantyMonths] = useState(String(part?.warrantyMonths ?? 12));
   const [freeShipping, setFreeShipping] = useState(part?.freeShipping ?? true);
+  const [seller, setSeller] = useState(part?.seller ?? "NOVACAR Oficial");
+  const [yearFrom, setYearFrom] = useState(String(part?.yearFrom ?? 2012));
+  const [yearTo, setYearTo] = useState(String(part?.yearTo ?? new Date().getFullYear()));
   const [compatibleBrands, setCompatibleBrands] = useState(part?.compatibleBrands.join(", ") ?? "");
   const [specs, setSpecs] = useState(part?.specs.map((s) => `${s.label}: ${s.value}`).join(", ") ?? "");
   const [imageUrl, setImageUrl] = useState(part?.imageUrl ?? "");
@@ -88,13 +92,13 @@ export function MarketplacePartFormModal({
       stock: Number(stock),
       reorderLevel: Number(reorderLevel),
       rating: Number(rating),
-      reviews: part?.reviews ?? 0,
-      seller: part?.seller ?? "NOVACAR Oficial",
+      reviews: Number(reviews) || 0,
+      seller: seller.trim() || "NOVACAR Oficial",
       freeShipping,
       warrantyMonths: Number(warrantyMonths),
       compatibleBrands: compatibleBrands.split(",").map((b) => b.trim()).filter(Boolean),
-      yearFrom: part?.yearFrom ?? 2012,
-      yearTo: part?.yearTo ?? new Date().getFullYear(),
+      yearFrom: Number(yearFrom),
+      yearTo: Number(yearTo),
       specs: parseSpecs(specs),
       imageUrl: imageUrl.trim() || undefined,
       accentFrom,
@@ -221,8 +225,27 @@ export function MarketplacePartFormModal({
               <Input type="number" min={0} max={5} step="0.1" value={rating} onChange={(e) => setRating(e.target.value)} />
             </label>
             <label className="addpart-field">
+              <span>{t("admin.partFieldReviews")}</span>
+              <Input type="number" min={0} value={reviews} onChange={(e) => setReviews(e.target.value)} />
+            </label>
+            <label className="addpart-field">
               <span>{t("admin.partFieldWarranty")}</span>
               <Input type="number" min={0} value={warrantyMonths} onChange={(e) => setWarrantyMonths(e.target.value)} />
+            </label>
+          </div>
+
+          <div className="addpart-row">
+            <label className="addpart-field">
+              <span>{t("admin.partFieldSeller")}</span>
+              <Input value={seller} onChange={(e) => setSeller(e.target.value)} />
+            </label>
+            <label className="addpart-field">
+              <span>{t("admin.partFieldYearFrom")}</span>
+              <Input type="number" min={1980} value={yearFrom} onChange={(e) => setYearFrom(e.target.value)} />
+            </label>
+            <label className="addpart-field">
+              <span>{t("admin.partFieldYearTo")}</span>
+              <Input type="number" min={1980} value={yearTo} onChange={(e) => setYearTo(e.target.value)} />
             </label>
           </div>
 
