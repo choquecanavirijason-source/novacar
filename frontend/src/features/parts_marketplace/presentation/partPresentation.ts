@@ -73,10 +73,25 @@ const categoryPhotoKeyword: Record<PartCategory, string> = {
 };
 
 /**
+ * Fotos reales propias (public/parts) para las categorías que ya cuentan con
+ * asset — evita depender de loremflickr (placeholder externo poco fiable,
+ * responde 500 seguido) para estas. Las categorías sin asset propio siguen
+ * cayendo al placeholder externo.
+ */
+const CATEGORY_PHOTO_OVERRIDES: Partial<Record<PartCategory, string>> = {
+  audio: "/parts/audio.png",
+  battery: "/parts/battery.png",
+  engine: "/parts/engine.png",
+  oil: "/parts/oil.png",
+  tires: "/parts/tires.png",
+};
+
+/**
  * URL de foto de la pieza: prioriza la imagen real cargada por el admin
- * (`imageUrl`); si falta, cae al placeholder externo por categoría, con
- * semilla estable por id para que la misma tarjeta muestre siempre la misma
- * imagen. Da a las tarjetas de autopartes el mismo tratamiento visual
+ * (`imageUrl`); si falta, usa el asset propio de la categoría si existe
+ * (ver CATEGORY_PHOTO_OVERRIDES); si tampoco, cae al placeholder externo,
+ * con semilla estable por id para que la misma tarjeta muestre siempre la
+ * misma imagen. Da a las tarjetas de autopartes el mismo tratamiento visual
  * (pop-out de imagen real) que las tarjetas de autos.
  */
 export const partPhotoUrl = (
@@ -86,6 +101,9 @@ export const partPhotoUrl = (
   imageUrl?: string,
 ): string => {
   if (imageUrl) return imageUrl;
+
+  const override = CATEGORY_PHOTO_OVERRIDES[category];
+  if (override) return override;
 
   const seed = Array.from(id).reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const keyword = (categoryPhotoKeyword as Record<string, string>)[category] ?? "autopart";

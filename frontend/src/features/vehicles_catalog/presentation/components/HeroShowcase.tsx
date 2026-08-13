@@ -146,10 +146,21 @@ export function HeroShowcase() {
       }
     };
 
+    // En el primer arranque en frío de `npm run dev`, Turbopack puede seguir
+    // compilando la ruta cuando el <video> pide el archivo — la petición
+    // falla (network error) y sin manejarlo el loader se queda esperando
+    // para siempre (hay que refrescar a mano). Reintentamos la carga sola.
     videos.forEach((v, i) => {
       const onProgress = () => reportProgress(i, v);
       v.addEventListener("progress", onProgress);
       cleanups.push(() => v.removeEventListener("progress", onProgress));
+
+      const onError = () => {
+        if (loaded[i]) return;
+        window.setTimeout(() => v.load(), 400);
+      };
+      v.addEventListener("error", onError);
+      cleanups.push(() => v.removeEventListener("error", onError));
     });
 
     const pollId = window.setInterval(() => {
@@ -163,6 +174,15 @@ export function HeroShowcase() {
       }
     }, 120);
     cleanups.push(() => window.clearInterval(pollId));
+
+    // Red de seguridad: si después de todo (compilación lenta, red rara,
+    // algo que no anticipamos) los videos no cargan, no dejamos el hero
+    // trabado para siempre — se revela igual pasado este máximo.
+    const failsafe = window.setTimeout(() => {
+      setLoadProgress(100);
+      setVideosReady(true);
+    }, 8000);
+    cleanups.push(() => window.clearTimeout(failsafe));
 
     return () => cleanups.forEach((fn) => fn());
   }, [reducedMotion]);

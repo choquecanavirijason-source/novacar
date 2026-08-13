@@ -7,12 +7,46 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { LOCALES, type Locale } from "@core/i18n/dictionaries";
 
-const FLAG: Record<Locale, string> = { es: "🇪🇸", en: "🇬🇧" };
+/**
+ * Banderas como SVG (bandas de color planas) en vez de fotos JPG/PNG
+ * escaladas: a 18–20px una foto de bandera pierde nitidez (moiré/ruido por
+ * el downscale); un vector con bloques de color sólido se ve nítido a
+ * cualquier tamaño.
+ */
+function FlagMX() {
+  return (
+    <svg viewBox="0 0 3 2" aria-hidden focusable="false">
+      <rect width="1" height="2" x="0" fill="#006341" />
+      <rect width="1" height="2" x="1" fill="#fff" />
+      <rect width="1" height="2" x="2" fill="#ce1126" />
+      <circle cx="1.5" cy="1" r="0.32" fill="#8a5a2e" />
+    </svg>
+  );
+}
+
+function FlagUS() {
+  return (
+    <svg viewBox="0 0 19 13" aria-hidden focusable="false">
+      <rect width="19" height="13" fill="#b22234" />
+      <g fill="#fff">
+        <rect y="1" width="19" height="1" />
+        <rect y="3" width="19" height="1" />
+        <rect y="5" width="19" height="1" />
+        <rect y="7" width="19" height="1" />
+        <rect y="9" width="19" height="1" />
+        <rect y="11" width="19" height="1" />
+      </g>
+      <rect width="8" height="7" fill="#3c3b6e" />
+    </svg>
+  );
+}
+
+const FLAG: Record<Locale, ReactNode> = { es: <FlagMX />, en: <FlagUS /> };
 const NAME: Record<Locale, string> = { es: "Español", en: "English" };
 
 export function LanguageSwitcher() {
@@ -48,7 +82,7 @@ export function LanguageSwitcher() {
         aria-expanded={open}
         aria-label={t("nav.language")}
       >
-        <span aria-hidden>{FLAG[locale]}</span>
+        <span className="lang-switch__flag">{FLAG[locale]}</span>
         <span>{locale.toUpperCase()}</span>
         <ChevronDown
           size={13}
@@ -72,7 +106,7 @@ export function LanguageSwitcher() {
                   setOpen(false);
                 }}
               >
-                <span aria-hidden>{FLAG[l]}</span>
+                <span className="lang-switch__flag">{FLAG[l]}</span>
                 {NAME[l]}
               </button>
             </li>
