@@ -2074,6 +2074,132 @@ body:has(.admin-shell) {
   padding: 0 4px;
 }
 
+/* ========================================
+   ANIMACIÓN PARA ÍCONO DE UBICACIÓN
+   ======================================== */
+
+@keyframes locationPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(0, 170, 255, 0.3));
+  }
+  50% {
+    transform: scale(0.80);        /* ← Cambiado: 0.95 → 0.75 (más reducción) */
+    opacity: 0.6;                 /* ← Cambiado: 0.7 → 0.4 (más transparente) */
+    filter: drop-shadow(0 0 40px rgba(0, 170, 255, 0.9)); /* ← Más brillo */
+  }
+}
+
+/* Efecto de "latido" ENERGÉTICO (más rápido y notorio) */
+@keyframes locationHeartbeat {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 5px rgba(0, 170, 255, 0.2));
+  }
+  14% {
+    transform: scale(1.3);         /* ← Cambiado: 1.2 → 1.3 */
+    filter: drop-shadow(0 0 30px rgba(0, 170, 255, 0.8));
+  }
+  28% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 5px rgba(0, 170, 255, 0.2));
+  }
+  42% {
+    transform: scale(1.15);        /* ← Cambiado: 1.1 → 1.15 */
+    filter: drop-shadow(0 0 20px rgba(0, 170, 255, 0.6));
+  }
+  70% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 5px rgba(0, 170, 255, 0.2));
+  }
+}
+
+/* Efecto de brillo INTENSO (glow pulsante) */
+@keyframes locationGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(0, 170, 255, 0.3));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 50px rgba(0, 170, 255, 0.9)); /* ← Más brillo */
+    transform: scale(1.05);        /* ← Añadido: pequeño crecimiento */
+  }
+}
+
+/* Efecto de "señal" GPS con movimiento y brillo */
+@keyframes locationSignal {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 5px rgba(0, 170, 255, 0.2));
+  }
+  25% {
+    transform: scale(1.15) rotate(-8deg);  /* ← Más rotación */
+    filter: drop-shadow(0 0 25px rgba(0, 170, 255, 0.6));
+  }
+  50% {
+    transform: scale(0.85) rotate(8deg);   /* ← Más rotación */
+    opacity: 0.7;
+    filter: drop-shadow(0 0 40px rgba(0, 170, 255, 0.9));
+  }
+  75% {
+    transform: scale(1.08) rotate(-4deg);
+    filter: drop-shadow(0 0 20px rgba(0, 170, 255, 0.5));
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 5px rgba(0, 170, 255, 0.2));
+  }
+}
+
+/* Parpadeo notorio - Con cambio de tamaño y opacidad */
+.location-icon-pulse {
+  animation: locationPulse 1.8s ease-in-out infinite; /* ← Más rápido: 2s → 1.8s */
+}
+
+/* Latido energético */
+.location-icon-heartbeat {
+  animation: locationHeartbeat 1.2s ease-in-out infinite; /* ← Más rápido: 1.5s → 1.2s */
+}
+
+/* Brillo intenso (glow) */
+.location-icon-glow {
+  animation: locationGlow 1.8s ease-in-out infinite; /* ← Más rápido: 2s → 1.8s */
+}
+
+/* Señal GPS con movimiento */
+.location-icon-signal {
+  animation: locationSignal 2s ease-in-out infinite; /* ← Más rápido: 2.5s → 2s */
+}
+
+.location-icon-pulse:hover,
+.location-icon-heartbeat:hover,
+.location-icon-glow:hover,
+.location-icon-signal:hover {
+  animation-play-state: paused;
+  transform: scale(1.15) !important;  /* ← Más grande al hacer hover */
+  filter: drop-shadow(0 0 30px rgba(0, 170, 255, 0.8)) !important;
+  transition: all 0.3s ease;
+}
+/* ========================================
+   HOVER - Detener animación al pasar el mouse
+   ======================================== */
+
+.location-icon-pulse:hover,
+.location-icon-heartbeat:hover,
+.location-icon-glow:hover,
+.location-icon-signal:hover {
+  animation-play-state: paused;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 10px rgba(0, 170, 255, 0.6));
+  transition: all 0.3s ease;
+}
+
+
+
+
 /* ============================================================
    Grano de película sutil, sitewide — refuerza el acabado cinematográfico
    del dark UI. Puramente decorativo, no bloquea clics/scroll.

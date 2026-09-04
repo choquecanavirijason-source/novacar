@@ -21,4 +21,20 @@ export interface CatalogVehicleDTO {
   accent_from: string;
   accent_to: string;
   highlighted: boolean;
+  color: string;
+  doors: number;
+  cylinders: number;
+  displacement: string;
+  drive_type: string;
+  title_code: string;
+  sale_date: string;
+  sale_time: string;
+  sale_location: string;
+  has_keys: boolean;
+  damage_type: string;
+  damage_severity: "none" | "minor" | "moderate" | "severe";
+  damage_description: string;
+  notes: string;
+  run_and_drive: boolean;
+  highlights: string[];
 }

@@ -7,13 +7,33 @@
  * de lista y el grid de especificaciones técnicas. Tailwind + tokens del
  * proyecto vía sintaxis `bg-(--token)`. Recibe la entidad ya resuelta
  * (server) y la traduce.
+ * 
+ * Versión mejorada con información detallada del vehículo similar a catálogos
+ * de subastas: título, odómetro, daños, llaves, fecha de venta, etc.
  */
 
 "use client";
 
 import { useState } from "react";
 import Image from "next/image";
-import { CheckCircle2, Maximize2, X } from "lucide-react";
+import { 
+  CheckCircle2, 
+  Maximize2, 
+  X,
+  CalendarDays,
+  Gauge,
+  Fuel,
+  User,
+  Cog,
+  Car,
+  Shield,
+  AlertTriangle,
+  Key,
+  Clock,
+  MapPin,
+  FileText,
+  DoorClosed
+} from "lucide-react";
 import type { CatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
@@ -33,18 +53,50 @@ import { TestDriveModal } from "../components/TestDriveModal";
 import "../styles/catalog.css";
 
 /**
- * Encuadres de la galería: hoy son crops de la misma foto (todavía no hay
- * varias fotos reales por vehículo), pero el componente ya soporta
- * cualquier cantidad — el día que el admin suba fotos reales, esto se
- * reemplaza por `vehicle.photos.map(...)` sin tocar el layout.
+ * Imágenes reales del Nissan Versa. La foto principal del catálogo sigue
+ * viniendo de vehiclePhotoUrl; esta lista controla únicamente el detalle.
  */
 const GALLERY_SHOTS = [
-  { key: "ext", label: "01 / EXTERIOR", position: "12% 35%" },
-  { key: "prf", label: "02 / PERFIL", position: "50% 45%" },
-  { key: "tra", label: "03 / TRASERA", position: "85% 40%" },
-  { key: "int", label: "04 / INTERIOR", position: "35% 60%" },
-  { key: "det", label: "05 / DETALLE", position: "88% 30%" },
+  { key: "prf", label: "01 / PERFIL", src: "/vehicles/2.jpg", position: "50% 50%" },
+  { key: "ext", label: "02 / EXTERIOR", src: "/vehicles/1.jpg", position: "50% 50%" },
+  { key: "tra", label: "03 / TRASERA", src: "/vehicles/3.jpg", position: "50% 50%" },
+  { key: "int", label: "04 / INTERIOR", src: "/vehicles/4.jpg", position: "50% 50%" },
+  { key: "det", label: "05 / DETALLE", src: "/vehicles/5.jpg", position: "50% 50%" },
+  { key: "mot", label: "06 / MOTOR", src: "/vehicles/6.jpg", position: "50% 50%" },
+  { key: "six", label: "07 / VISTA", src: "/vehicles/7.jpg", position: "50% 50%" },
+  { key: "sev", label: "08 / VISTA", src: "/vehicles/8.jpg", position: "50% 50%" },
 ] as const;
+
+// Helper para badge de severidad de daño
+const getDamageBadgeStyles = (severity: string) => {
+  const styles = {
+    none: "bg-green-500/10 text-green-400 border-green-500/20",
+    minor: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+    moderate: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+    severe: "bg-red-500/10 text-red-400 border-red-500/20",
+  };
+  return styles[severity as keyof typeof styles] || styles.none;
+};
+
+const getDamageIcon = (severity: string) => {
+  const icons = {
+    none: <Shield size={14} className="text-green-400" />,
+    minor: <AlertTriangle size={14} className="text-yellow-400" />,
+    moderate: <AlertTriangle size={14} className="text-orange-400" />,
+    severe: <AlertTriangle size={14} className="text-red-400" />,
+  };
+  return icons[severity as keyof typeof icons] || icons.none;
+};
+
+const getSeverityLabel = (severity: string, t: any) => {
+  const labels = {
+    none: t("detail.damageNone"),
+    minor: t("detail.damageMinor"),
+    moderate: t("detail.damageModerate"),
+    severe: t("detail.damageSevere"),
+  };
+  return labels[severity as keyof typeof labels] || severity;
+};
 
 export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
   const { t, locale } = useTranslation();
@@ -54,35 +106,59 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
   const [testDriveOpen, setTestDriveOpen] = useState(false);
   const lightboxPanelRef = useModalA11y<HTMLDivElement>(() => setLightboxOpen(false));
 
+  // Helper para valores por defecto (campos opcionales)
+  const getValueOrDefault = (value: any, defaultValue: any = "—") => {
+    return value !== undefined && value !== null && value !== "" ? value : defaultValue;
+  };
+
+  // Especificaciones técnicas mejoradas
   const specColumns = [
     {
       title: t("detail.specMotor"),
-      items: [t(fuelKey[vehicle.fuelType]), `${vehicle.horsepower} HP`],
+      icon: <Cog size={16} className="text-(--accent-neon)" />,
+      items: [
+        { label: t("detail.horsepower"), value: `${vehicle.horsepower} HP` },
+        { label: t("detail.cylinders"), value: getValueOrDefault(vehicle.cylinders, "—") },
+        { label: t("detail.displacement"), value: getValueOrDefault(vehicle.displacement, "—") },
+        { label: t("detail.fuel"), value: t(fuelKey[vehicle.fuelType]) },
+      ],
       isTech: false,
     },
     {
       title: t("detail.specPerformance"),
-      items: [t(transmissionKey[vehicle.transmission])],
+      icon: <Car size={16} className="text-(--accent-neon)" />,
+      items: [
+        { label: t("detail.transmission"), value: t(transmissionKey[vehicle.transmission]) },
+        { label: t("detail.driveType"), value: getValueOrDefault(vehicle.driveType, "—") },
+      ],
       isTech: false,
     },
     {
       title: t("detail.specDimensions"),
+      icon: <Gauge size={16} className="text-(--accent-neon)" />,
       items: [
-        t(bodyTypeKey[vehicle.bodyType]),
-        `${vehicle.seats} ${t("detail.seats").toLowerCase()}`,
-        `${vehicle.year}`,
-        mileageText(vehicle.mileageKm, t),
+        { label: t("detail.bodyType"), value: t(bodyTypeKey[vehicle.bodyType]) },
+        { label: t("detail.color"), value: getValueOrDefault(vehicle.color, "—") },
+        { label: t("detail.seats"), value: `${vehicle.seats} ${t("detail.seatsLabel").toLowerCase()}` },
+        { label: t("detail.doors"), value: getValueOrDefault(vehicle.doors, "—") },
       ],
       isTech: false,
     },
     {
       title: t("detail.specTech"),
-      items: vehicle.features,
+      icon: null,
+      items: vehicle.features.map((feature) => ({ label: "", value: feature, isFeature: true })),
       isTech: true,
     },
   ];
 
   const photoUrl = vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 1920, h: 1080 }, vehicle.imageUrl);
+  const galleryShots = vehicle.id === "nissan-versa-2021"
+    ? GALLERY_SHOTS
+    : GALLERY_SHOTS.map((shot) => ({ ...shot, src: photoUrl }));
+
+  // Determinar si mostrar información adicional (campos extra)
+  const hasExtraInfo = vehicle.color || vehicle.doors || vehicle.cylinders || vehicle.driveType;
 
   return (
     <>
@@ -110,12 +186,12 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
           >
             {!photoFailed && (
               <Image
-                src={photoUrl}
-                alt={`${vehicle.brand} ${vehicle.model} — ${GALLERY_SHOTS[activeShot].label}`}
+                src={galleryShots[activeShot].src}
+                alt={`${vehicle.brand} ${vehicle.model} — ${galleryShots[activeShot].label}`}
                 fill
-                unoptimized={photoUrl.startsWith("http")}
+                unoptimized={galleryShots[activeShot].src.startsWith("http")}
                 sizes="(max-width: 720px) 100vw, 900px"
-                style={{ objectPosition: GALLERY_SHOTS[activeShot].position }}
+                style={{ objectPosition: galleryShots[activeShot].position }}
                 loading="eager"
                 onError={() => setPhotoFailed(true)}
               />
@@ -131,7 +207,7 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
 
           {!photoFailed && (
             <div className="vdetail-gallery__thumbs" role="tablist" aria-label={t("detail.gallery")}>
-              {GALLERY_SHOTS.map((shot, i) => (
+              {galleryShots.map((shot, i) => (
                 <button
                   key={shot.key}
                   type="button"
@@ -141,10 +217,10 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
                   onClick={() => setActiveShot(i)}
                 >
                   <Image
-                    src={photoUrl}
+                    src={shot.src}
                     alt=""
                     fill
-                    unoptimized={photoUrl.startsWith("http")}
+                    unoptimized={shot.src.startsWith("http")}
                     sizes="120px"
                     style={{ objectPosition: shot.position }}
                   />
@@ -156,6 +232,7 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
         </div>
       </section>
 
+      {/* Lightbox */}
       {lightboxOpen && !photoFailed && (
         <ModalPortal>
           <div
@@ -182,17 +259,17 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
 
               <div className="vdetail-lightbox__img">
                 <Image
-                  src={photoUrl}
-                  alt={`${vehicle.brand} ${vehicle.model} — ${GALLERY_SHOTS[activeShot].label}`}
+                  src={galleryShots[activeShot].src}
+                  alt={`${vehicle.brand} ${vehicle.model} — ${galleryShots[activeShot].label}`}
                   fill
-                  unoptimized={photoUrl.startsWith("http")}
+                  unoptimized={galleryShots[activeShot].src.startsWith("http")}
                   sizes="90vw"
-                  style={{ objectPosition: GALLERY_SHOTS[activeShot].position }}
+                  style={{ objectPosition: galleryShots[activeShot].position }}
                 />
               </div>
 
               <div className="vdetail-gallery__thumbs vdetail-lightbox__thumbs" role="tablist" aria-label={t("detail.gallery")}>
-                {GALLERY_SHOTS.map((shot, i) => (
+                {galleryShots.map((shot, i) => (
                   <button
                     key={shot.key}
                     type="button"
@@ -202,10 +279,10 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
                     onClick={() => setActiveShot(i)}
                   >
                     <Image
-                      src={photoUrl}
+                      src={shot.src}
                       alt=""
                       fill
-                      unoptimized={photoUrl.startsWith("http")}
+                      unoptimized={shot.src.startsWith("http")}
                       sizes="120px"
                       style={{ objectPosition: shot.position }}
                     />
@@ -222,6 +299,7 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
       <section className="relative ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] w-screen bg-(--bg-base)">
         <div className="vdetail-pricecard-wrap">
           <div className="vdetail-pricecard">
+            {/* Precio y estado */}
             <div className="vdetail-pricecard__top">
               <span className="vdetail-pricecard__label">{t("detail.listPrice")}</span>
               <span className="vdetail-pricecard__badge">
@@ -239,12 +317,14 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
 
             <div className="vdetail-pricecard__divider" />
 
+            {/* Meta información rápida */}
             <div className="vdetail-pricecard__meta">
               <span>{vehicle.year}</span>
               <span>{mileageText(vehicle.mileageKm, t)}</span>
               <span>{t(fuelKey[vehicle.fuelType])}</span>
             </div>
 
+            {/* Acciones */}
             <div className="vdetail-pricecard__actions">
               <Button onClick={() => setTestDriveOpen(true)}>{t("detail.testDrive")}</Button>
               <Button href="/buscador" variant="ghost">
@@ -254,25 +334,193 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
 
             <div className="vdetail-pricecard__divider" />
 
+            {/* Especificaciones técnicas - Grid 4 columnas mejorado */}
             <div className="vdetail-specs grid grid-cols-1 md:grid-cols-4">
-              {specColumns.map((col) => (
-                <div key={col.title} className="vdetail-specs__col py-6 first:pt-0 last:pb-0 md:px-7 md:py-0 md:first:pl-0 md:last:pr-0">
-                  <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-white">
+              {specColumns.map((col, colIndex) => (
+                <div 
+                  key={col.title} 
+                  className={`
+                    vdetail-specs__col py-6 
+                    first:pt-0 last:pb-0 
+                    md:px-7 md:py-0 
+                    md:first:pl-0 md:last:pr-0
+                    ${colIndex > 0 && colIndex < 3 ? 'md:border-l md:border-white/5' : ''}
+                  `}
+                >
+                  <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                    {col.icon}
                     {col.title}
                   </h3>
                   <ul className="flex flex-col gap-3">
-                    {col.items.map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-sm text-gray-400">
-                        {col.isTech && (
-                          <CheckCircle2 size={14} strokeWidth={2} className="shrink-0 text-(--accent-neon)" aria-hidden />
+                    {col.items.map((item, itemIndex) => (
+                      <li key={itemIndex} className="flex items-center gap-2 text-sm text-gray-400">
+                        {col.isTech ? (
+                          <>
+                            <CheckCircle2 size={14} strokeWidth={2} className="shrink-0 text-(--accent-neon)" aria-hidden />
+                            <span>{item.value}</span>
+                          </>
+                        ) : (
+                          <>
+                            {item.label && (
+                              <span className="text-xs text-gray-500 min-w-[4.5rem]">{item.label}:</span>
+                            )}
+                            <span>{item.value}</span>
+                          </>
                         )}
-                        {item}
                       </li>
                     ))}
                   </ul>
                 </div>
               ))}
             </div>
+
+            {/* Información adicional expandida (similar a captura) */}
+            {(vehicle.titleCode || vehicle.saleDate || vehicle.damageType || vehicle.hasKeys !== undefined) && (
+              <>
+                <div className="vdetail-pricecard__divider" />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                  {/* Columna izquierda: Información del vehículo */}
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                      <FileText size={16} className="text-gray-400" />
+                      {t("detail.vehicleInfo")}
+                    </h4>
+                    
+                    {/* Código de título */}
+                    {vehicle.titleCode && (
+                      <div className="flex items-start gap-3">
+                        <FileText size={16} className="shrink-0 mt-0.5 text-gray-400" />
+                        <div>
+                          <span className="text-xs text-gray-500">{t("detail.titleCode")}</span>
+                          <p className="text-sm text-gray-300">{vehicle.titleCode}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Odómetro actual */}
+                    <div className="flex items-start gap-3">
+                      <Gauge size={16} className="shrink-0 mt-0.5 text-gray-400" />
+                      <div>
+                        <span className="text-xs text-gray-500">{t("detail.odometer")}</span>
+                        <p className="text-sm text-gray-300">
+                          {mileageText(vehicle.mileageKm, t)} <span className="text-xs text-gray-500">{t("detail.current")}</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Daños */}
+                    {vehicle.damageType && (
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle size={16} className="shrink-0 mt-0.5 text-gray-400" />
+                        <div>
+                          <span className="text-xs text-gray-500">{t("detail.primaryDamage")}</span>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`
+                              inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border
+                              ${getDamageBadgeStyles(vehicle.damageSeverity || 'none')}
+                            `}>
+                              {getDamageIcon(vehicle.damageSeverity || 'none')}
+                              {vehicle.damageType}
+                              {vehicle.damageSeverity && vehicle.damageSeverity !== 'none' && (
+                                <span className="opacity-50">· {getSeverityLabel(vehicle.damageSeverity, t)}</span>
+                              )}
+                            </span>
+                          </div>
+                          {vehicle.damageDescription && (
+                            <p className="text-xs text-gray-500 mt-1">{vehicle.damageDescription}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tiene llave */}
+                    {vehicle.hasKeys !== undefined && (
+                      <div className="flex items-start gap-3">
+                        <Key size={16} className="shrink-0 mt-0.5 text-gray-400" />
+                        <div>
+                          <span className="text-xs text-gray-500">{t("detail.hasKeys")}</span>
+                          <p className="text-sm text-gray-300">
+                            {vehicle.hasKeys ? "✓ Sí" : "✗ No"}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Destacados */}
+                    {vehicle.highlights && vehicle.highlights.length > 0 && (
+                      <div className="flex items-start gap-3">
+                        <Shield size={16} className="shrink-0 mt-0.5 text-gray-400" />
+                        <div>
+                          <span className="text-xs text-gray-500">{t("detail.highlights")}</span>
+                          <div className="flex flex-wrap gap-1.5 mt-1">
+                            {vehicle.highlights.map((highlight, idx) => (
+                              <span key={idx} className="text-xs px-2 py-0.5 bg-(--accent-neon)/10 text-(--accent-neon) rounded-full">
+                                {highlight}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Columna derecha: Información de venta */}
+                  <div className="space-y-4 md:border-l md:border-white/5 md:pl-6">
+                    <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+                      <CalendarDays size={16} className="text-gray-400" />
+                      {t("detail.saleInfo")}
+                    </h4>
+
+                    {/* Fecha de venta */}
+                    {vehicle.saleDate && (
+                      <div className="flex items-start gap-3">
+                        <CalendarDays size={16} className="shrink-0 mt-0.5 text-gray-400" />
+                        <div>
+                          <span className="text-xs text-gray-500">{t("detail.saleDate")}</span>
+                          <p className="text-sm text-gray-300">
+                            {vehicle.saleDate}
+                            {vehicle.saleTime && (
+                              <span className="text-xs text-gray-500 block">
+                                <Clock size={12} className="inline mr-1" />
+                                {vehicle.saleTime}
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Ubicación */}
+                    {vehicle.saleLocation && (
+                      <div className="flex items-start gap-3">
+                        <MapPin size={16} className="shrink-0 mt-0.5 text-gray-400" />
+                        <div>
+                          <span className="text-xs text-gray-500">{t("detail.location")}</span>
+                          <p className="text-sm text-gray-300">{vehicle.saleLocation}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Notas */}
+                    {vehicle.notes && (
+                      <div className="flex items-start gap-3">
+                        <FileText size={16} className="shrink-0 mt-0.5 text-gray-400" />
+                        <div>
+                          <span className="text-xs text-gray-500">{t("detail.notes")}</span>
+                          <p className="text-sm text-gray-400 italic">{vehicle.notes}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Emoji decorativo */}
+                    <div className="mt-4 text-4xl opacity-10 select-none">
+                      🚗
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>

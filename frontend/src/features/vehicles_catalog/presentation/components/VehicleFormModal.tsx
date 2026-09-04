@@ -91,6 +91,22 @@ export function VehicleFormModal({
       accentFrom,
       accentTo,
       highlighted,
+      color: vehicle?.color ?? "No especificado",
+      doors: vehicle?.doors ?? 4,
+      cylinders: vehicle?.cylinders ?? 4,
+      displacement: vehicle?.displacement ?? "No especificado",
+      driveType: vehicle?.driveType ?? "No especificado",
+      titleCode: vehicle?.titleCode ?? "No especificado",
+      saleDate: vehicle?.saleDate ?? new Date().toISOString().slice(0, 10),
+      saleTime: vehicle?.saleTime ?? "No especificado",
+      saleLocation: vehicle?.saleLocation ?? "No especificado",
+      hasKeys: vehicle?.hasKeys ?? true,
+      damageType: vehicle?.damageType ?? "Sin daños reportados",
+      damageSeverity: vehicle?.damageSeverity ?? "none",
+      damageDescription: vehicle?.damageDescription ?? "Sin daños reportados",
+      notes: vehicle?.notes ?? "",
+      runAndDrive: vehicle?.runAndDrive ?? true,
+      highlights: vehicle?.highlights ?? [],
     });
     setSaving(false);
     if (ok) {

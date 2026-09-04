@@ -40,12 +40,12 @@ export const mileageText = (km: number, t: (k: string, v?: Record<string, string
 
 /** Fotos reales propias (public/vehicles) para los autos que ya cuentan con asset. */
 const VEHICLE_PHOTO_OVERRIDES: Record<string, string> = {
-  "nissan-versa-2021": "/vehicles/auto-1.jpg",
-  "vw-jetta-2022": "/vehicles/auto-2.jpg",
-  "toyota-corolla-2023": "/vehicles/auto-3.jpg",
-  "tesla-model3-2023": "/vehicles/auto-4.jpg",
-  "bmw-e46-m3-2004": "/vehicles/auto-5.webp",
-  "bmw-f650gs-2023": "/vehicles/moto-1.webp",
+  "nissan-versa-2021": "/vehicles/Nissan.jpg",
+  "vw-jetta-2022": "/vehicles/VW.jpg",
+  "toyota-corolla-2023": "/vehicles/Toyota.jpg",
+  "tesla-model3-2023": "/vehicles/Tesla.jpg",
+  "bmw-e46-m3-2004": "/vehicles/BMW.jpg",
+  "bmw-f650gs-2023": "/vehicles/BMW.jpg",
 };
 
 /**

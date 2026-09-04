@@ -34,6 +34,14 @@ buildea sin errores. **Dev/Prod corren en el puerto 3001** (`npm run dev`).
 
 ## Entradas
 
+### 2026-09-03 — Corrección del formulario de vehículos
+
+- **Qué:** completado el payload de `VehicleFormModal` con los metadatos requeridos por `NewCatalogVehicle`, usando valores existentes al editar y defaults para altas nuevas.
+- **Dónde:** `frontend/src/features/vehicles_catalog/presentation/components/VehicleFormModal.tsx`.
+- **Por qué:** el formulario no compilaba porque enviaba un objeto incompleto al caso de uso.
+- **Capa:** presentation.
+- **Pendientes:** tests del backend bloqueados localmente por PHP 8.2.12; las dependencias requieren PHP >= 8.4.1.
+
 ### 2026-06-22 — Reorganización a monorepo (frontend/ + backend/)
 
 - **Qué:** Movida toda la app Next.js a `frontend/` para separar frontend y backend con

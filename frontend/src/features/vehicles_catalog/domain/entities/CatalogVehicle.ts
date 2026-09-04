@@ -33,6 +33,22 @@ export interface CatalogVehicle {
   readonly accentFrom: string;
   readonly accentTo: string;
   readonly highlighted: boolean;  // destacado en landing
+  readonly color: string;
+  readonly doors: number;
+  readonly cylinders: number;
+  readonly displacement: string;
+  readonly driveType: string;
+  readonly titleCode: string;
+  readonly saleDate: string;
+  readonly saleTime: string;
+  readonly saleLocation: string;
+  readonly hasKeys: boolean;
+  readonly damageType: string;
+  readonly damageSeverity: "none" | "minor" | "moderate" | "severe";
+  readonly damageDescription: string;
+  readonly notes: string;
+  readonly runAndDrive: boolean;
+  readonly highlights: ReadonlyArray<string>;
 }
 
 /** Datos que el administrador captura al crear/editar un auto del catálogo. */

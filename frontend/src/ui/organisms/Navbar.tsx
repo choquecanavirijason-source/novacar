@@ -14,7 +14,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CircleUserRound, Menu as MenuIcon, Search, X } from "lucide-react";
+import { CircleUserRound, Menu as MenuIcon, Search, X, } from "lucide-react";
 import { useAuth } from "@core/auth/AuthProvider";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Logo } from "../atoms/Logo";
@@ -26,6 +26,7 @@ const DRAWER_LINKS = [
   { href: "/autopartes", key: "nav.parts" },
   { href: "/buscador", key: "nav.finder" },
   { href: "/importaciones", key: "nav.imports" },
+  { href: "/ubicaciones", key: "nav.locations" }, 
 ] as const;
 
 const isActiveLink = (pathname: string, href: string) =>
@@ -59,6 +60,8 @@ export function Navbar() {
         <nav className="nav__center" aria-label={t("nav.menu")}>
           {DRAWER_LINKS.map((link, i) => {
             const active = isActiveLink(pathname, link.href);
+            // 🔍 Detectar si es el enlace de ubicaciones para agregar ícono
+            const isLocation = link.href === "/ubicaciones";
             return (
               <span key={link.href} className="nav__link-group">
                 {i > 0 && (
@@ -66,7 +69,12 @@ export function Navbar() {
                     |
                   </span>
                 )}
-                <Link href={link.href} className={`nav__link ${active ? "nav__link--active" : ""}`}>
+                <Link 
+                    href={{ pathname: link.href }}
+                  
+                  className={`nav__link ${active ? "nav__link--active" : ""}`}
+                >
+                  
                   {t(link.key)}
                 </Link>
               </span>
@@ -85,7 +93,7 @@ export function Navbar() {
             {isAuthenticated && user ? (
               <span className="nav__avatar-initial">{user.name.charAt(0)}</span>
             ) : (
-              <CircleUserRound size={19} strokeWidth={1.5} aria-hidden />
+              <CircleUserRound size={10} strokeWidth={1.5} aria-hidden />
             )}
           </Link>
 
@@ -101,9 +109,9 @@ export function Navbar() {
             aria-label={t("nav.menu")}
           >
             {menuOpen ? (
-              <X size={19} strokeWidth={1.5} aria-hidden />
+              <X size={10} strokeWidth={1.5} aria-hidden />
             ) : (
-              <MenuIcon size={19} strokeWidth={1.5} aria-hidden />
+              <MenuIcon size={10} strokeWidth={1.5} aria-hidden />
             )}
           </button>
 
@@ -111,13 +119,15 @@ export function Navbar() {
             <nav className="nav__drawer" aria-label={t("nav.menu")}>
               {DRAWER_LINKS.map((link) => {
                 const active = isActiveLink(pathname, link.href);
+                const isLocation = link.href === "/ubicaciones";
                 return (
                   <Link
                     key={link.href}
-                    href={link.href}
+                    href={{ pathname: link.href }}
                     className={`nav__drawer-link ${active ? "nav__drawer-link--active" : ""}`}
                     onClick={() => setMenuOpen(false)}
                   >
+                    
                     {t(link.key)}
                   </Link>
                 );
