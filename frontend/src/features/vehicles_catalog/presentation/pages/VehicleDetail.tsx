@@ -1,29 +1,23 @@
+// src/features/vehicles_catalog/presentation/pages/VehicleDetail.tsx
+// (Reemplaza todo el contenido con esto)
+
 /**
  * Presentation · Component · VehicleDetail (client)
- * "Ver más" de un auto: galería clásica (foto grande + tira de miniaturas
- * scrollable debajo, clic para cambiar) en vez del tríptico anterior fijo a
- * 3 encuadres — así escala igual con 3 fotos que con 10 cuando el catálogo
- * tenga más de una foto real por vehículo. Seguida de la tarjeta de precio
- * de lista y el grid de especificaciones técnicas. Tailwind + tokens del
- * proyecto vía sintaxis `bg-(--token)`. Recibe la entidad ya resuelta
- * (server) y la traduce.
- * 
- * Versión mejorada con información detallada del vehículo similar a catálogos
- * de subastas: título, odómetro, daños, llaves, fecha de venta, etc.
+ * Muestra la galería de fotos, precio, especificaciones e información adicional.
+ * Diseño centrado, responsive, con lightbox al hacer clic en la imagen principal.
  */
 
 "use client";
 
 import { useState } from "react";
 import Image from "next/image";
-import { 
-  CheckCircle2, 
-  Maximize2, 
+import {
+  CheckCircle2,
+  Maximize2,
   X,
   CalendarDays,
   Gauge,
   Fuel,
-  User,
   Cog,
   Car,
   Shield,
@@ -31,10 +25,10 @@ import {
   Key,
   Clock,
   MapPin,
-  FileText,
-  DoorClosed
+  FileText
 } from "lucide-react";
 import type { CatalogVehicle } from "../../domain/entities/CatalogVehicle";
+import { getVehicleImageUrl } from "../catalogPresentation";
 import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Button } from "@ui/atoms/Button";
@@ -47,27 +41,18 @@ import {
   fuelKey,
   transmissionKey,
   mileageText,
-  vehiclePhotoUrl,
 } from "../vehiclePresentation";
 import { TestDriveModal } from "../components/TestDriveModal";
 import "../styles/catalog.css";
 
-/**
- * Imágenes reales del Nissan Versa. La foto principal del catálogo sigue
- * viniendo de vehiclePhotoUrl; esta lista controla únicamente el detalle.
- */
 const GALLERY_SHOTS = [
-  { key: "prf", label: "01 / PERFIL", src: "/vehicles/2.jpg", position: "50% 50%" },
-  { key: "ext", label: "02 / EXTERIOR", src: "/vehicles/1.jpg", position: "50% 50%" },
-  { key: "tra", label: "03 / TRASERA", src: "/vehicles/3.jpg", position: "50% 50%" },
-  { key: "int", label: "04 / INTERIOR", src: "/vehicles/4.jpg", position: "50% 50%" },
-  { key: "det", label: "05 / DETALLE", src: "/vehicles/5.jpg", position: "50% 50%" },
-  { key: "mot", label: "06 / MOTOR", src: "/vehicles/6.jpg", position: "50% 50%" },
-  { key: "six", label: "07 / VISTA", src: "/vehicles/7.jpg", position: "50% 50%" },
-  { key: "sev", label: "08 / VISTA", src: "/vehicles/8.jpg", position: "50% 50%" },
+  { key: "ext", label: "01 / EXTERIOR", position: "12% 35%" },
+  { key: "prf", label: "02 / PERFIL", position: "50% 45%" },
+  { key: "tra", label: "03 / TRASERA", position: "85% 40%" },
+  { key: "int", label: "04 / INTERIOR", position: "35% 60%" },
+  { key: "det", label: "05 / DETALLE", position: "88% 30%" },
 ] as const;
 
-// Helper para badge de severidad de daño
 const getDamageBadgeStyles = (severity: string) => {
   const styles = {
     none: "bg-green-500/10 text-green-400 border-green-500/20",
@@ -106,129 +91,127 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
   const [testDriveOpen, setTestDriveOpen] = useState(false);
   const lightboxPanelRef = useModalA11y<HTMLDivElement>(() => setLightboxOpen(false));
 
-  // Helper para valores por defecto (campos opcionales)
+  const imageUrl = getVehicleImageUrl(vehicle);
+
   const getValueOrDefault = (value: any, defaultValue: any = "—") => {
     return value !== undefined && value !== null && value !== "" ? value : defaultValue;
   };
 
-  // Especificaciones técnicas mejoradas
-  const specColumns = [
+  // Especificaciones agrupadas para grid
+  const specGroups = [
     {
       title: t("detail.specMotor"),
       icon: <Cog size={16} className="text-(--accent-neon)" />,
       items: [
-        { label: t("detail.horsepower"), value: `${vehicle.horsepower} HP` },
-        { label: t("detail.cylinders"), value: getValueOrDefault(vehicle.cylinders, "—") },
-        { label: t("detail.displacement"), value: getValueOrDefault(vehicle.displacement, "—") },
-        { label: t("detail.fuel"), value: t(fuelKey[vehicle.fuelType]) },
+        { label: t("detail.horsepower"), value: `${vehicle.horsepower} HP`, isTech: false },
+        { label: t("detail.cylinders"), value: getValueOrDefault(vehicle.cylinders), isTech: false },
+        { label: t("detail.displacement"), value: getValueOrDefault(vehicle.displacement), isTech: false },
+        { label: t("detail.fuel"), value: t(fuelKey[vehicle.fuelType]), isTech: false },
       ],
-      isTech: false,
     },
     {
       title: t("detail.specPerformance"),
       icon: <Car size={16} className="text-(--accent-neon)" />,
       items: [
-        { label: t("detail.transmission"), value: t(transmissionKey[vehicle.transmission]) },
-        { label: t("detail.driveType"), value: getValueOrDefault(vehicle.driveType, "—") },
+        { label: t("detail.transmission"), value: t(transmissionKey[vehicle.transmission]), isTech: false },
+        { label: t("detail.driveType"), value: getValueOrDefault(vehicle.driveType), isTech: false },
       ],
-      isTech: false,
     },
     {
       title: t("detail.specDimensions"),
       icon: <Gauge size={16} className="text-(--accent-neon)" />,
       items: [
-        { label: t("detail.bodyType"), value: t(bodyTypeKey[vehicle.bodyType]) },
-        { label: t("detail.color"), value: getValueOrDefault(vehicle.color, "—") },
-        { label: t("detail.seats"), value: `${vehicle.seats} ${t("detail.seatsLabel").toLowerCase()}` },
-        { label: t("detail.doors"), value: getValueOrDefault(vehicle.doors, "—") },
+        { label: t("detail.bodyType"), value: t(bodyTypeKey[vehicle.bodyType]), isTech: false },
+        { label: t("detail.color"), value: getValueOrDefault(vehicle.color), isTech: false },
+        { label: t("detail.seats"), value: `${vehicle.seats} ${t("detail.seatsLabel").toLowerCase()}`, isTech: false },
+        { label: t("detail.doors"), value: getValueOrDefault(vehicle.doors), isTech: false },
       ],
-      isTech: false,
     },
     {
       title: t("detail.specTech"),
       icon: null,
-      items: vehicle.features.map((feature) => ({ label: "", value: feature, isFeature: true })),
-      isTech: true,
+      items: vehicle.features.map((f) => ({ label: "", value: f, isTech: true })),
     },
   ];
 
-  const photoUrl = vehiclePhotoUrl(vehicle.id, vehicle.brand, vehicle.bodyType, { w: 1920, h: 1080 }, vehicle.imageUrl);
-  const galleryShots = vehicle.id === "nissan-versa-2021"
-    ? GALLERY_SHOTS
-    : GALLERY_SHOTS.map((shot) => ({ ...shot, src: photoUrl }));
-
-  // Determinar si mostrar información adicional (campos extra)
-  const hasExtraInfo = vehicle.color || vehicle.doors || vehicle.cylinders || vehicle.driveType;
+  const hasExtraInfo = vehicle.titleCode || vehicle.saleDate || vehicle.damageType || vehicle.hasKeys !== undefined;
 
   return (
     <>
-      {/* Bloque 1: encabezado + galería clásica (foto grande + miniaturas) */}
+      {/* Sección: Galería */}
       <section className="vdetail-gallery-section">
-        <Breadcrumbs
-          items={[
-            { label: t("nav.home"), href: "/" },
-            { label: t("nav.catalog"), href: "/catalogo" },
-            { label: `${vehicle.brand} ${vehicle.model}` },
-          ]}
-        />
+        <div className="container mx-auto px-4">
+          <Breadcrumbs
+            items={[
+              { label: t("nav.home"), href: "/" },
+              { label: t("nav.catalog"), href: "/catalogo" },
+              { label: `${vehicle.brand} ${vehicle.model}` },
+            ]}
+          />
 
-        <div className="vdetail-heading">
-          <span className="vdetail-hero__brand">{vehicle.brand}</span>
-          <h1 className="vdetail-hero__title">{vehicle.model}</h1>
-        </div>
+          <div className="vdetail-heading">
+            <span className="vdetail-hero__brand">{vehicle.brand}</span>
+            <h1 className="vdetail-hero__title">{vehicle.model}</h1>
+          </div>
 
-        <div className="vdetail-gallery">
-          <button
-            type="button"
-            className="vdetail-gallery__main"
-            onClick={() => setLightboxOpen(true)}
-            aria-label={t("detail.expandPhoto")}
-          >
+          <div className="vdetail-gallery">
+            <button
+              type="button"
+              className="vdetail-gallery__main"
+              onClick={() => setLightboxOpen(true)}
+              aria-label={t("detail.expandPhoto")}
+            >
+              {!photoFailed ? (
+                <Image
+                  src={imageUrl}
+                  alt={`${vehicle.brand} ${vehicle.model} — ${GALLERY_SHOTS[activeShot].label}`}
+                  fill
+                  unoptimized={imageUrl.startsWith("http")}
+                  sizes="(max-width: 720px) 100vw, 900px"
+                  style={{ objectPosition: GALLERY_SHOTS[activeShot].position }}
+                  loading="eager"
+                  onError={() => setPhotoFailed(true)}
+                />
+              ) : (
+                <div className="flex items-center justify-center w-full h-full bg-(--bg-elevated) text-(--text-muted)">
+                  <Car className="w-16 h-16" />
+                  <span className="ml-2">Sin imagen</span>
+                </div>
+              )}
+              <span className="vdetail-gallery__badge">
+                {vehicle.condition === "nuevo" ? t("common.new") : t("common.used")}
+              </span>
+              <span className="vdetail-gallery__expand">
+                <Maximize2 size={15} strokeWidth={2} aria-hidden />
+                {t("detail.expandPhoto")}
+              </span>
+            </button>
+
             {!photoFailed && (
-              <Image
-                src={galleryShots[activeShot].src}
-                alt={`${vehicle.brand} ${vehicle.model} — ${galleryShots[activeShot].label}`}
-                fill
-                unoptimized={galleryShots[activeShot].src.startsWith("http")}
-                sizes="(max-width: 720px) 100vw, 900px"
-                style={{ objectPosition: galleryShots[activeShot].position }}
-                loading="eager"
-                onError={() => setPhotoFailed(true)}
-              />
+              <div className="vdetail-gallery__thumbs" role="tablist" aria-label={t("detail.gallery")}>
+                {GALLERY_SHOTS.map((shot, i) => (
+                  <button
+                    key={shot.key}
+                    type="button"
+                    role="tab"
+                    aria-selected={i === activeShot}
+                    className={`vdetail-gallery__thumb ${i === activeShot ? "vdetail-gallery__thumb--active" : ""}`}
+                    onClick={() => setActiveShot(i)}
+                  >
+                    <Image
+                      src={imageUrl}
+                      alt=""
+                      fill
+                      unoptimized={imageUrl.startsWith("http")}
+                      sizes="120px"
+                      style={{ objectPosition: shot.position }}
+                    />
+                    <span className="vdetail-gallery__thumb-label">{shot.label}</span>
+                  </button>
+                ))}
+              </div>
             )}
-            <span className="vdetail-gallery__badge">
-              {vehicle.condition === "nuevo" ? t("common.new") : t("common.used")}
-            </span>
-            <span className="vdetail-gallery__expand">
-              <Maximize2 size={15} strokeWidth={2} aria-hidden />
-              {t("detail.expandPhoto")}
-            </span>
-          </button>
-
-          {!photoFailed && (
-            <div className="vdetail-gallery__thumbs" role="tablist" aria-label={t("detail.gallery")}>
-              {galleryShots.map((shot, i) => (
-                <button
-                  key={shot.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={i === activeShot}
-                  className={`vdetail-gallery__thumb ${i === activeShot ? "vdetail-gallery__thumb--active" : ""}`}
-                  onClick={() => setActiveShot(i)}
-                >
-                  <Image
-                    src={shot.src}
-                    alt=""
-                    fill
-                    unoptimized={shot.src.startsWith("http")}
-                    sizes="120px"
-                    style={{ objectPosition: shot.position }}
-                  />
-                  <span className="vdetail-gallery__thumb-label">{shot.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
+          </div>
         </div>
       </section>
 
@@ -256,20 +239,18 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
               >
                 <X size={20} strokeWidth={1.75} aria-hidden />
               </button>
-
               <div className="vdetail-lightbox__img">
                 <Image
-                  src={galleryShots[activeShot].src}
-                  alt={`${vehicle.brand} ${vehicle.model} — ${galleryShots[activeShot].label}`}
+                  src={imageUrl}
+                  alt={`${vehicle.brand} ${vehicle.model} — ${GALLERY_SHOTS[activeShot].label}`}
                   fill
-                  unoptimized={galleryShots[activeShot].src.startsWith("http")}
+                  unoptimized={imageUrl.startsWith("http")}
                   sizes="90vw"
-                  style={{ objectPosition: galleryShots[activeShot].position }}
+                  style={{ objectPosition: GALLERY_SHOTS[activeShot].position }}
                 />
               </div>
-
               <div className="vdetail-gallery__thumbs vdetail-lightbox__thumbs" role="tablist" aria-label={t("detail.gallery")}>
-                {galleryShots.map((shot, i) => (
+                {GALLERY_SHOTS.map((shot, i) => (
                   <button
                     key={shot.key}
                     type="button"
@@ -279,10 +260,10 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
                     onClick={() => setActiveShot(i)}
                   >
                     <Image
-                      src={shot.src}
+                      src={imageUrl}
                       alt=""
                       fill
-                      unoptimized={shot.src.startsWith("http")}
+                      unoptimized={imageUrl.startsWith("http")}
                       sizes="120px"
                       style={{ objectPosition: shot.position }}
                     />
@@ -295,11 +276,11 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
         </ModalPortal>
       )}
 
-      {/* Tarjeta única: precio de lista + especificaciones */}
-      <section className="relative ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] w-screen bg-(--bg-base)">
-        <div className="vdetail-pricecard-wrap">
+      {/* Sección: Precio y especificaciones */}
+      <section className="vdetail-pricecard-wrap">
+        <div className="container mx-auto px-4">
           <div className="vdetail-pricecard">
-            {/* Precio y estado */}
+            {/* Precio */}
             <div className="vdetail-pricecard__top">
               <span className="vdetail-pricecard__label">{t("detail.listPrice")}</span>
               <span className="vdetail-pricecard__badge">
@@ -317,14 +298,12 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
 
             <div className="vdetail-pricecard__divider" />
 
-            {/* Meta información rápida */}
             <div className="vdetail-pricecard__meta">
               <span>{vehicle.year}</span>
               <span>{mileageText(vehicle.mileageKm, t)}</span>
               <span>{t(fuelKey[vehicle.fuelType])}</span>
             </div>
 
-            {/* Acciones */}
             <div className="vdetail-pricecard__actions">
               <Button onClick={() => setTestDriveOpen(true)}>{t("detail.testDrive")}</Button>
               <Button href="/buscador" variant="ghost">
@@ -334,37 +313,26 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
 
             <div className="vdetail-pricecard__divider" />
 
-            {/* Especificaciones técnicas - Grid 4 columnas mejorado */}
-            <div className="vdetail-specs grid grid-cols-1 md:grid-cols-4">
-              {specColumns.map((col, colIndex) => (
-                <div 
-                  key={col.title} 
-                  className={`
-                    vdetail-specs__col py-6 
-                    first:pt-0 last:pb-0 
-                    md:px-7 md:py-0 
-                    md:first:pl-0 md:last:pr-0
-                    ${colIndex > 0 && colIndex < 3 ? 'md:border-l md:border-white/5' : ''}
-                  `}
-                >
-                  <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-                    {col.icon}
-                    {col.title}
+            {/* Especificaciones: grid 4 columnas */}
+            <div className="vdetail-specs-grid">
+              {specGroups.map((group, idx) => (
+                <div key={group.title} className="vdetail-specs-group">
+                  <h3 className="vdetail-specs-group__title">
+                    {group.icon}
+                    {group.title}
                   </h3>
-                  <ul className="flex flex-col gap-3">
-                    {col.items.map((item, itemIndex) => (
-                      <li key={itemIndex} className="flex items-center gap-2 text-sm text-gray-400">
-                        {col.isTech ? (
+                  <ul className="vdetail-specs-group__list">
+                    {group.items.map((item, i) => (
+                      <li key={i} className="vdetail-specs-group__item">
+                        {item.isTech ? (
                           <>
-                            <CheckCircle2 size={14} strokeWidth={2} className="shrink-0 text-(--accent-neon)" aria-hidden />
+                            <CheckCircle2 size={14} className="shrink-0 text-(--accent-neon)" />
                             <span>{item.value}</span>
                           </>
                         ) : (
                           <>
-                            {item.label && (
-                              <span className="text-xs text-gray-500 min-w-[4.5rem]">{item.label}:</span>
-                            )}
-                            <span>{item.value}</span>
+                            <span className="vdetail-specs-group__item-label">{item.label}</span>
+                            <span className="vdetail-specs-group__item-value">{item.value}</span>
                           </>
                         )}
                       </li>
@@ -374,149 +342,116 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
               ))}
             </div>
 
-            {/* Información adicional expandida (similar a captura) */}
-            {(vehicle.titleCode || vehicle.saleDate || vehicle.damageType || vehicle.hasKeys !== undefined) && (
+            {/* Información adicional */}
+            {hasExtraInfo && (
               <>
                 <div className="vdetail-pricecard__divider" />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                  {/* Columna izquierda: Información del vehículo */}
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-                      <FileText size={16} className="text-gray-400" />
+                <div className="vdetail-additional-info">
+                  {/* Columna: Vehículo */}
+                  <div className="vdetail-additional-info__col">
+                    <h4 className="vdetail-additional-info__title">
+                      <FileText size={16} />
                       {t("detail.vehicleInfo")}
                     </h4>
-                    
-                    {/* Código de título */}
+
                     {vehicle.titleCode && (
-                      <div className="flex items-start gap-3">
-                        <FileText size={16} className="shrink-0 mt-0.5 text-gray-400" />
-                        <div>
-                          <span className="text-xs text-gray-500">{t("detail.titleCode")}</span>
-                          <p className="text-sm text-gray-300">{vehicle.titleCode}</p>
-                        </div>
+                      <div className="vdetail-additional-info__item">
+                        <span className="vdetail-additional-info__item-label">{t("detail.titleCode")}</span>
+                        <p className="vdetail-additional-info__item-value">{vehicle.titleCode}</p>
                       </div>
                     )}
 
-                    {/* Odómetro actual */}
-                    <div className="flex items-start gap-3">
-                      <Gauge size={16} className="shrink-0 mt-0.5 text-gray-400" />
-                      <div>
-                        <span className="text-xs text-gray-500">{t("detail.odometer")}</span>
-                        <p className="text-sm text-gray-300">
-                          {mileageText(vehicle.mileageKm, t)} <span className="text-xs text-gray-500">{t("detail.current")}</span>
-                        </p>
-                      </div>
+                    <div className="vdetail-additional-info__item">
+                      <span className="vdetail-additional-info__item-label">{t("detail.odometer")}</span>
+                      <p className="vdetail-additional-info__item-value">
+                        {mileageText(vehicle.mileageKm, t)}{" "}
+                        <span className="text-xs text-(--text-muted)">{t("detail.current")}</span>
+                      </p>
                     </div>
 
-                    {/* Daños */}
                     {vehicle.damageType && (
-                      <div className="flex items-start gap-3">
-                        <AlertTriangle size={16} className="shrink-0 mt-0.5 text-gray-400" />
-                        <div>
-                          <span className="text-xs text-gray-500">{t("detail.primaryDamage")}</span>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className={`
-                              inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border
-                              ${getDamageBadgeStyles(vehicle.damageSeverity || 'none')}
-                            `}>
-                              {getDamageIcon(vehicle.damageSeverity || 'none')}
-                              {vehicle.damageType}
-                              {vehicle.damageSeverity && vehicle.damageSeverity !== 'none' && (
-                                <span className="opacity-50">· {getSeverityLabel(vehicle.damageSeverity, t)}</span>
-                              )}
-                            </span>
-                          </div>
-                          {vehicle.damageDescription && (
-                            <p className="text-xs text-gray-500 mt-1">{vehicle.damageDescription}</p>
-                          )}
+                      <div className="vdetail-additional-info__item">
+                        <span className="vdetail-additional-info__item-label">{t("detail.primaryDamage")}</span>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${getDamageBadgeStyles(
+                              vehicle.damageSeverity || "none"
+                            )}`}
+                          >
+                            {getDamageIcon(vehicle.damageSeverity || "none")}
+                            {vehicle.damageType}
+                            {vehicle.damageSeverity && vehicle.damageSeverity !== "none" && (
+                              <span className="opacity-50">· {getSeverityLabel(vehicle.damageSeverity, t)}</span>
+                            )}
+                          </span>
                         </div>
+                        {vehicle.damageDescription && (
+                          <p className="text-xs text-(--text-muted) mt-1">{vehicle.damageDescription}</p>
+                        )}
                       </div>
                     )}
 
-                    {/* Tiene llave */}
                     {vehicle.hasKeys !== undefined && (
-                      <div className="flex items-start gap-3">
-                        <Key size={16} className="shrink-0 mt-0.5 text-gray-400" />
-                        <div>
-                          <span className="text-xs text-gray-500">{t("detail.hasKeys")}</span>
-                          <p className="text-sm text-gray-300">
-                            {vehicle.hasKeys ? "✓ Sí" : "✗ No"}
-                          </p>
-                        </div>
+                      <div className="vdetail-additional-info__item">
+                        <span className="vdetail-additional-info__item-label">{t("detail.hasKeys")}</span>
+                        <p className="vdetail-additional-info__item-value">{vehicle.hasKeys ? "✓ Sí" : "✗ No"}</p>
                       </div>
                     )}
 
-                    {/* Destacados */}
                     {vehicle.highlights && vehicle.highlights.length > 0 && (
-                      <div className="flex items-start gap-3">
-                        <Shield size={16} className="shrink-0 mt-0.5 text-gray-400" />
-                        <div>
-                          <span className="text-xs text-gray-500">{t("detail.highlights")}</span>
-                          <div className="flex flex-wrap gap-1.5 mt-1">
-                            {vehicle.highlights.map((highlight, idx) => (
-                              <span key={idx} className="text-xs px-2 py-0.5 bg-(--accent-neon)/10 text-(--accent-neon) rounded-full">
-                                {highlight}
-                              </span>
-                            ))}
-                          </div>
+                      <div className="vdetail-additional-info__item">
+                        <span className="vdetail-additional-info__item-label">{t("detail.highlights")}</span>
+                        <div className="flex flex-wrap gap-1.5 mt-1">
+                          {vehicle.highlights.map((h, idx) => (
+                            <span
+                              key={idx}
+                              className="text-xs px-2 py-0.5 bg-(--accent-neon)/10 text-(--accent-neon) rounded-full"
+                            >
+                              {h}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Columna derecha: Información de venta */}
-                  <div className="space-y-4 md:border-l md:border-white/5 md:pl-6">
-                    <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-                      <CalendarDays size={16} className="text-gray-400" />
+                  {/* Columna: Venta */}
+                  <div className="vdetail-additional-info__col">
+                    <h4 className="vdetail-additional-info__title">
+                      <CalendarDays size={16} />
                       {t("detail.saleInfo")}
                     </h4>
 
-                    {/* Fecha de venta */}
                     {vehicle.saleDate && (
-                      <div className="flex items-start gap-3">
-                        <CalendarDays size={16} className="shrink-0 mt-0.5 text-gray-400" />
-                        <div>
-                          <span className="text-xs text-gray-500">{t("detail.saleDate")}</span>
-                          <p className="text-sm text-gray-300">
-                            {vehicle.saleDate}
-                            {vehicle.saleTime && (
-                              <span className="text-xs text-gray-500 block">
-                                <Clock size={12} className="inline mr-1" />
-                                {vehicle.saleTime}
-                              </span>
-                            )}
-                          </p>
-                        </div>
+                      <div className="vdetail-additional-info__item">
+                        <span className="vdetail-additional-info__item-label">{t("detail.saleDate")}</span>
+                        <p className="vdetail-additional-info__item-value">
+                          {vehicle.saleDate}
+                          {vehicle.saleTime && (
+                            <span className="block text-xs text-(--text-muted)">
+                              <Clock size={12} className="inline mr-1" />
+                              {vehicle.saleTime}
+                            </span>
+                          )}
+                        </p>
                       </div>
                     )}
 
-                    {/* Ubicación */}
                     {vehicle.saleLocation && (
-                      <div className="flex items-start gap-3">
-                        <MapPin size={16} className="shrink-0 mt-0.5 text-gray-400" />
-                        <div>
-                          <span className="text-xs text-gray-500">{t("detail.location")}</span>
-                          <p className="text-sm text-gray-300">{vehicle.saleLocation}</p>
-                        </div>
+                      <div className="vdetail-additional-info__item">
+                        <span className="vdetail-additional-info__item-label">{t("detail.location")}</span>
+                        <p className="vdetail-additional-info__item-value">{vehicle.saleLocation}</p>
                       </div>
                     )}
 
-                    {/* Notas */}
                     {vehicle.notes && (
-                      <div className="flex items-start gap-3">
-                        <FileText size={16} className="shrink-0 mt-0.5 text-gray-400" />
-                        <div>
-                          <span className="text-xs text-gray-500">{t("detail.notes")}</span>
-                          <p className="text-sm text-gray-400 italic">{vehicle.notes}</p>
-                        </div>
+                      <div className="vdetail-additional-info__item">
+                        <span className="vdetail-additional-info__item-label">{t("detail.notes")}</span>
+                        <p className="vdetail-additional-info__item-value italic text-(--text-muted)">{vehicle.notes}</p>
                       </div>
                     )}
 
-                    {/* Emoji decorativo */}
-                    <div className="mt-4 text-4xl opacity-10 select-none">
-                      🚗
-                    </div>
+                    <div className="mt-4 text-4xl opacity-10 select-none">🚗</div>
                   </div>
                 </div>
               </>

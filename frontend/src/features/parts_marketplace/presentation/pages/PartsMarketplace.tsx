@@ -150,7 +150,7 @@ export function PartsMarketplace() {
       </ScrollReveal>
 
       <div id="mk-product-grid" className="market">
-        <h2 className="text-center text-2xl font-black uppercase tracking-wide text-white sm:text-3xl">
+        <h2 className="text-center text-2xl font-black uppercase tracking-wide text-[var(--text-primary)] sm:text-3xl">
           {t("market.productsTitle")}
         </h2>
 

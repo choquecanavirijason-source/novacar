@@ -165,8 +165,8 @@ function LocationCard({ location, t }: { location: Location; t: any }) {
 
   return (
     <div className={`
-      group relative bg-(--bg-card) rounded-2xl overflow-hidden 
-      border border-white/5 hover:border-(--accent-neon)/30 
+      group relative bg-(--bg-surface) rounded-2xl overflow-hidden
+      border border-(--border) hover:border-(--accent-neon)/30
       transition-all duration-300 hover:shadow-2xl hover:shadow-(--accent-neon)/5
       ${location.featured ? 'ring-2 ring-(--accent-neon)/20' : ''}
     `}>
@@ -181,7 +181,7 @@ function LocationCard({ location, t }: { location: Location; t: any }) {
       {/* Imagen de la ubicación */}
       <div className="relative h-48 md:h-64 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10" />
-        <div className="relative w-full h-full bg-gray-800 flex items-center justify-center">
+        <div className="relative w-full h-full bg-(--bg-elevated) flex items-center justify-center">
           {location.image && !imageError ? (
             <Image
               src={location.image}
@@ -191,7 +191,7 @@ function LocationCard({ location, t }: { location: Location; t: any }) {
               onError={() => setImageError(true)}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center text-gray-600">
+            <div className="flex flex-col items-center justify-center text-(--text-muted)">
               <Building2 className="w-16 h-16 mb-2 opacity-30" />
               <span className="text-sm opacity-30">Sin imagen</span>
             </div>
@@ -220,28 +220,28 @@ function LocationCard({ location, t }: { location: Location; t: any }) {
       <div className="p-6 space-y-4">
         {/* Descripción */}
         {location.description && (
-          <p className="text-sm text-gray-400">{location.description}</p>
+          <p className="text-sm text-(--text-secondary)">{location.description}</p>
         )}
 
         {/* Grid de información */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Información de contacto */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-gray-500">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-(--text-muted)">
               {t("ubicaciones.contact")}
             </h4>
             <div className="space-y-1.5">
-              <div className="flex items-center gap-2 text-sm text-gray-300">
+              <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
                 <MapPin className="w-4 h-4 shrink-0 text-(--accent-neon)" />
                 <span>{location.address}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
+              <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
                 <Phone className="w-4 h-4 shrink-0 text-(--accent-neon)" />
                 <a href={`tel:${location.phone}`} className="hover:text-(--accent-neon) transition-colors">
                   {location.phone}
                 </a>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
+              <div className="flex items-center gap-2 text-sm text-(--text-secondary)">
                 <Mail className="w-4 h-4 shrink-0 text-(--accent-neon)" />
                 <a href={`mailto:${location.email}`} className="hover:text-(--accent-neon) transition-colors">
                   {location.email}
@@ -252,13 +252,13 @@ function LocationCard({ location, t }: { location: Location; t: any }) {
 
           {/* Horarios */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-gray-500">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-(--text-muted)">
               {t("ubicaciones.schedule")}
             </h4>
             <div className="space-y-1 text-sm">
               {location.hours.map((hour, idx) => (
-                <div key={idx} className="flex justify-between text-gray-300">
-                  <span className="text-gray-400">{hour.day}</span>
+                <div key={idx} className="flex justify-between text-(--text-secondary)">
+                  <span className="text-(--text-muted)">{hour.day}</span>
                   <span>
                     {hour.isClosed ? (
                       <span className="text-red-400">{t("ubicaciones.closed")}</span>
@@ -274,14 +274,14 @@ function LocationCard({ location, t }: { location: Location; t: any }) {
 
         {/* Servicios */}
         <div>
-          <h4 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">
+          <h4 className="text-xs font-bold uppercase tracking-widest text-(--text-muted) mb-3">
             {t("ubicaciones.services")}
           </h4>
           <div className="flex flex-wrap gap-2">
             {location.services.map((service, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-1.5 bg-white/5 rounded-full px-3 py-1.5 text-xs text-gray-300"
+                className="flex items-center gap-1.5 bg-(--bg-elevated) rounded-full px-3 py-1.5 text-xs text-(--text-secondary)"
               >
                 {service.icon}
                 <span>{service.label}</span>
@@ -291,7 +291,7 @@ function LocationCard({ location, t }: { location: Location; t: any }) {
         </div>
 
         {/* Acciones */}
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-white/5">
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-(--border)">
           <a
             href={`https://maps.google.com/?q=${location.coordinates.lat},${location.coordinates.lng}`}
             target="_blank"
@@ -303,7 +303,7 @@ function LocationCard({ location, t }: { location: Location; t: any }) {
           </a>
           <a
             href={`tel:${location.phone}`}
-            className="flex items-center gap-2 text-sm bg-white/5 hover:bg-white/10 px-4 py-2 rounded-lg transition-colors text-white"
+            className="flex items-center gap-2 text-sm bg-(--bg-elevated) hover:bg-(--border) px-4 py-2 rounded-lg transition-colors text-(--text-primary)"
           >
             <Phone className="w-4 h-4" />
             {t("ubicaciones.callUs")}
@@ -334,44 +334,44 @@ export default function UbiPage() {
       <div className="container mx-auto px-4 pt-8 pb-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white flex items-center gap-4">
-             
-              <MapPin 
+            <h1 className="text-4xl md:text-5xl font-bold text-(--text-primary) flex items-center gap-4">
+
+              <MapPin
                 className="
-                  w-10  h-10 
-                  md:w-16 md:h-16 
-                  text-(--accent-neon) 
-                  flex-shrink-0 
+                  w-10  h-10
+                  md:w-16 md:h-16
+                  text-(--accent-neon)
+                  flex-shrink-0
                   location-icon-pulse
-                  hover:scale-110 
+                  hover:scale-110
                   transition-all duration-300
                   drop-shadow-[0_0_15px_rgba(0,170,255,0.3)]
-                " 
-                strokeWidth={1.5} 
+                "
+                strokeWidth={1.5}
               />
               <span className="flex items-center gap-3">
                 {t("ubicaciones.title")}
-                <span className="text-sm md:text-base font-normal text-gray-500 bg-white/5 px-3 py-1 rounded-full">
+                <span className="text-sm md:text-base font-normal text-(--text-muted) bg-(--bg-elevated) px-3 py-1 rounded-full">
                   {LOCATIONS.length} {t("ubicaciones.locations")}
                 </span>
               </span>
             </h1>
-            <p className="text-gray-400 mt-3 text-base md:text-lg">
+            <p className="text-(--text-secondary) mt-3 text-base md:text-lg">
               {t("ubicaciones.subtitle")}
             </p>
             {/* ✅ TAGS DE CIUDADES SIN ÍCONOS */}
             <div className="flex flex-wrap items-center gap-3 mt-2">
               {LOCATIONS.map((location) => (
-                <span 
+                <span
                   key={location.id}
-                  className="text-sm text-gray-400 bg-white/5 px-4 py-1.5 rounded-full"
+                  className="text-sm text-(--text-secondary) bg-(--bg-elevated) px-4 py-1.5 rounded-full"
                 >
                   {location.city}
                 </span>
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-4 text-sm text-gray-400">
+          <div className="flex items-center gap-4 text-sm text-(--text-secondary)">
             <span className="flex items-center gap-1.5">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               {t("ubicaciones.openNow")}
@@ -390,12 +390,12 @@ export default function UbiPage() {
       </div>
 
       {/* Sección de preguntas frecuentes */}
-      <div className="container mx-auto px-4 py-12 border-t border-white/5">
+      <div className="container mx-auto px-4 py-12 border-t border-(--border)">
         <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold text-white mb-4">
+          <h2 className="text-2xl font-bold text-(--text-primary) mb-4">
             {t("ubicaciones.faqTitle")}
           </h2>
-          <p className="text-gray-400 text-sm mb-6">
+          <p className="text-(--text-secondary) text-sm mb-6">
             {t("ubicaciones.faqSubtitle")}
           </p>
           <Link

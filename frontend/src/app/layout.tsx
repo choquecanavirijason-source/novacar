@@ -12,6 +12,7 @@ import "@ui/templates/templates.css";
 import { I18nProvider } from "@core/i18n/I18nProvider";
 import { AuthProvider } from "@core/auth/AuthProvider";
 import { ToastProvider } from "@core/toast/ToastProvider";
+import { ThemeProvider, THEME_INIT_SCRIPT } from "@core/theme/ThemeProvider";
 import { SmoothScroll } from "@core/motion/SmoothScroll";
 import { SiteChrome } from "@core/layout/SiteChrome";
 import { SkipLink } from "@ui/atoms/SkipLink";
@@ -47,18 +48,32 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${playfair.variable} ${inter.variable} ${okomito.variable}`}>
+    <html
+      lang="es"
+      className={`${playfair.variable} ${inter.variable} ${okomito.variable}`}
+      // El script inline de abajo escribe data-theme en <html> antes del
+      // primer paint (para no flashear); React no debe pelear por ese
+      // atributo al hidratar, ver core/theme/ThemeProvider.tsx.
+      suppressHydrationWarning
+    >
+      <head>
+        {/* Aplica el tema guardado antes del primer paint: evita el flash
+            claro→oscuro al recargar con "oscuro" seleccionado. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>
-        <I18nProvider>
-          <AuthProvider>
-            <ToastProvider>
-              <SmoothScroll />
-              <div className="grain-overlay" aria-hidden />
-              <SkipLink />
-              <SiteChrome>{children}</SiteChrome>
-            </ToastProvider>
-          </AuthProvider>
-        </I18nProvider>
+        <ThemeProvider>
+          <I18nProvider>
+            <AuthProvider>
+              <ToastProvider>
+                <SmoothScroll />
+                <div className="grain-overlay" aria-hidden />
+                <SkipLink />
+                <SiteChrome>{children}</SiteChrome>
+              </ToastProvider>
+            </AuthProvider>
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

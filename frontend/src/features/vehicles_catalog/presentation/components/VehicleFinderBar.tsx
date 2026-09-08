@@ -52,14 +52,14 @@ export function VehicleFinderBar() {
     <div className="relative z-20 mt-10 px-4 pb-10">
       <form
         onSubmit={handleSubmit}
-        className="mx-auto flex flex-col gap-4 rounded-(--radius-btn) border border-white/10 bg-(--bg-surface) p-5 shadow-2xl sm:flex-row sm:items-end"
+        className="mx-auto flex flex-col gap-4 rounded-(--radius-btn) border border-(--border) bg-(--bg-surface) p-5 shadow-2xl sm:flex-row sm:items-end"
       >
         <label className="flex flex-1 flex-col gap-1.5">
-          <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <span className="text-xs font-semibold uppercase tracking-wide text-(--text-muted)">
             {t("catalog.brand")}
           </span>
           <select
-            className="rounded-(--radius-btn) border border-white/10 bg-(--bg-base) px-3 py-2.5 text-sm text-white outline-none focus:border-(--accent-neon)"
+            className="rounded-(--radius-btn) border border-(--border) bg-(--bg-base) px-3 py-2.5 text-sm text-(--text-primary) outline-none focus:border-(--accent-neon)"
             value={brand}
             onChange={(e) => setBrand(e.target.value)}
           >
@@ -73,11 +73,11 @@ export function VehicleFinderBar() {
         </label>
 
         <label className="flex flex-1 flex-col gap-1.5">
-          <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <span className="text-xs font-semibold uppercase tracking-wide text-(--text-muted)">
             {t("catalog.body")}
           </span>
           <select
-            className="rounded-(--radius-btn) border border-white/10 bg-(--bg-base) px-3 py-2.5 text-sm text-white outline-none focus:border-(--accent-neon)"
+            className="rounded-(--radius-btn) border border-(--border) bg-(--bg-base) px-3 py-2.5 text-sm text-(--text-primary) outline-none focus:border-(--accent-neon)"
             value={bodyType}
             onChange={(e) => setBodyType(e.target.value)}
           >
@@ -91,11 +91,11 @@ export function VehicleFinderBar() {
         </label>
 
         <label className="flex flex-1 flex-col gap-1.5">
-          <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <span className="text-xs font-semibold uppercase tracking-wide text-(--text-muted)">
             {t("catalog.maxPrice")}
           </span>
           <select
-            className="rounded-(--radius-btn) border border-white/10 bg-(--bg-base) px-3 py-2.5 text-sm text-white outline-none focus:border-(--accent-neon)"
+            className="rounded-(--radius-btn) border border-(--border) bg-(--bg-base) px-3 py-2.5 text-sm text-(--text-primary) outline-none focus:border-(--accent-neon)"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
           >

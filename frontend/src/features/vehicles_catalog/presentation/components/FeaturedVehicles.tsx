@@ -122,7 +122,7 @@ export function FeaturedVehicles() {
             {/* Marca de agua decorativa: capa de fondo, se mueve más lento (profundidad) */}
             <Parallax
               speed={-0.12}
-              className="pointer-events-none absolute -top-4 right-2 z-0 select-none text-[5rem] font-black uppercase leading-none text-white/5 sm:text-[7rem] lg:-top-8 lg:right-6 lg:text-[9rem]"
+              className="pointer-events-none absolute -top-4 right-2 z-0 select-none text-[5rem] font-black uppercase leading-none text-(--text-primary)/5 sm:text-[7rem] lg:-top-8 lg:right-6 lg:text-[9rem]"
             >
               <span aria-hidden>{t("featured.watermark")}</span>
             </Parallax>
@@ -133,7 +133,7 @@ export function FeaturedVehicles() {
               className="relative z-10 flex w-full flex-col justify-center space-y-10 text-left lg:w-1/2 lg:space-y-12"
             >
               <div>
-                <h3 className="text-3xl font-bold text-white sm:text-4xl">
+                <h3 className="text-3xl font-bold text-(--text-primary) sm:text-4xl">
                   {vehicle.brand} {vehicle.model}
                 </h3>
                 <p className="mt-2 text-(--text-secondary)">
@@ -145,17 +145,17 @@ export function FeaturedVehicles() {
                 {specs.map((spec) => (
                   <div key={spec.label} className="flex flex-col gap-1.5">
                     <span className="h-1.5 w-1.5 rounded-full bg-(--accent-neon)" aria-hidden />
-                    <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                    <span className="text-xs font-medium uppercase tracking-wide text-(--text-muted)">
                       {spec.label}
                     </span>
-                    <span className="font-semibold text-white">{spec.value}</span>
+                    <span className="font-semibold text-(--text-primary)">{spec.value}</span>
                   </div>
                 ))}
               </div>
 
               <Link
                 href={`/catalogo/${vehicle.id}`}
-                className="relative inline-flex w-fit items-center overflow-hidden rounded-(--radius-btn) border border-(--accent-neon)/40 px-6 py-3 text-sm font-semibold text-white transform-[skewX(-12deg)] transition-colors duration-300 hover:border-(--accent-neon) hover:bg-(--accent-soft)"
+                className="relative inline-flex w-fit items-center overflow-hidden rounded-(--radius-btn) border border-(--accent-neon)/40 px-6 py-3 text-sm font-semibold text-(--text-primary) transform-[skewX(-12deg)] transition-colors duration-300 hover:border-(--accent-neon) hover:bg-(--accent-soft)"
               >
                 <span
                   className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/15 via-white/0 to-black/15"
@@ -192,15 +192,15 @@ export function FeaturedVehicles() {
             </div>
 
             {/* Tarjeta flotante de precio: esquina inferior derecha de la tarjeta general */}
-            <div className="absolute bottom-5 right-5 z-20 max-w-[170px] rounded-xl border border-white/10 bg-(--bg-elevated)/30 px-4 py-3 backdrop-blur-(--glass-blur)">
-              <span className="text-[0.65rem] uppercase tracking-wide text-gray-400">
+            <div className="absolute bottom-5 right-5 z-20 max-w-[170px] rounded-xl border border-(--border) bg-(--bg-elevated)/60 px-4 py-3 backdrop-blur-(--glass-blur)">
+              <span className="text-[0.65rem] uppercase tracking-wide text-(--text-muted)">
                 {t("featured.priceCaption")}
               </span>
-              <p className="mt-0.5 text-lg font-bold text-white">
+              <p className="mt-0.5 text-lg font-bold text-(--text-primary)">
                 {formatCurrency(vehicle.price, locale)}
               </p>
-              <div className="my-2 h-px bg-white/10" />
-              <p className="line-clamp-2 text-[0.7rem] leading-relaxed text-gray-300">{vehicle.tagline}</p>
+              <div className="my-2 h-px bg-(--divider-subtle)" />
+              <p className="line-clamp-2 text-[0.7rem] leading-relaxed text-(--text-secondary)">{vehicle.tagline}</p>
             </div>
           </div>
 

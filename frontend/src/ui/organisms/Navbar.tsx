@@ -19,6 +19,7 @@ import { useAuth } from "@core/auth/AuthProvider";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Logo } from "../atoms/Logo";
 import { LanguageSwitcher } from "../molecules/LanguageSwitcher";
+import { ThemeSwitch } from "../molecules/ThemeSwitch";
 
 const DRAWER_LINKS = [
   { href: "/", key: "nav.home" },
@@ -83,6 +84,7 @@ export function Navbar() {
         </nav>
 
         <div className="nav__right">
+          <ThemeSwitch />
           <LanguageSwitcher />
 
           <Link

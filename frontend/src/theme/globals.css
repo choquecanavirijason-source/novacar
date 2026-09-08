@@ -6,38 +6,40 @@
 @import "tailwindcss";
 
 :root {
-  /* ---- Paleta base (negro profundo, sin fondos claros) ---- */
-  --bg-base: #0d0d0d;
-  --bg-surface: #161616;
-  --bg-elevated: #1f1f1f;
-  --bg-overlay: rgba(13, 13, 13, 0.75);
+  color-scheme: light;
+
+  /* ---- Paleta base (gris premium claro, sin blanco puro) ---- */
+  --bg-base: #f5f6f8;
+  --bg-surface: #ffffff;
+  --bg-elevated: #eef0f3;
+  --bg-overlay: rgba(255, 255, 255, 0.82);
 
   /* ---- Marca: Azul eléctrico (botones / bordes / acentos) ---- */
-  --primary: #00aaff;
-  --primary-glow: #00aaff;            /* azul principal */
-  --primary-soft: rgba(0, 170, 255, 0.16);
-  --accent-neon: #00aaff;             /* azul acento/glow */
-  --accent-soft: rgba(0, 170, 255, 0.16);
+  --primary: #0088cc;
+  --primary-glow: #0088cc;
+  --primary-soft: rgba(0, 136, 204, 0.1);
+  --accent-neon: #0077b3;             /* algo más oscuro que --primary: contraste AA como texto sobre blanco */
+  --accent-soft: rgba(0, 136, 204, 0.1);
 
-  /* ---- Texto (blanco puro + gris) ---- */
-  --text-primary: #ffffff;
-  --text-secondary: #b8b8b8;
-  --text-muted: #7d7d7d;
+  /* ---- Texto (casi-negro + gris, nunca negro puro) ---- */
+  --text-primary: #14161a;
+  --text-secondary: #52565c;
+  --text-muted: #83878d;
 
-  /* ---- Texto sobre superficies de marca (botones/badges dorados) ---- */
+  /* ---- Texto sobre superficies de marca (botones/badges) ---- */
   --on-brand: #14120a;
 
   /* ---- Estados ---- */
-  --success: #4caf7d;
-  --success-soft: rgba(76, 175, 125, 0.14);
-  --warning: #e0a838;
-  --warning-soft: rgba(224, 168, 56, 0.14);
-  --danger: #e05252;
-  --danger-soft: rgba(224, 82, 82, 0.14);
+  --success: #2f9463;
+  --success-soft: rgba(47, 148, 99, 0.12);
+  --warning: #b5791f;
+  --warning-soft: rgba(181, 121, 31, 0.12);
+  --danger: #cf3b3b;
+  --danger-soft: rgba(207, 59, 59, 0.12);
 
-  /* ---- Bordes: hairline azul finísimo ---- */
-  --border: rgba(0, 170, 255, 0.15);
-  --border-strong: rgba(0, 170, 255, 0.35);
+  /* ---- Bordes: hairline sutil ---- */
+  --border: rgba(20, 22, 26, 0.1);
+  --border-strong: rgba(20, 22, 26, 0.22);
 
   /* ---- Radios ---- */
   --radius-sm: 8px;
@@ -46,27 +48,40 @@
   --radius-pill: 9999px;
   /* Botones: look clásico, rectangular (Premium Dark UI Negro/Oro). */
   --radius-btn: 4px;
-  --divider-subtle: rgba(255, 255, 255, 0.05);
+  --divider-subtle: rgba(20, 22, 26, 0.07);
 
   /* ---- Sombras / glow azul ---- */
-  --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.6);
-  --glow-primary: 0 0 0 1px var(--primary-soft), 0 2px 14px rgba(0, 170, 255, 0.28);
-  --glow-accent: 0 0 20px rgba(0, 170, 255, 0.5), 0 0 48px rgba(0, 170, 255, 0.28),
-    0 0 90px rgba(0, 170, 255, 0.12);
-  --text-glow: 0 0 18px rgba(0, 170, 255, 0.5);
+  --shadow-soft: 0 8px 30px rgba(20, 22, 26, 0.12);
+  --glow-primary: 0 0 0 1px var(--primary-soft), 0 2px 14px rgba(0, 136, 204, 0.2);
+  --glow-accent: 0 0 20px rgba(0, 136, 204, 0.3), 0 0 48px rgba(0, 136, 204, 0.16),
+    0 0 90px rgba(0, 136, 204, 0.08);
+  --text-glow: 0 0 18px rgba(0, 136, 204, 0.3);
 
   /* ---- Profundidad 3D ---- */
-  --shadow-3d: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 18px 40px rgba(0, 0, 0, 0.5),
-    0 4px 12px rgba(0, 0, 0, 0.35);
-  --shadow-3d-hover: 0 1px 0 rgba(255, 255, 255, 0.07) inset, 0 28px 60px rgba(0, 0, 0, 0.55),
-    0 8px 20px rgba(0, 0, 0, 0.4), var(--glow-accent);
+  --shadow-3d: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 18px 40px rgba(20, 22, 26, 0.12),
+    0 4px 12px rgba(20, 22, 26, 0.07);
+  --shadow-3d-hover: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 28px 60px rgba(20, 22, 26, 0.16),
+    0 8px 20px rgba(20, 22, 26, 0.1), var(--glow-accent);
   --perspective: 1200px;
 
-  /* ---- Glassmorphism (negro 40% opacidad + blur + hairline dorado) ---- */
-  --glass-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
-    rgba(13, 13, 13, 0.4);
-  --glass-border: rgba(0, 170, 255, 0.3);
+  /* ---- Glassmorphism (blanco translúcido + blur + hairline azul) ---- */
+  --glass-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.6)),
+    rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(20, 22, 26, 0.12);
   --glass-blur: 10px;
+
+  /* ---- Tarjetas de producto (glass sobre fondo claro) ---- */
+  --product-card-bg: rgba(255, 255, 255, 0.65);
+  --product-card-border: rgba(20, 22, 26, 0.12);
+
+  /* ---- Navbar flotante: idle = siempre con panel claro legible (no
+     depende de que la página tenga un hero oscuro debajo, a diferencia
+     del modo oscuro que sí puede quedar transparente). ---- */
+  --nav-bg-idle: rgba(255, 255, 255, 0.72);
+  --nav-bg-scrolled: rgba(255, 255, 255, 0.92);
+  --nav-text: #14161a;
+  --nav-text-shadow: none;
+  --nav-icon-shadow: none;
 
   /* ---- Transiciones (motion con propósito) ---- */
   --transition-smooth: 280ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -79,7 +94,7 @@
   --gradient-brand-cool: linear-gradient(135deg, #99ddff, #4dc4ff);
   --gradient-brand-deep: linear-gradient(135deg, #005f8f, #0088cc);
   --gradient-warm: linear-gradient(130deg, var(--danger), var(--warning));
-  --gradient-surface: linear-gradient(160deg, var(--bg-elevated), var(--bg-surface));
+  --gradient-surface: linear-gradient(160deg, #ffffff, #eef0f3);
 
   /* ---- Tipografía: fuente de marca (títulos/logo) + sans ligera (cuerpo) ----
      --font-serif mantiene el nombre histórico por compatibilidad (pocos usos
@@ -94,6 +109,71 @@
   /* Sitio full-bleed: sin tope de ancho, ocupa todo el viewport (solo queda
      el padding-inline de `.container` como respiro lateral mínimo). */
   --container-max: none;
+}
+
+/* ============================================================
+   Modo oscuro — look original "Premium Dark UI" del sitio, sin tocar.
+   Se activa poniendo data-theme="dark" en <html> (ver
+   core/theme/ThemeProvider.tsx + ThemeSwitch en el Navbar). El claro de
+   arriba es ahora el default.
+   ============================================================ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-base: #0d0d0d;
+  --bg-surface: #161616;
+  --bg-elevated: #1f1f1f;
+  --bg-overlay: rgba(13, 13, 13, 0.75);
+
+  --primary: #00aaff;
+  --primary-glow: #00aaff;
+  --primary-soft: rgba(0, 170, 255, 0.16);
+  --accent-neon: #00aaff;
+  --accent-soft: rgba(0, 170, 255, 0.16);
+
+  --text-primary: #ffffff;
+  --text-secondary: #b8b8b8;
+  --text-muted: #7d7d7d;
+
+  --on-brand: #14120a;
+
+  --success: #4caf7d;
+  --success-soft: rgba(76, 175, 125, 0.14);
+  --warning: #e0a838;
+  --warning-soft: rgba(224, 168, 56, 0.14);
+  --danger: #e05252;
+  --danger-soft: rgba(224, 82, 82, 0.14);
+
+  --border: rgba(0, 170, 255, 0.15);
+  --border-strong: rgba(0, 170, 255, 0.35);
+
+  --divider-subtle: rgba(255, 255, 255, 0.05);
+
+  --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.6);
+  --glow-primary: 0 0 0 1px var(--primary-soft), 0 2px 14px rgba(0, 170, 255, 0.28);
+  --glow-accent: 0 0 20px rgba(0, 170, 255, 0.5), 0 0 48px rgba(0, 170, 255, 0.28),
+    0 0 90px rgba(0, 170, 255, 0.12);
+  --text-glow: 0 0 18px rgba(0, 170, 255, 0.5);
+
+  --shadow-3d: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 18px 40px rgba(0, 0, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-3d-hover: 0 1px 0 rgba(255, 255, 255, 0.07) inset, 0 28px 60px rgba(0, 0, 0, 0.55),
+    0 8px 20px rgba(0, 0, 0, 0.4), var(--glow-accent);
+
+  --glass-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
+    rgba(13, 13, 13, 0.4);
+  --glass-border: rgba(0, 170, 255, 0.3);
+
+  --product-card-bg: rgba(255, 255, 255, 0.05);
+  --product-card-border: rgba(255, 255, 255, 0.14);
+
+  --nav-bg-idle: transparent;
+  --nav-bg-scrolled: rgba(13, 13, 13, 0.9);
+  --nav-text: #ffffff;
+  --nav-text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  --nav-icon-shadow: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
+
+  --gradient-surface: linear-gradient(160deg, var(--bg-elevated), var(--bg-surface));
 }
 
 h1,
@@ -123,20 +203,14 @@ h3,
     overflow-x: hidden;
   }
 
-  /* Fondo global negro profundo: sheen diagonal cepillado + viñeta +
-     gradiente oscuro, con el acento azul muy tenue por encima. */
+  /* Fondo global: claro con acento azul muy tenue arriba a la derecha.
+     El look "negro profundo + sheen cepillado" original vive ahora en el
+     override [data-theme="dark"] más abajo, sin tocarlo. */
   body {
     background:
-      radial-gradient(1200px 600px at 80% -10%, rgba(0, 170, 255, 0.12), transparent 60%),
-      radial-gradient(900px 500px at 0% 0%, rgba(0, 170, 255, 0.07), transparent 55%),
-      repeating-linear-gradient(
-        115deg,
-        rgba(255, 255, 255, 0.02) 0px,
-        rgba(255, 255, 255, 0.02) 1px,
-        transparent 1px,
-        transparent 3px
-      ),
-      radial-gradient(140% 100% at 50% 0%, #1a1a1a 0%, #0d0d0d 45%, #0a0a0a 100%);
+      radial-gradient(1200px 600px at 80% -10%, rgba(0, 136, 204, 0.07), transparent 60%),
+      radial-gradient(900px 500px at 0% 0%, rgba(0, 136, 204, 0.05), transparent 55%),
+      var(--bg-base);
     background-attachment: fixed;
     color: var(--text-primary);
     font-family: var(--font-sans);
@@ -181,6 +255,24 @@ h3,
     background: var(--accent-soft);
     color: var(--text-primary);
   }
+}
+
+/* Fuera de @layer base a propósito: una regla sin capa le gana a cualquier
+   regla en capa sin importar especificidad, así este override de modo
+   oscuro siempre pisa el `body` claro de arriba. */
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(0, 170, 255, 0.12), transparent 60%),
+    radial-gradient(900px 500px at 0% 0%, rgba(0, 170, 255, 0.07), transparent 55%),
+    repeating-linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.02) 0px,
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    radial-gradient(140% 100% at 50% 0%, #1a1a1a 0%, #0d0d0d 45%, #0a0a0a 100%);
+  background-attachment: fixed;
 }
 
 /* ---- Utilidades compartidas ---- */
@@ -544,17 +636,24 @@ h3,
   left: 0;
   right: 0;
   z-index: 100;
-  background: transparent;
+  /* En oscuro: transparente (flota sobre el hero). En claro: siempre con
+     panel translúcido — no hay hero oscuro debajo en todas las páginas,
+     así que depender de transparencia rompería la legibilidad. */
+  background: var(--nav-bg-idle);
   transition: background var(--transition-smooth), box-shadow var(--transition-smooth),
     border-color var(--transition-smooth);
 }
 
-/* Al hacer scroll: negro semitransparente con desenfoque (glass) + sombra
-   sutil, para diferenciarse del estado transparente inicial. */
+/* Al hacer scroll: panel translúcido con desenfoque (glass) + sombra sutil,
+   para diferenciarse del estado idle. */
 .nav--scrolled {
-  background: rgba(13, 13, 13, 0.9);
+  background: var(--nav-bg-scrolled);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(20, 22, 26, 0.12);
+}
+
+:root[data-theme="dark"] .nav--scrolled {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
@@ -632,7 +731,7 @@ h3,
 
 .nav__sep {
   margin-right: 28px;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
   font-weight: 400;
   font-size: 0.8rem;
 }
@@ -641,13 +740,13 @@ h3,
   background: none;
   border: none;
   padding: 0;
-  color: #fff;
+  color: var(--nav-text);
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 2px;
   white-space: nowrap;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  text-shadow: var(--nav-text-shadow);
   transition: opacity var(--transition-fast), color var(--transition-fast);
 }
 
@@ -663,7 +762,15 @@ h3,
 /* ---- Bloque derecho: idioma + búsqueda + menú ---- */
 .nav__right {
   position: relative;
-  flex: 1;
+  z-index: 3;
+  /* flex:1 (como .nav__logo) hacía que esta caja ocupara la mitad de la
+     navbar aunque su contenido visual sea angosto — esa mitad invisible,
+     con z-index encima, tapaba los clics de los links de la derecha en
+     .nav__center (Ubicaciones/Importaciones). margin-left:auto empuja este
+     bloque al borde igual que flex:1, pero su caja real queda ajustada al
+     contenido: .nav__logo (sigue en flex:1) absorbe todo el espacio sobrante. */
+  flex: none;
+  margin-left: auto;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -674,10 +781,10 @@ h3,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--nav-text);
   background: none;
   border: none;
-  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.5));
+  filter: var(--nav-icon-shadow);
   transition: color var(--transition-fast), transform var(--transition-fast);
 }
 
@@ -698,7 +805,7 @@ h3,
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
-  color: #fff;
+  color: var(--nav-text);
   flex-shrink: 0;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
     transform var(--transition-fast);
@@ -1755,11 +1862,11 @@ body:has(.admin-shell) {
   gap: 6px;
   background: none;
   border: none;
-  color: #fff;
+  color: var(--nav-text);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.03em;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  text-shadow: var(--nav-text-shadow);
   transition: color var(--transition-fast);
 }
 
@@ -1841,6 +1948,64 @@ body:has(.admin-shell) {
   color: var(--accent-neon);
   background: var(--accent-soft);
   font-weight: 700;
+}
+
+/* ---- ThemeSwitch: pill claro/oscuro en el Navbar (ver ThemeSwitch.tsx) ----
+   Track opaco propio (no depende de --nav-bg-idle/transparente) para que
+   siempre se lea igual, esté el nav flotando sobre un hero o ya con glass.
+   Sol/luna quedan fijos en cada extremo; el thumb desliza y tapa el ícono
+   del modo inactivo. */
+.theme-switch {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.theme-switch__track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 46px;
+  height: 24px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  transition: border-color var(--transition-fast);
+}
+
+.theme-switch__icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.theme-switch__thumb {
+  position: absolute;
+  z-index: 2;
+  top: 2px;
+  left: 2px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  color: var(--on-brand);
+  box-shadow: var(--shadow-soft);
+  transform: translateX(0);
+  transition: transform var(--transition-spring), background var(--transition-smooth);
+}
+
+.theme-switch--dark .theme-switch__thumb {
+  transform: translateX(24px);
+}
+
+.theme-switch:hover .theme-switch__track {
+  border-color: var(--accent-neon);
 }
 
 /* ---- Footer ---- */
@@ -2361,6 +2526,13 @@ body:has(.admin-shell) {
     20px 20px,
     20px 20px,
     20px 20px;
-  opacity: 0.6;
+  /* La textura de fibra de carbono es un motivo de dark UI: en claro queda
+     invisible (fondo claro liso de body) y solo aparece en oscuro, ver
+     override [data-theme="dark"] más abajo. */
+  opacity: 0;
   pointer-events: none;
+}
+
+:root[data-theme="dark"] .landing-bg {
+  opacity: 0.6;
 }

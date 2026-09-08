@@ -25,6 +25,9 @@ const es = {
     menu: "Menú",
     search: "Buscar",
     language: "Idioma",
+    theme: "Modo claro/oscuro",
+    themeToLight: "Cambiar a modo claro",
+    themeToDark: "Cambiar a modo oscuro",
   },
   auth: {
     signIn: "Iniciar sesión",
@@ -255,6 +258,7 @@ const es = {
     empty: "No encontramos autos con esos filtros. Prueba ampliando la búsqueda.",
     viewHorizontal: "Vista horizontal",
     viewGrid: "Vista de cuadrícula",
+    viewDetails: "Ver detalles",
   },
   detail: {
     back: "Volver al catálogo",
@@ -640,6 +644,9 @@ const en = {
     menu: "Menu",
     search: "Search",
     language: "Language",
+    theme: "Light/dark mode",
+    themeToLight: "Switch to light mode",
+    themeToDark: "Switch to dark mode",
   },
   auth: {
     signIn: "Sign in",
@@ -867,6 +874,7 @@ const en = {
     empty: "No cars match those filters. Try broadening your search.",
     viewHorizontal: "Horizontal view",
     viewGrid: "Grid view",
+    viewDetails: "View details",
   },
   detail: {
     back: "Back to catalog",

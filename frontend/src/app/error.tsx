@@ -35,7 +35,7 @@ export default function Error({
         {t("errorPage.eyebrow")}
       </span>
 
-      <h1 className="max-w-lg text-3xl font-black uppercase text-white sm:text-4xl">
+      <h1 className="max-w-lg text-3xl font-black uppercase text-(--text-primary) sm:text-4xl">
         {t("errorPage.title")}
       </h1>
 

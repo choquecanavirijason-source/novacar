@@ -34,6 +34,120 @@ buildea sin errores. **Dev/Prod corren en el puerto 3001** (`npm run dev`).
 
 ## Entradas
 
+### 2026-09-08 — Colores de texto/fondo "quemados" en modo claro (post modo claro/oscuro)
+
+- **Qué:** tras el modo claro/oscuro, varias pantallas fuera de `/catalogo` seguían con
+  colores Tailwind crudos (`text-white`, `text-gray-400/500/600`, `bg-gray-800`,
+  `bg-white/5`, etc.) o gradientes hex fijos, en vez de los tokens de `theme/globals.css` —
+  en claro quedaban ilegibles (texto claro sobre fondo claro) o con cajas negras sólidas.
+  Pedido por el usuario: "que sean el mismo tema que los colores, como ejemplo de
+  catálogo". Arreglado archivo por archivo:
+  - `app/not-found.tsx`, `app/error.tsx`: `h1` con `text-white` → `text-(--text-primary)`.
+  - `app/ubicaciones/page.tsx`: reescrita casi por completo a tokens (`bg-(--bg-surface)`,
+    `bg-(--bg-elevated)`, `text-(--text-secondary)`, `text-(--text-muted)`,
+    `border-(--border)`, etc.). De paso corregido `bg-(--bg-card)` — variable que **nunca
+    existió** en `globals.css`, la tarjeta llevaba meses sin fondo real (transparente,
+    disimulado por el fondo oscuro de antes). Se dejaron intactos el texto/badges que van
+    **sobre foto** (overlay con scrim oscuro) — esos sí deben seguir blancos en ambos temas.
+  - `features/parts_marketplace/presentation/pages/PartsMarketplace.tsx`: título
+    "NUESTROS PRODUCTOS" (`text-white` directo sobre el fondo de página) →
+    `text-(--text-primary)` (namespace i18n `market.productsTitle`).
+  - `features/parts_marketplace/presentation/components/PartCard.tsx`,
+    `features/vehicles_catalog/presentation/components/ImportVehicleGridCard.tsx`: el
+    fondo de la foto de cada tarjeta (`ProductCard` → prop `accentFrom/accentTo`) estaba
+    **hardcodeado** a grises casi negros (`#252525`, `#1c1c1c`/`#0a0a0a`) sin importar el
+    tema — por eso en `/autopartes` y `/importaciones` las fotos de producto se veían como
+    cajas negras sólidas en claro. Cambiado a `var(--bg-elevated)`/`var(--bg-surface)`
+    (funciona en gradiente inline porque `var()` se resuelve igual en `style` que en CSS).
+  - `features/vehicles_catalog/presentation/components/{FeaturedVehicles,ImportVehicleCard}.tsx`:
+    tarjeta destacada/importación con `bg-(--bg-base)` (ya temeada) pero título/precio/specs
+    en `text-white` y labels en `text-gray-400` → tokens; el watermark decorativo
+    `text-white/5` → `text-(--text-primary)/5` (para que siga visible, tenue, en claro).
+  - `features/vehicles_catalog/presentation/components/VehicleFinderBar.tsx` (buscador bajo
+    el Hero): `<select>` con `bg-(--bg-base)` pero `text-white` — el texto del dropdown era
+    invisible en claro. `border-white/10` → `border-(--border)`.
+  - `features/vehicles_catalog/presentation/{pages/VehicleDetail,components/VehicleGridCard,components/VehicleShowcaseSlide}.tsx`:
+    placeholders de "sin imagen" con `text-gray-500/600`/`bg-gray-800` sueltos, pisando el
+    `color: var(--text-muted)` ya puesto en el contenedor (`.vehicle-grid-card__placeholder`
+    / `.vehicle-showcase-slide__placeholder` en `catalog.css`) — quitados para que hereden.
+  - `theme/globals.css`: `.nav__avatar` (círculo de perfil/login) tenía `color: #fff`
+    hardcodeado — el ícono quedaba invisible sobre el círculo de vidrio claro del navbar
+    en modo claro. → `var(--nav-text)` (mismo token que el resto del nav).
+- **Bug de entorno (no de código) encontrado al verificar:** después de este fix el navegador
+  seguía sirviendo el chunk CSS **viejo** de Turbopack (`.nav__avatar{color:#fff}` literal en
+  vez de la var) — mismo patrón que el panic de Turbopack del inicio de esta sesión. Se
+  resolvió matando el proceso de `next dev` y borrando `.next` antes de reiniciar. Si algo
+  similar vuelve a pasar (un cambio de CSS que "no se ve" pese a estar en el archivo):
+  matar el proceso en el puerto 3001 y `rm -rf .next` antes de `npm run dev`.
+- **Dónde:** ver lista de archivos arriba.
+- **Capa:** presentation + theme.
+- **Verificado:** `tsc --noEmit` limpio; Playwright (Chromium) — barrido de screenshots en
+  `/`, `/catalogo`, `/autopartes`, `/buscador`, `/importaciones`, `/ubicaciones`, `/login`,
+  `/registro` en modo claro; color computado del ícono del avatar confirmado
+  `rgb(20, 22, 26)` (antes `rgb(255, 255, 255)`); los 5 links del navbar + ThemeSwitch +
+  LanguageSwitcher siguen funcionando tras el reinicio limpio.
+
+### 2026-09-08 — Fix: `.nav__right` tapaba Ubicaciones/Importaciones (regresión de la entrada anterior)
+
+- **Qué:** el fix de `z-index:3` en `.nav__right` de la entrada de abajo (para que el
+  `ThemeSwitch` no quedara tapado por `.nav__center`) tenía un efecto secundario: como
+  `.nav__right` seguía siendo `flex:1`, su caja invisible ocupaba **la mitad derecha de
+  toda la navbar** — con `z-index:3` esa mitad ahora tapaba los clics de los links de
+  `.nav__center` que caen ahí (Ubicaciones, Importaciones). Reportado por el usuario
+  ("catálogo y ubicación no entran"); reproducido con Playwright (Chromium + Firefox,
+  `elementFromPoint` resolvía a `.nav__right`, no al `<a>`).
+- **Fix real:** `.nav__right` pasa de `flex: 1` a `flex: none; margin-left: auto`. Sigue
+  pegado al borde derecho, pero su caja ahora se ajusta a su contenido real (los íconos)
+  en vez de inflarse a medio navbar. `.nav__logo` (el otro lado, ya en `flex:1`) absorbe
+  el espacio sobrante sin problema porque nunca tuvo z-index (no tapa nada).
+- **Dónde:** `frontend/src/theme/globals.css` (`.nav__right`).
+- **Capa:** theme.
+- **Verificado:** Playwright en Chromium y Firefox — los 5 links de `.nav__center`
+  (Catálogo/Autopartes/Buscador/Importaciones/Ubicaciones) + `ThemeSwitch` +
+  `LanguageSwitcher` navegan/click-ean correctamente; `elementFromPoint` confirma que
+  cada click cae en el `<a>` correcto, no en una caja invisible.
+
+### 2026-09-08 — Modo claro/oscuro sitewide + switch en Navbar
+
+- **Qué:** el sitio pasó de ser 100% dark-only a tener modo **claro por defecto** con
+  toggle a **oscuro**, persistente:
+  - `:root` de `theme/globals.css` reescrito como paleta clara nueva; el look "Premium
+    Dark UI" original se preservó **intacto y sin tocar** bajo `:root[data-theme="dark"]`.
+  - `ThemeProvider` (contexto + `localStorage["autodrive.theme"]`, mismo patrón que
+    `I18nProvider`) + script inline en `<head>` que aplica `data-theme` antes del primer
+    paint (evita flash), con `suppressHydrationWarning` en `<html>`.
+  - `ThemeSwitch` (pill sol/luna) integrado en `Navbar` junto al `LanguageSwitcher`.
+  - Tokens nuevos: `--nav-bg-idle/--nav-bg-scrolled/--nav-text/--nav-text-shadow/--nav-icon-shadow`
+    (en claro el nav siempre lleva panel translúcido legible, ya no depende de que la
+    página tenga un hero oscuro debajo como en oscuro) y `--product-card-bg/--product-card-border`
+    (glass de `.product-card` en `ui/templates/templates.css`, reusado en catálogo y marketplace).
+  - `body` background y `.landing-bg` (textura fibra de carbono) ahora theme-aware.
+  - A propósito **sin tocar**: `hero-showcase.css` / `vehicle-showcase.css` /
+    `brand-ticker.css` — franjas cinematográficas full-bleed, se quedan oscuras en ambos
+    temas (patrón intencional tipo Tesla/Apple, no un fondo de página).
+- **Bug real encontrado y corregido:** `.nav__center` (`position:absolute; z-index:2`)
+  tapaba los clics de `.nav__right` en desktop (~1440px) — el `ThemeSwitch` nuevo quedaba
+  bajo esa capa. Fix: `.nav__right` → `z-index: 3`.
+- **Fix adicional (pedido por el usuario):** faltaba la key i18n `catalog.viewDetails`
+  (se veía el literal `catalog.viewDetails` en las tarjetas del catálogo) — agregada en
+  `dictionaries.ts` (ES: "Ver detalles", EN: "View details").
+- **Dónde:** `src/theme/globals.css`, `src/core/theme/ThemeProvider.tsx` (nuevo),
+  `src/ui/molecules/ThemeSwitch.tsx` (nuevo), `src/ui/organisms/Navbar.tsx`,
+  `src/app/layout.tsx`, `src/ui/templates/templates.css`,
+  `src/features/parts_marketplace/presentation/styles/marketplace.css`,
+  `src/core/i18n/dictionaries.ts` (namespace `nav`: `theme/themeToLight/themeToDark`;
+  namespace `catalog`: `viewDetails`).
+- **Por qué:** pedido explícito del usuario — sitio quedó fijo en oscuro, pidió claro por
+  defecto + switch en el navbar para alternar.
+- **Capa:** theme + core + presentation (ui) + i18n.
+- **Verificado:** `tsc --noEmit` limpio; Playwright (chromium headless) — toggle
+  funcional, persiste tras reload, sin errores de consola, capturas de navbar/home/catálogo
+  en ambos temas y en una página sin hero (`/catalogo`) para confirmar legibilidad.
+- **Pendientes:** no se retemizaron manualmente los "shine"/gloss decorativos
+  (`rgba(255,255,255,0.x)` sobre botones/cards en `templates.css` y demás CSS de
+  features) — son translúcidos sutiles, no rompen legibilidad en claro, pero podrían
+  refinarse más adelante si se quiere fidelidad pixel-perfect.
+
 ### 2026-09-03 — Corrección del formulario de vehículos
 
 - **Qué:** completado el payload de `VehicleFormModal` con los metadatos requeridos por `NewCatalogVehicle`, usando valores existentes al editar y defaults para altas nuevas.

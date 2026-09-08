@@ -43,8 +43,8 @@ export function ImportVehicleGridCard({ vehicle, index = 0 }: { vehicle: Catalog
       <ProductCard
         onCtaClick={() => setQuoteOpen(true)}
         index={index}
-        accentFrom="#1c1c1c"
-        accentTo="#0a0a0a"
+        accentFrom="var(--bg-elevated)"
+        accentTo="var(--bg-surface)"
         photoHeight={210}
         imageUrl={cutoutOk ? cutoutUrl : photoUrl}
         imageAlt={`${vehicle.brand} ${vehicle.model}`}

@@ -474,12 +474,12 @@
 /* ---- Tarjeta de producto "Blocky": bloques planos, sin glass/gradiente,
    compacta (menos padding/gaps que la ProductCard base). ---- */
 .mk-grid .product-card {
-  background: #1a1a1a;
-  border-color: rgba(255, 255, 255, 0.06);
+  background: var(--bg-elevated);
+  border-color: var(--border);
 }
 
 .mk-grid .product-card__photo {
-  background: #252525;
+  background: var(--bg-surface);
   padding: 18px;
 }
 

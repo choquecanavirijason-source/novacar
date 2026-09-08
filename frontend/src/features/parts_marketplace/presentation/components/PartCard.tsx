@@ -34,8 +34,8 @@ export function PartCard({ part, index = 0 }: { part: MarketplacePart; index?: n
         href={`/autopartes/${part.id}`}
         onCtaClick={() => setInquiryOpen(true)}
         index={index}
-        accentFrom="#252525"
-        accentTo="#252525"
+        accentFrom="var(--bg-elevated)"
+        accentTo="var(--bg-surface)"
         photoHeight={220}
         imageUrl={partPhotoUrl(part.id, part.category, undefined, part.imageUrl)}
         imageAlt={part.name}

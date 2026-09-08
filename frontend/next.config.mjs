@@ -6,7 +6,10 @@ const nextConfig = {
   images: {
     // Placeholder externo usado como respaldo mientras faltan assets propios
     // (ver vehiclePresentation.ts / partPresentation.ts).
-    remotePatterns: [{ protocol: "https", hostname: "loremflickr.com" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "loremflickr.com" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+    ],
   },
 };
 
