@@ -16,6 +16,7 @@ import { ImageUrlField } from "@ui/molecules/ImageUrlField";
 import { ModalPortal } from "@ui/atoms/ModalPortal";
 import { useModalA11y } from "@ui/hooks/useModalA11y";
 import type {
+  Availability,
   BodyType,
   CatalogVehicle,
   Condition,
@@ -28,6 +29,7 @@ const BODY_TYPES: BodyType[] = ["sedan", "suv", "hatchback", "pickup", "motocicl
 const FUEL_TYPES: FuelType[] = ["gasolina", "hibrido", "electrico", "diesel"];
 const TRANSMISSIONS: Transmission[] = ["manual", "automatica"];
 const CONDITIONS: Condition[] = ["nuevo", "seminuevo"];
+const AVAILABILITIES: Availability[] = ["disponible", "agotado", "reservado"];
 
 export function VehicleFormModal({
   vehicle,
@@ -36,7 +38,8 @@ export function VehicleFormModal({
 }: {
   vehicle?: CatalogVehicle;
   onClose: () => void;
-  onSubmit: (input: NewCatalogVehicle) => Promise<boolean>;
+  /** `true` si guardó bien; si falló, el mensaje de error a mostrar. */
+  onSubmit: (input: NewCatalogVehicle) => Promise<true | string>;
 }) {
   const { t } = useTranslation();
   const toast = useToast();
@@ -57,8 +60,19 @@ export function VehicleFormModal({
   const [accentFrom, setAccentFrom] = useState(vehicle?.accentFrom ?? "#005f8f");
   const [accentTo, setAccentTo] = useState(vehicle?.accentTo ?? "#00aaff");
   const [highlighted, setHighlighted] = useState(vehicle?.highlighted ?? false);
+  // Motor, tracción, color, puertas, velocidad y aceleración: ya existían en
+  // la entidad (para la ficha de detalle) pero el form solo los rellenaba
+  // con un placeholder fijo — ahora son editables de verdad.
+  const [displacement, setDisplacement] = useState(vehicle?.displacement ?? "");
+  const [driveType, setDriveType] = useState(vehicle?.driveType ?? "");
+  const [color, setColor] = useState(vehicle?.color ?? "");
+  const [doors, setDoors] = useState(String(vehicle?.doors ?? 4));
+  const [topSpeedKmh, setTopSpeedKmh] = useState(String(vehicle?.topSpeedKmh ?? ""));
+  const [zeroToHundredSec, setZeroToHundredSec] = useState(String(vehicle?.zeroToHundredSec ?? ""));
+  const [availability, setAvailability] = useState<Availability>(vehicle?.availability ?? "disponible");
+  const [description, setDescription] = useState(vehicle?.notes ?? "");
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<string[]>([]);
   const panelRef = useModalA11y<HTMLDivElement>(onClose);
 
   const bodyTypeBuiltin = BODY_TYPES.map((b) => ({ value: b, label: t(`body.${b}`) }));
@@ -68,12 +82,68 @@ export function VehicleFormModal({
     value: c,
     label: t(c === "nuevo" ? "common.new" : "common.used"),
   }));
+  const availabilityBuiltin = AVAILABILITIES.map((a) => ({ value: a, label: t(`availability.${a}`) }));
+
+  /** Valida antes de tocar red — mismas reglas mínimas que CreateVehicleUseCase,
+   *  pero con mensajes concretos por campo en vez de un solo error genérico. */
+  function validate(): string[] {
+    const problems: string[] = [];
+    if (!brand.trim()) problems.push(t("admin.validationBrandRequired"));
+    if (!model.trim()) problems.push(t("admin.validationModelRequired"));
+
+    const yearNum = Number(year);
+    const maxYear = new Date().getFullYear() + 1;
+    if (!year.trim() || !Number.isFinite(yearNum) || yearNum < 1980 || yearNum > maxYear) {
+      problems.push(t("admin.validationYearInvalid", { min: 1980, max: maxYear }));
+    }
+
+    const priceNum = Number(price);
+    if (!price.trim() || !Number.isFinite(priceNum) || priceNum <= 0) {
+      problems.push(t("admin.validationPriceInvalid"));
+    }
+
+    const horsepowerNum = Number(horsepower);
+    if (!horsepower.trim() || !Number.isFinite(horsepowerNum) || horsepowerNum < 0) {
+      problems.push(t("admin.validationHorsepowerInvalid"));
+    }
+
+    const seatsNum = Number(seats);
+    if (!seats.trim() || !Number.isFinite(seatsNum) || seatsNum < 1) {
+      problems.push(t("admin.validationSeatsInvalid"));
+    }
+
+    if (doors.trim()) {
+      const doorsNum = Number(doors);
+      if (!Number.isFinite(doorsNum) || doorsNum < 0) problems.push(t("admin.validationDoorsInvalid"));
+    }
+
+    if (topSpeedKmh.trim()) {
+      const topSpeedNum = Number(topSpeedKmh);
+      if (!Number.isFinite(topSpeedNum) || topSpeedNum < 0) problems.push(t("admin.validationTopSpeedInvalid"));
+    }
+
+    if (zeroToHundredSec.trim()) {
+      const accelNum = Number(zeroToHundredSec);
+      if (!Number.isFinite(accelNum) || accelNum < 0) problems.push(t("admin.validationAccelerationInvalid"));
+    }
+
+    if (imageUrl.trim() && !/^(https?:\/\/|data:image\/|\/)/.test(imageUrl.trim())) {
+      problems.push(t("admin.validationImageUrlInvalid"));
+    }
+
+    return problems;
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setError("");
+    const validationErrors = validate();
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setErrors([]);
     setSaving(true);
-    const ok = await onSubmit({
+    const result = await onSubmit({
       brand: brand.trim(),
       model: model.trim(),
       year: Number(year),
@@ -86,16 +156,19 @@ export function VehicleFormModal({
       mileageKm: Number(mileageKm),
       horsepower: Number(horsepower),
       seats: Number(seats),
+      topSpeedKmh: topSpeedKmh.trim() ? Number(topSpeedKmh) : 0,
+      zeroToHundredSec: zeroToHundredSec.trim() ? Number(zeroToHundredSec) : 0,
+      availability,
       features: features.split(",").map((f) => f.trim()).filter(Boolean),
       imageUrl: imageUrl.trim() || undefined,
       accentFrom,
       accentTo,
       highlighted,
-      color: vehicle?.color ?? "No especificado",
-      doors: vehicle?.doors ?? 4,
+      color: color.trim() || "No especificado",
+      doors: doors.trim() ? Number(doors) : 0,
       cylinders: vehicle?.cylinders ?? 4,
-      displacement: vehicle?.displacement ?? "No especificado",
-      driveType: vehicle?.driveType ?? "No especificado",
+      displacement: displacement.trim() || "No especificado",
+      driveType: driveType.trim() || "No especificado",
       titleCode: vehicle?.titleCode ?? "No especificado",
       saleDate: vehicle?.saleDate ?? new Date().toISOString().slice(0, 10),
       saleTime: vehicle?.saleTime ?? "No especificado",
@@ -104,16 +177,16 @@ export function VehicleFormModal({
       damageType: vehicle?.damageType ?? "Sin daños reportados",
       damageSeverity: vehicle?.damageSeverity ?? "none",
       damageDescription: vehicle?.damageDescription ?? "Sin daños reportados",
-      notes: vehicle?.notes ?? "",
+      notes: description.trim(),
       runAndDrive: vehicle?.runAndDrive ?? true,
       highlights: vehicle?.highlights ?? [],
     });
     setSaving(false);
-    if (ok) {
+    if (result === true) {
       toast.success(vehicle ? t("admin.vehicleUpdateSuccess") : t("admin.vehicleCreateSuccess"));
       onClose();
     } else {
-      setError(t("common.saveError"));
+      setErrors([result]);
     }
   }
 
@@ -215,6 +288,36 @@ export function VehicleFormModal({
 
           <div className="addpart-row">
             <label className="addpart-field">
+              <span>{t("admin.vehicleFieldEngine")}</span>
+              <Input value={displacement} onChange={(e) => setDisplacement(e.target.value)} placeholder="1.6L" />
+            </label>
+            <label className="addpart-field">
+              <span>{t("admin.vehicleFieldDriveType")}</span>
+              <Input value={driveType} onChange={(e) => setDriveType(e.target.value)} placeholder="FWD, RWD, AWD…" />
+            </label>
+            <label className="addpart-field">
+              <span>{t("admin.vehicleFieldColor")}</span>
+              <Input value={color} onChange={(e) => setColor(e.target.value)} />
+            </label>
+          </div>
+
+          <div className="addpart-row">
+            <label className="addpart-field">
+              <span>{t("admin.vehicleFieldTopSpeed")}</span>
+              <Input type="number" min={0} value={topSpeedKmh} onChange={(e) => setTopSpeedKmh(e.target.value)} />
+            </label>
+            <label className="addpart-field">
+              <span>{t("admin.vehicleFieldAcceleration")}</span>
+              <Input type="number" min={0} step={0.1} value={zeroToHundredSec} onChange={(e) => setZeroToHundredSec(e.target.value)} />
+            </label>
+            <label className="addpart-field">
+              <span>{t("admin.vehicleFieldDoors")}</span>
+              <Input type="number" min={0} max={10} value={doors} onChange={(e) => setDoors(e.target.value)} />
+            </label>
+          </div>
+
+          <div className="addpart-row">
+            <label className="addpart-field">
               <span>{t("admin.vehicleFieldCondition")}</span>
               <SelectWithAdd
                 storageKey="novacar.options.vehicle.condition"
@@ -226,18 +329,41 @@ export function VehicleFormModal({
               />
             </label>
             <label className="addpart-field">
+              <span>{t("admin.vehicleFieldAvailability")}</span>
+              <SelectWithAdd
+                storageKey="novacar.options.vehicle.availability"
+                builtin={availabilityBuiltin}
+                value={availability}
+                onChange={(v) => setAvailability(v as Availability)}
+                addLabel={t("admin.addOption")}
+                addPlaceholder={t("admin.addOptionPlaceholder")}
+              />
+            </label>
+            <label className="addpart-field">
               <span>{t("admin.vehicleFieldSeats")}</span>
               <Input type="number" min={1} max={9} value={seats} onChange={(e) => setSeats(e.target.value)} />
             </label>
-            <label className="addpart-field addpart-field--checkbox">
-              <input type="checkbox" checked={highlighted} onChange={(e) => setHighlighted(e.target.checked)} />
-              <span>{t("admin.vehicleFieldHighlighted")}</span>
-            </label>
           </div>
+
+          <label className="addpart-field addpart-field--checkbox">
+            <input type="checkbox" checked={highlighted} onChange={(e) => setHighlighted(e.target.checked)} />
+            <span>{t("admin.vehicleFieldHighlighted")}</span>
+          </label>
 
           <label className="addpart-field">
             <span>{t("admin.vehicleFieldFeatures")}</span>
             <Input value={features} onChange={(e) => setFeatures(e.target.value)} placeholder={t("admin.vehicleFeaturesPlaceholder")} />
+          </label>
+
+          <label className="addpart-field">
+            <span>{t("admin.vehicleFieldDescription")}</span>
+            <textarea
+              className="ui-input"
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={t("admin.vehicleDescriptionPlaceholder")}
+            />
           </label>
 
           <div className="addpart-row">
@@ -251,10 +377,12 @@ export function VehicleFormModal({
             </label>
           </div>
 
-          {error && (
-            <p className="login-page__error" role="alert">
-              {error}
-            </p>
+          {errors.length > 0 && (
+            <ul className="login-page__error" role="alert" style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 4 }}>
+              {errors.map((message) => (
+                <li key={message}>{message}</li>
+              ))}
+            </ul>
           )}
 
           <div className="addpart-actions">

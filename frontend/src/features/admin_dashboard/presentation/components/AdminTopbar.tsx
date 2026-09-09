@@ -12,8 +12,9 @@ import { useAuth } from "@core/auth/AuthProvider";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { Logo } from "@ui/atoms/Logo";
 import { LanguageSwitcher } from "@ui/molecules/LanguageSwitcher";
+import { ThemeSwitch } from "@ui/molecules/ThemeSwitch";
 
-export type AdminPage = "analytics" | "vehicles" | "inventory" | "banners" | "quotes";
+export type AdminPage = "analytics" | "vehicles" | "inventory" | "banners" | "quotes" | "users";
 
 interface AdminTopbarProps {
   active: AdminPage;
@@ -36,6 +37,7 @@ export function AdminTopbar({ active, onNavigate }: AdminTopbarProps) {
     { id: "inventory", Icon: Package, label: t("admin.inventory") },
     { id: "banners", Icon: Image, label: t("admin.banners") },
     { id: "quotes", Icon: MessageSquareText, label: t("admin.quotes") },
+    { id:"users", Icon: MessageSquareText, label: t("admin.users") },
   ];
 
   function handleLogout() {
@@ -65,6 +67,7 @@ export function AdminTopbar({ active, onNavigate }: AdminTopbarProps) {
         </nav>
 
         <div className="admin-topbar__actions">
+          <ThemeSwitch />
           <LanguageSwitcher />
 
           <a href="/" className="admin-topbar__back">

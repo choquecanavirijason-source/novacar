@@ -2,7 +2,6 @@
  * Composition Root del módulo `parts_marketplace`.
  */
 
-import { createApiClient } from "@core/http/createApiClient";
 import {
   MarketplaceHttpDataSource,
   MarketplaceMockDataSource,
@@ -16,9 +15,7 @@ import { UpdatePartUseCase } from "./domain/usecases/UpdatePartUseCase";
 import { DeletePartUseCase } from "./domain/usecases/DeletePartUseCase";
 
 const useHttp = process.env.NEXT_PUBLIC_USE_API === "true";
-const dataSource = useHttp
-  ? new MarketplaceHttpDataSource(createApiClient())
-  : new MarketplaceMockDataSource();
+const dataSource = useHttp ? new MarketplaceHttpDataSource() : new MarketplaceMockDataSource();
 
 const repository = new MarketplaceRepositoryImpl(dataSource);
 

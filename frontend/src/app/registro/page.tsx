@@ -104,7 +104,7 @@ export default function RegisterPage() {
               <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                minLength={4}
+                minLength={6}
                 required
               />
             </label>
@@ -113,7 +113,7 @@ export default function RegisterPage() {
               <PasswordInput
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                minLength={4}
+                minLength={6}
                 required
               />
             </label>

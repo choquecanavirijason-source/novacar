@@ -37,10 +37,13 @@ export function VehiclesAdminPage() {
     return vehicles.filter((v) => `${v.brand} ${v.model}`.toLowerCase().includes(q));
   }, [vehicles, query]);
 
-  async function handleSubmit(input: NewCatalogVehicle) {
-    if (modalVehicle === "new") return create(input);
-    if (modalVehicle) return update(modalVehicle.id, input);
-    return false;
+  async function handleSubmit(input: NewCatalogVehicle): Promise<true | string> {
+    const ok = modalVehicle === "new" ? await create(input) : modalVehicle ? await update(modalVehicle.id, input) : false;
+    if (ok) return true;
+    // El store ya guardó el motivo real (validación del use case, error del
+    // backend, red caída, etc.) en `error` — se lo pasamos al modal en vez
+    // de perderlo detrás de un "no se pudo guardar" genérico.
+    return useVehicleAdminStore.getState().error ?? t("common.saveError");
   }
 
   async function handleDelete(vehicle: CatalogVehicle) {

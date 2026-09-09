@@ -77,3 +77,25 @@ export function createUser(input: {
   writeUsers([...users, user]);
   return toAuthUser(user);
 }
+
+/** Lista todas las cuentas registradas (sin password) — para el panel admin. */
+export function listUsers(): AuthUser[] {
+  return readUsers().map(toAuthUser);
+}
+
+/** Cambia el rol de una cuenta. Devuelve el usuario actualizado, o null si no existe. */
+export function updateUserRole(id: string, role: UserRole): AuthUser | null {
+  const users = readUsers();
+  const index = users.findIndex((u) => u.id === id);
+  if (index === -1) return null;
+  const updated: StoredUser = { ...users[index], role };
+  const next = [...users];
+  next[index] = updated;
+  writeUsers(next);
+  return toAuthUser(updated);
+}
+
+/** Elimina una cuenta del directorio. */
+export function deleteUser(id: string): void {
+  writeUsers(readUsers().filter((u) => u.id !== id));
+}

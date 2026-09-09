@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
@@ -31,4 +32,8 @@ Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
     Route::post('/inventory', [AdminController::class, 'store']);
     Route::get('/analytics', [AdminController::class, 'analytics']);
     Route::patch('/inventory/{id}/stock', [AdminController::class, 'updateStock']);
+
+    Route::post('/catalog/vehicles', [CatalogController::class, 'store']);
+    Route::put('/catalog/vehicles/{id}', [CatalogController::class, 'update']);
+    Route::delete('/catalog/vehicles/{id}', [CatalogController::class, 'destroy']);
 });

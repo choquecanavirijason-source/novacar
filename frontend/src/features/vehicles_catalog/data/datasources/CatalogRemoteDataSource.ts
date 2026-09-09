@@ -4,6 +4,8 @@
  * el admin crea/edita/borra sobreviven a recargas de página en este navegador.
  */
 
+import { createApiClient } from "@core/http/createApiClient";
+import { getAuthToken } from "@core/auth/token";
 import type { HttpClient } from "@core/http/HttpClient";
 import type { NewCatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import type { CatalogVehicleDTO } from "../models/CatalogVehicleDTO";
@@ -18,28 +20,35 @@ export interface CatalogRemoteDataSource {
 }
 
 export class CatalogHttpDataSource implements CatalogRemoteDataSource {
-  constructor(private readonly http: HttpClient) {}
+  // Factory (no instancia fija): el token de sesión se lee al momento de
+  // cada request, no al armar el composition root (ahí todavía no hay
+  // sesión iniciada) — mismo patrón que BannerHttpDataSource.
+  constructor(private readonly clientFactory: () => HttpClient = () => createApiClient(getAuthToken())) {}
+
+  private http() {
+    return this.clientFactory();
+  }
 
   fetchAll() {
-    return this.http.get<CatalogVehicleDTO[]>("/catalog/vehicles");
+    return this.http().get<CatalogVehicleDTO[]>("/catalog/vehicles");
   }
 
   fetchById(id: string) {
-    return this.http
+    return this.http()
       .get<CatalogVehicleDTO>(`/catalog/vehicles/${id}`)
       .catch(() => null);
   }
 
   create(input: NewCatalogVehicle) {
-    return this.http.post<CatalogVehicleDTO>("/admin/catalog/vehicles", toCatalogVehiclePayload(input));
+    return this.http().post<CatalogVehicleDTO>("/admin/catalog/vehicles", toCatalogVehiclePayload(input));
   }
 
   update(id: string, input: NewCatalogVehicle) {
-    return this.http.put<CatalogVehicleDTO>(`/admin/catalog/vehicles/${id}`, toCatalogVehiclePayload(input));
+    return this.http().put<CatalogVehicleDTO>(`/admin/catalog/vehicles/${id}`, toCatalogVehiclePayload(input));
   }
 
   remove(id: string) {
-    return this.http.delete<void>(`/admin/catalog/vehicles/${id}`);
+    return this.http().delete<void>(`/admin/catalog/vehicles/${id}`);
   }
 }
 
@@ -58,6 +67,9 @@ export const SEED: CatalogVehicleDTO[] = [
     mileage_km: 28000,
     horsepower: 118,
     seats: 5,
+    top_speed_kmh: 170,
+    zero_to_hundred_sec: 11.5,
+    availability: "disponible",
     features: ["Cámara de reversa", "Apple CarPlay", "Bluetooth", "Aire acondicionado"],
     image_url: "/vehicles/logo-cochabamba.png",
     accent_from: "#005f8f",
@@ -95,6 +107,9 @@ export const SEED: CatalogVehicleDTO[] = [
     mileage_km: 0,
     horsepower: 158,
     seats: 5,
+    top_speed_kmh: 200,
+    zero_to_hundred_sec: 9.5,
+    availability: "disponible",
     features: ["Turbo TSI", "Climatronic", "Control de crucero", "Sensores de estacionamiento"],
     accent_from: "#0077b3",
     accent_to: "#4dc4ff",
@@ -131,6 +146,9 @@ export const SEED: CatalogVehicleDTO[] = [
     mileage_km: 0,
     horsepower: 138,
     seats: 5,
+    top_speed_kmh: 180,
+    zero_to_hundred_sec: 10.5,
+    availability: "disponible",
     features: ["Toyota Safety Sense", "Pantalla táctil 8\"", "Cámaras 360°", "Asientos de cuero"],
     accent_from: "#00aaff",
     accent_to: "#0088cc",
@@ -167,6 +185,9 @@ export const SEED: CatalogVehicleDTO[] = [
     mileage_km: 0,
     horsepower: 283,
     seats: 5,
+    top_speed_kmh: 225,
+    zero_to_hundred_sec: 5.6,
+    availability: "disponible",
     features: ["Autopilot", "Pantalla 15\"", "Acceso sin llave", "Actualizaciones OTA"],
     accent_from: "#00aaff",
     accent_to: "#0077b3",
@@ -203,6 +224,9 @@ export const SEED: CatalogVehicleDTO[] = [
     mileage_km: 32000,
     horsepower: 333,
     seats: 4,
+    top_speed_kmh: 250,
+    zero_to_hundred_sec: 5.1,
+    availability: "reservado",
     features: ["Escape deportivo", "Suspensión ajustable", "Asientos deportivos", "Techo solar"],
     accent_from: "#0077b3",
     accent_to: "#00aaff",
@@ -239,6 +263,9 @@ export const SEED: CatalogVehicleDTO[] = [
     mileage_km: 0,
     horsepower: 48,
     seats: 2,
+    top_speed_kmh: 135,
+    zero_to_hundred_sec: 8.2,
+    availability: "disponible",
     features: ["ABS", "Parabrisas ajustable", "GPS integrado", "Calentador de puños"],
     accent_from: "#0077b3",
     accent_to: "#00aaff",
@@ -275,11 +302,19 @@ function readStore(): CatalogVehicleDTO[] {
       return SEED;
     }
     const vehicles = JSON.parse(raw) as CatalogVehicleDTO[];
-    const migratedVehicles = vehicles.map((vehicle) =>
-      vehicle.id === "nissan-versa-2021" && !vehicle.image_url
-        ? { ...vehicle, image_url: "/vehicles/logo-cochabamba.png" }
-        : vehicle,
-    );
+    const migratedVehicles = vehicles.map((vehicle) => {
+      let next = vehicle;
+      if (next.id === "nissan-versa-2021" && !next.image_url) {
+        next = { ...next, image_url: "/vehicles/logo-cochabamba.png" };
+      }
+      // Autos guardados en localStorage antes de agregar estos campos —
+      // sin default, el form de edición y la ficha de detalle mostrarían
+      // "undefined".
+      if (next.top_speed_kmh == null) next = { ...next, top_speed_kmh: 180 };
+      if (next.zero_to_hundred_sec == null) next = { ...next, zero_to_hundred_sec: 9.5 };
+      if (!next.availability) next = { ...next, availability: "disponible" };
+      return next;
+    });
     if (migratedVehicles.some((vehicle, index) => vehicle !== vehicles[index])) {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(migratedVehicles));
     }

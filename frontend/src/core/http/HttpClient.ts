@@ -30,6 +30,30 @@ export class HttpError extends Error {
   }
 }
 
+/**
+ * Convierte la respuesta de error del backend (Laravel: `{message}` en
+ * 401/500, `{message, errors}` en 422) en un texto legible para el usuario,
+ * en vez del genérico "Request failed: POST /...". Cae a un mensaje por
+ * status cuando el body no trae nada útil (ej. HTML de un 500 sin JSON).
+ */
+function extractErrorMessage(data: unknown, status: number, fallback: string): string {
+  if (data && typeof data === "object") {
+    const obj = data as Record<string, unknown>;
+    if (obj.errors && typeof obj.errors === "object") {
+      const firstField = Object.values(obj.errors as Record<string, unknown>)[0];
+      const firstMessage = Array.isArray(firstField) ? firstField[0] : firstField;
+      if (typeof firstMessage === "string") return firstMessage;
+    }
+    if (typeof obj.message === "string" && obj.message.trim()) return obj.message;
+  }
+  if (typeof data === "string" && data.trim() && data.length < 300) return data;
+  if (status === 401) return "Sesión expirada o no autorizada. Vuelve a iniciar sesión.";
+  if (status === 403) return "No tienes permiso para realizar esta acción.";
+  if (status === 404) return "El recurso solicitado no existe.";
+  if (status >= 500) return "Error del servidor. Intenta de nuevo en unos minutos.";
+  return fallback;
+}
+
 function buildUrl(baseUrl: string, path: string, params?: HttpRequestConfig["params"]): string {
   const url = new URL(path.replace(/^\//, ""), baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`);
   if (params) {
@@ -55,18 +79,25 @@ export class FetchHttpClient implements HttpClient {
     config?: HttpRequestConfig,
     body?: unknown,
   ): Promise<T> {
-    const res = await fetch(buildUrl(this.baseUrl, path, config?.params), {
-      method,
-      headers: { ...this.defaultHeaders, ...config?.headers },
-      body: body !== undefined ? JSON.stringify(body) : undefined,
-      signal: config?.signal,
-    });
+    let res: Response;
+    try {
+      res = await fetch(buildUrl(this.baseUrl, path, config?.params), {
+        method,
+        headers: { ...this.defaultHeaders, ...config?.headers },
+        body: body !== undefined ? JSON.stringify(body) : undefined,
+        signal: config?.signal,
+      });
+    } catch {
+      // Backend caído/inaccesible, CORS, sin red, etc. — el fetch nunca
+      // llega a responder, así que no hay `res` ni status que reportar.
+      throw new HttpError(0, "No se pudo conectar con el servidor. Verifica tu conexión e inténtalo de nuevo.");
+    }
 
     const isJson = res.headers.get("content-type")?.includes("application/json");
     const data = isJson ? await res.json() : ((await res.text()) as unknown);
 
     if (!res.ok) {
-      throw new HttpError(res.status, `Request failed: ${method} ${path}`, data);
+      throw new HttpError(res.status, extractErrorMessage(data, res.status, `Request failed: ${method} ${path}`), data);
     }
     return data as T;
   }

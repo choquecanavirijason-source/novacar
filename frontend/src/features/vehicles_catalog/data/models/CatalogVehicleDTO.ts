@@ -16,6 +16,9 @@ export interface CatalogVehicleDTO {
   mileage_km: number;
   horsepower: number;
   seats: number;
+  top_speed_kmh: number;
+  zero_to_hundred_sec: number;
+  availability: string;
   features: string[];
   image_url?: string;
   accent_from: string;

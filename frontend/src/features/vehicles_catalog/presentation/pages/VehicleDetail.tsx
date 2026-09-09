@@ -115,6 +115,21 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
       items: [
         { label: t("detail.transmission"), value: t(transmissionKey[vehicle.transmission]), isTech: false },
         { label: t("detail.driveType"), value: getValueOrDefault(vehicle.driveType), isTech: false },
+        {
+          label: t("detail.topSpeed"),
+          value: vehicle.topSpeedKmh ? `${vehicle.topSpeedKmh} km/h` : "—",
+          isTech: false,
+        },
+        {
+          label: t("detail.acceleration"),
+          value: vehicle.zeroToHundredSec ? `${vehicle.zeroToHundredSec}s (0-100 km/h)` : "—",
+          isTech: false,
+        },
+        {
+          label: t("detail.availability"),
+          value: vehicle.availability ? t(`availability.${vehicle.availability}`) : "—",
+          isTech: false,
+        },
       ],
     },
     {

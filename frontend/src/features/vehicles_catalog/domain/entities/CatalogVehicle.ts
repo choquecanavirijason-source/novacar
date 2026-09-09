@@ -8,6 +8,7 @@ export type BodyType = "sedan" | "suv" | "hatchback" | "pickup" | "motocicleta";
 export type FuelType = "gasolina" | "hibrido" | "electrico" | "diesel";
 export type Transmission = "manual" | "automatica";
 export type Condition = "nuevo" | "seminuevo";
+export type Availability = "disponible" | "agotado" | "reservado";
 
 export interface CatalogVehicle {
   readonly id: string;
@@ -25,6 +26,9 @@ export interface CatalogVehicle {
   readonly mileageKm: number;     // 0 = nuevo
   readonly horsepower: number;
   readonly seats: number;
+  readonly topSpeedKmh: number;
+  readonly zeroToHundredSec: number;
+  readonly availability: Availability;
 
   readonly features: ReadonlyArray<string>;
   /** URL de foto real (pegada por el admin). Si falta, se usa un placeholder. */

@@ -5,6 +5,8 @@
  * correr sin backend.
  */
 
+import { createApiClient } from "@core/http/createApiClient";
+import { getAuthToken } from "@core/auth/token";
 import type { HttpClient } from "@core/http/HttpClient";
 import type { NewMarketplacePart } from "../../domain/entities/MarketplacePart";
 import type { MarketplacePartDTO } from "../models/MarketplacePartDTO";
@@ -20,21 +22,26 @@ export interface MarketplaceRemoteDataSource {
 
 /* ---- Implementación HTTP real ---- */
 export class MarketplaceHttpDataSource implements MarketplaceRemoteDataSource {
-  constructor(private readonly http: HttpClient) {}
+  // Factory: el token se lee al momento del request, no al armar el
+  // composition root (mismo patrón que BannerHttpDataSource / CatalogHttpDataSource).
+  constructor(private readonly clientFactory: () => HttpClient = () => createApiClient(getAuthToken())) {}
+  private http() {
+    return this.clientFactory();
+  }
   fetchAll() {
-    return this.http.get<MarketplacePartDTO[]>("/marketplace/parts");
+    return this.http().get<MarketplacePartDTO[]>("/marketplace/parts");
   }
   fetchById(id: string) {
-    return this.http.get<MarketplacePartDTO | null>(`/marketplace/parts/${id}`);
+    return this.http().get<MarketplacePartDTO | null>(`/marketplace/parts/${id}`);
   }
   create(input: NewMarketplacePart) {
-    return this.http.post<MarketplacePartDTO>("/admin/marketplace/parts", toMarketplacePartPayload(input));
+    return this.http().post<MarketplacePartDTO>("/admin/marketplace/parts", toMarketplacePartPayload(input));
   }
   update(id: string, input: NewMarketplacePart) {
-    return this.http.put<MarketplacePartDTO>(`/admin/marketplace/parts/${id}`, toMarketplacePartPayload(input));
+    return this.http().put<MarketplacePartDTO>(`/admin/marketplace/parts/${id}`, toMarketplacePartPayload(input));
   }
   remove(id: string) {
-    return this.http.delete<void>(`/admin/marketplace/parts/${id}`);
+    return this.http().delete<void>(`/admin/marketplace/parts/${id}`);
   }
 }
 

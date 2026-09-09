@@ -77,10 +77,10 @@ export function BarChart({ data, unit = "" }: { data: BarDatum[]; unit?: string 
           aria-label={data.map((d) => `${d.label}: ${d.value}${unit}`).join(", ")}
         >
           {/* Gridlines hairline (recessive) */}
-          {gridSteps.map((g) => {
+          {gridSteps.map((g, i) => {
             const y = BASELINE - (g / max) * (BASELINE - PADDING_TOP);
             return (
-              <line key={g} x1={0} x2={W} y1={y} y2={y} stroke="var(--border)" strokeWidth={1} />
+              <line key={i} x1={0} x2={W} y1={y} y2={y} stroke="var(--border)" strokeWidth={1} />
             );
           })}
 
