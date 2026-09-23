@@ -30,8 +30,8 @@ export default function LoginPage() {
   const { t } = useTranslation();
   const { login, isAuthenticated, user } = useAuth();
   const router = useRouter();
-  const [email, setEmail] = useState("admin@novacar.com");
-  const [password, setPassword] = useState("demo");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 

@@ -48,10 +48,13 @@ export function MarketplacePartsAdminPage({
     );
   }, [parts, query]);
 
-  async function handleSubmit(input: NewMarketplacePart) {
-    if (modalPart === "new") return create(input);
-    if (modalPart) return update(modalPart.id, input);
-    return false;
+  async function handleSubmit(input: NewMarketplacePart): Promise<true | string> {
+    const ok = modalPart === "new" ? await create(input) : modalPart ? await update(modalPart.id, input) : false;
+    if (ok) return true;
+    // El store ya guardó el motivo real (validación del backend, red caída,
+    // etc.) en `error` — se lo pasamos al modal en vez de perderlo detrás de
+    // un "no se pudo guardar" genérico (mismo patrón que VehiclesAdminPage).
+    return useMarketplacePartAdminStore.getState().error ?? t("common.saveError");
   }
 
   async function handleDelete(part: MarketplacePart) {

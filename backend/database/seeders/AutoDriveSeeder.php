@@ -6,6 +6,7 @@ use App\Models\CatalogVehicle;
 use App\Models\CompatiblePart;
 use App\Models\InventoryItem;
 use App\Models\MarketplacePart;
+use App\Models\SiteBanner;
 use App\Models\User;
 use App\Models\VehicleFitment;
 use Illuminate\Database\Seeder;
@@ -74,6 +75,29 @@ class AutoDriveSeeder extends Seeder
             'reviews' => 210, 'seller' => 'AutoDrive Oficial', 'free_shipping' => true, 'warranty_months' => 12,
             'compatible_brands' => ['Nissan', 'Toyota', 'Honda'], 'year_from' => 2012, 'year_to' => 2024,
             'specs' => [['label' => 'Medida', 'value' => '205/55 R16']], 'accent_from' => '#22e0ff', 'accent_to' => '#2ee6a6',
+        ]);
+
+        SiteBanner::updateOrCreate(['id' => '11111111-1111-4111-8111-111111111111'], [
+            'title' => 'Autopartes con envío gratis',
+            'subtitle' => 'Baterías y llantas seleccionadas durante todo el mes.',
+            'image_url' => '/car-azul-hero.png',
+            'cta_label' => 'Ver autopartes',
+            'href' => '/autopartes',
+            'accent_from' => '#005f8f',
+            'accent_to' => '#00aaff',
+            'active' => true,
+            'sort_order' => 0,
+        ]);
+        SiteBanner::updateOrCreate(['id' => '22222222-2222-4222-8222-222222222222'], [
+            'title' => 'Autos seminuevos certificados',
+            'subtitle' => 'Revisión de 120 puntos y garantía incluida.',
+            'image_url' => '/car-azul-hero.png',
+            'cta_label' => 'Ver catálogo',
+            'href' => '/catalogo',
+            'accent_from' => '#0077b3',
+            'accent_to' => '#4dc4ff',
+            'active' => true,
+            'sort_order' => 1,
         ]);
 
         $inventory = [

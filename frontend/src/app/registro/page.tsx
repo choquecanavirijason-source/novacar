@@ -108,6 +108,7 @@ export default function RegisterPage() {
                 required
               />
             </label>
+            
             <label className="login-page__field">
               <span className="login-page__label">{t("auth.confirmPassword")}</span>
               <PasswordInput

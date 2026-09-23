@@ -10,6 +10,7 @@ import { getVehicleImageUrl } from "../catalogPresentation";
 import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { bodyTypeKey, transmissionKey, mileageText } from "../vehiclePresentation";
+import { AuctionLotBadges } from "./AuctionLotBadges";
 
 export function VehicleGridCard({ vehicle, index = 0 }: { vehicle: CatalogVehicle; index?: number }) {
   const { t, locale } = useTranslation();
@@ -85,6 +86,8 @@ export function VehicleGridCard({ vehicle, index = 0 }: { vehicle: CatalogVehicl
             {t(bodyTypeKey[vehicle.bodyType])}
           </span>
         </div>
+
+        <AuctionLotBadges vehicle={vehicle} compact />
 
         <div className="vehicle-grid-card__tagline">
           {vehicle.tagline}

@@ -17,6 +17,7 @@ import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { ProductCard } from "@ui/molecules/ProductCard";
 import { bodyTypeKey, mileageText, transmissionKey, vehiclePhotoUrl } from "../vehiclePresentation";
+import { AuctionLotBadges } from "./AuctionLotBadges";
 import { ImportQuoteModal } from "./ImportQuoteModal";
 
 /** PNG transparente por marca: `public/vehicles/{Marca}.png` (subir manualmente). */
@@ -51,6 +52,7 @@ export function ImportVehicleGridCard({ vehicle, index = 0 }: { vehicle: Catalog
         photoTopSlot={
           <div className="grid-card__badges">
             <span className="tag-pill">{vehicle.condition === "nuevo" ? t("common.new") : t("common.used")}</span>
+            <AuctionLotBadges vehicle={vehicle} compact only={["title"]} />
           </div>
         }
         title={`${vehicle.brand} ${vehicle.model}`}

@@ -12,8 +12,8 @@ class MarketplacePart extends Model
 
     protected $fillable = [
         'id', 'sku', 'name', 'category', 'brand', 'condition', 'price',
-        'original_price', 'stock', 'rating', 'reviews', 'seller',
-        'free_shipping', 'warranty_months', 'compatible_brands',
+        'discount_percent', 'stock', 'reorder_level', 'image_url', 'rating',
+        'reviews', 'seller', 'free_shipping', 'warranty_months', 'compatible_brands',
         'year_from', 'year_to', 'specs', 'accent_from', 'accent_to',
     ];
 

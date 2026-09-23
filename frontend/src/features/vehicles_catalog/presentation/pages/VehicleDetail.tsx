@@ -41,6 +41,8 @@ import {
   fuelKey,
   transmissionKey,
   mileageText,
+  damageBadgeClass,
+  damageSeverityKey,
 } from "../vehiclePresentation";
 import { TestDriveModal } from "../components/TestDriveModal";
 import "../styles/catalog.css";
@@ -53,35 +55,12 @@ const GALLERY_SHOTS = [
   { key: "det", label: "05 / DETALLE", position: "88% 30%" },
 ] as const;
 
-const getDamageBadgeStyles = (severity: string) => {
-  const styles = {
-    none: "bg-green-500/10 text-green-400 border-green-500/20",
-    minor: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-    moderate: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-    severe: "bg-red-500/10 text-red-400 border-red-500/20",
-  };
-  return styles[severity as keyof typeof styles] || styles.none;
-};
-
-const getDamageIcon = (severity: string) => {
-  const icons = {
-    none: <Shield size={14} className="text-green-400" />,
-    minor: <AlertTriangle size={14} className="text-yellow-400" />,
-    moderate: <AlertTriangle size={14} className="text-orange-400" />,
-    severe: <AlertTriangle size={14} className="text-red-400" />,
-  };
-  return icons[severity as keyof typeof icons] || icons.none;
-};
-
-const getSeverityLabel = (severity: string, t: any) => {
-  const labels = {
-    none: t("detail.damageNone"),
-    minor: t("detail.damageMinor"),
-    moderate: t("detail.damageModerate"),
-    severe: t("detail.damageSevere"),
-  };
-  return labels[severity as keyof typeof labels] || severity;
-};
+const getDamageIcon = (severity: string) =>
+  severity !== "none" && severity !== "" ? (
+    <AlertTriangle size={14} />
+  ) : (
+    <Shield size={14} />
+  );
 
 export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
   const { t, locale } = useTranslation();
@@ -389,14 +368,14 @@ export function VehicleDetail({ vehicle }: { vehicle: CatalogVehicle }) {
                         <span className="vdetail-additional-info__item-label">{t("detail.primaryDamage")}</span>
                         <div className="flex items-center gap-2 mt-1">
                           <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${getDamageBadgeStyles(
-                              vehicle.damageSeverity || "none"
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${damageBadgeClass(
+                              vehicle.damageSeverity
                             )}`}
                           >
                             {getDamageIcon(vehicle.damageSeverity || "none")}
                             {vehicle.damageType}
                             {vehicle.damageSeverity && vehicle.damageSeverity !== "none" && (
-                              <span className="opacity-50">· {getSeverityLabel(vehicle.damageSeverity, t)}</span>
+                              <span className="opacity-50">· {t(damageSeverityKey(vehicle.damageSeverity))}</span>
                             )}
                           </span>
                         </div>

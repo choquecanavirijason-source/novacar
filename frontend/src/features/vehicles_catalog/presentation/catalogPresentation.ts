@@ -1,5 +1,6 @@
 // src/features/vehicles_catalog/presentation/catalogPresentation.ts
 import type { CatalogVehicle } from "../domain/entities/CatalogVehicle";
+import { vehiclePhotoUrl } from "./vehiclePresentation";
 
 /**
  * Mapeo de imágenes por vehículo usando Unsplash
@@ -51,9 +52,12 @@ export function getVehicleImageUrl(vehicle: CatalogVehicle | { id: string; brand
   if (brandImages[vehicle.brand]) {
     return brandImages[vehicle.brand];
   }
-  
-  // Imagen por defecto
-  return 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=600&fit=crop&crop=center';
+
+  // Marca sin foto curada: mismo fallback de stock libre que usa /importaciones
+  // (loremflickr por palabra clave marca+carrocería, semilla estable por id) en
+  // vez de repetir una única foto genérica para todas las marcas sin mapear.
+  const bodyType = "bodyType" in vehicle ? vehicle.bodyType : "sedan";
+  return vehiclePhotoUrl(vehicle.id, vehicle.brand, bodyType);
 }
 
 export { VEHICLE_IMAGES };

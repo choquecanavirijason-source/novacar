@@ -16,7 +16,7 @@
   height: 100vh;
   min-height: 560px;
   overflow: hidden;
-  background: #0d0d0d;
+  background: var(--bg-base);
   isolation: isolate;
 }
 
@@ -241,7 +241,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  background: rgba(5, 5, 5, 0.95);
+  background: var(--bg-base);
 }
 
 .hero-scrub__loader-flag {

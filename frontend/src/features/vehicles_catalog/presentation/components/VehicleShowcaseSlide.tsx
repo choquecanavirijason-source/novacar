@@ -18,6 +18,7 @@ import { getVehicleImageUrl } from "../catalogPresentation";
 import { formatCurrency } from "@core/format/formatters";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { bodyTypeKey, mileageText } from "../vehiclePresentation";
+import { AuctionLotBadges } from "./AuctionLotBadges";
 
 // Miniaturas decorativas (usamos la misma imagen con diferentes posiciones)
 const GALLERY_SHOTS = [
@@ -185,6 +186,8 @@ export function VehicleShowcaseSlide({
                 </span>
               </div>
             </div>
+
+            <AuctionLotBadges vehicle={vehicle} />
 
             {/* Características destacadas */}
             {vehicle.features.length > 0 && (

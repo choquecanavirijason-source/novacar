@@ -133,7 +133,7 @@ export function VehiclesAdminPage() {
         </Button>
       </div>
 
-      <label className="admin-search">
+      <label className="admin-search"> 
         <Search size={16} strokeWidth={1.75} aria-hidden />
         <input
           type="search"

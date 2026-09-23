@@ -5,7 +5,7 @@
 
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { X } from "lucide-react";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { useToast } from "@core/toast/ToastProvider";
@@ -27,6 +27,14 @@ import { formatCurrency } from "@core/format/formatters";
 
 const CONDITIONS: PartCondition[] = ["nuevo", "usado", "reconstruido"];
 
+/**
+ * Formato esperado: "etiqueta: valor, etiqueta: valor" (ver placeholder del
+ * campo). Un fragmento sin ":" o sin valor después (ej. "Medida" o "Medida:")
+ * no arma una spec completa — el backend exige label+value cuando `specs` no
+ * está vacío (`specs.*.value` → 422 "field is required"), así que en vez de
+ * mandar una spec a medias y que falle el guardado entero, se descarta ese
+ * fragmento y se conservan los que sí están completos.
+ */
 function parseSpecs(text: string) {
   return text
     .split(",")
@@ -34,8 +42,9 @@ function parseSpecs(text: string) {
     .filter(Boolean)
     .map((chunk) => {
       const [label, value] = chunk.split(":").map((s) => s.trim());
-      return { label: label ?? chunk, value: value ?? "" };
-    });
+      return { label: label ?? "", value: value ?? "" };
+    })
+    .filter((spec) => spec.label && spec.value);
 }
 
 export function MarketplacePartFormModal({
@@ -45,7 +54,8 @@ export function MarketplacePartFormModal({
 }: {
   part?: MarketplacePart;
   onClose: () => void;
-  onSubmit: (input: NewMarketplacePart) => Promise<boolean>;
+  /** `true` si guardó bien; si falló, el mensaje de error a mostrar. */
+  onSubmit: (input: NewMarketplacePart) => Promise<true | string>;
 }) {
   const { t, locale } = useTranslation();
   const toast = useToast();
@@ -56,6 +66,9 @@ export function MarketplacePartFormModal({
   const [condition, setCondition] = useState<PartCondition>(part?.condition ?? "nuevo");
   const [price, setPrice] = useState(String(part?.price ?? ""));
   const [discountPercent, setDiscountPercent] = useState(String(part?.discountPercent ?? 0));
+  const [finalPriceDraft, setFinalPriceDraft] = useState(
+    String(finalPrice({ price: part?.price ?? 0, discountPercent: part?.discountPercent ?? 0 })),
+  );
   const [stock, setStock] = useState(String(part?.stock ?? ""));
   const [reorderLevel, setReorderLevel] = useState(String(part?.reorderLevel ?? 5));
   const [rating, setRating] = useState(String(part?.rating ?? 4.5));
@@ -76,6 +89,35 @@ export function MarketplacePartFormModal({
 
   const categoryBuiltin = PART_CATEGORIES.map((c) => ({ value: c, label: t(`partCat.${c}`) }));
   const conditionBuiltin = CONDITIONS.map((c) => ({ value: c, label: t(`cond.${c}`) }));
+
+  /**
+   * "Precio final" no tiene columna propia — el dominio solo guarda `price`
+   * (base) + `discountPercent` (0–100, entero). Por eso NO puede recalcular
+   * el % en cada tecla: hacerlo pisaba el valor tipeado en cada keystroke
+   * (escribías "850" y el campo saltaba a otro número a mitad de tipeo,
+   * porque cada dígito parcial se redondeaba a un % distinto). Ahora el
+   * campo se escribe libre (`finalPriceDraft`) y el % de descuento recién se
+   * recalcula al salir del campo (`onBlur`) — un solo ajuste, no uno por
+   * tecla. Si aún no hay precio base, el monto escrito pasa a ser el precio
+   * de lista, sin descuento.
+   */
+  useEffect(() => {
+    setFinalPriceDraft(String(finalPrice({ price: Number(price) || 0, discountPercent: Number(discountPercent) || 0 })));
+  }, [price, discountPercent]);
+
+  function commitFinalPrice() {
+    const basePrice = Number(price) || 0;
+    const target = Number(finalPriceDraft) || 0;
+
+    if (basePrice <= 0) {
+      setPrice(finalPriceDraft);
+      setDiscountPercent("0");
+      return;
+    }
+
+    const pct = Math.min(100, Math.max(0, Math.round((1 - target / basePrice) * 100)));
+    setDiscountPercent(String(pct));
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -105,11 +147,11 @@ export function MarketplacePartFormModal({
       accentTo,
     });
     setSaving(false);
-    if (ok) {
+    if (ok === true) {
       toast.success(part ? t("admin.partUpdateSuccess") : t("admin.partCreateSuccess"));
       onClose();
     } else {
-      setError(t("common.saveError"));
+      setError(ok);
     }
   }
 
@@ -201,12 +243,20 @@ export function MarketplacePartFormModal({
             <label className="addpart-field">
               <span>{t("admin.partFieldFinalPrice")}</span>
               <Input
-                value={formatCurrency(finalPrice({ price: Number(price) || 0, discountPercent: Number(discountPercent) || 0 }), locale)}
-                readOnly
-                disabled
+                type="number"
+                min={0}
+                value={finalPriceDraft}
+                onChange={(e) => setFinalPriceDraft(e.target.value)}
+                onBlur={commitFinalPrice}
               />
             </label>
           </div>
+
+          <p className="addpart-hint">
+            {formatCurrency(finalPrice({ price: Number(price) || 0, discountPercent: Number(discountPercent) || 0 }), locale)}
+            {" · "}
+            {t("admin.partFieldFinalPriceHint")}
+          </p>
 
           <div className="addpart-row">
             <label className="addpart-field">

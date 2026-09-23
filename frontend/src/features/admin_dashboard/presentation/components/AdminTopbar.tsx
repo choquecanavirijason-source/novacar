@@ -6,7 +6,7 @@
 
 "use client";
 
-import { ArrowLeft, Car, Image, LayoutDashboard, LogOut, MessageSquareText, Package, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Car, Image, LayoutDashboard, LogOut, MessageSquareText, Wrench, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@core/auth/AuthProvider";
 import { useTranslation } from "@core/i18n/I18nProvider";
@@ -34,10 +34,10 @@ export function AdminTopbar({ active, onNavigate }: AdminTopbarProps) {
   const items: { id: AdminPage; Icon: LucideIcon; label: string }[] = [
     { id: "analytics", Icon: LayoutDashboard, label: t("admin.analytics") },
     { id: "vehicles", Icon: Car, label: t("admin.vehicles") },
-    { id: "inventory", Icon: Package, label: t("admin.inventory") },
     { id: "banners", Icon: Image, label: t("admin.banners") },
     { id: "quotes", Icon: MessageSquareText, label: t("admin.quotes") },
-    { id:"users", Icon: MessageSquareText, label: t("admin.users") },
+    { id: "inventory", Icon: Wrench, label: t("admin.inventory") },
+    { id: "users", Icon: MessageSquareText, label: t("admin.users") },
   ];
 
   function handleLogout() {
@@ -65,6 +65,7 @@ export function AdminTopbar({ active, onNavigate }: AdminTopbarProps) {
             </button>
           ))}
         </nav>
+        
 
         <div className="admin-topbar__actions">
           <ThemeSwitch />

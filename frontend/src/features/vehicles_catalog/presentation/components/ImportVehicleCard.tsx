@@ -17,6 +17,7 @@ import { useTranslation } from "@core/i18n/I18nProvider";
 import { CountUp } from "@ui/atoms/CountUp";
 import { TypewriterText } from "@ui/atoms/TypewriterText";
 import { fuelKey, transmissionKey, vehiclePhotoUrl } from "../vehiclePresentation";
+import { AuctionLotBadges } from "./AuctionLotBadges";
 import { ImportQuoteModal } from "./ImportQuoteModal";
 
 const vehicleCutoutUrl = (brand: string) => `/vehicles/${brand}.png`;
@@ -72,6 +73,9 @@ export function ImportVehicleCard({ vehicle }: { vehicle: CatalogVehicle }) {
             <p className="mt-2 text-(--text-secondary)">
               {vehicle.year} · {vehicle.condition === "nuevo" ? t("common.new") : t("common.used")}
             </p>
+            <div className="mt-4">
+              <AuctionLotBadges vehicle={vehicle} />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-x-8 gap-y-6">

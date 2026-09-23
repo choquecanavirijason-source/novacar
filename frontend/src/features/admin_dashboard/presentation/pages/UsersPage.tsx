@@ -9,14 +9,16 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Plus, Search, Trash2 } from "lucide-react";
 import { useAuth } from "@core/auth/AuthProvider";
-import { deleteUser, listUsers, updateUserRole } from "@core/auth/mockUsersStore";
+import { createUser, deleteUser, emailIsTaken, listUsers, updateUserRole } from "@core/auth/mockUsersStore";
 import type { AuthUser, UserRole } from "@core/auth/types";
 import { useTranslation } from "@core/i18n/I18nProvider";
 import { useToast } from "@core/toast/ToastProvider";
 import { Badge } from "@ui/atoms/Badge";
+import { Button } from "@ui/atoms/Button";
 import { DataTable, type Column } from "@ui/organisms/DataTable";
+import { UserFormModal } from "../components/UserFormModal";
 
 const ROLE_TONE: Record<UserRole, "neon" | "low" | "in"> = {
   admin: "neon",
@@ -29,12 +31,28 @@ export function UsersPage() {
   const toast = useToast();
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<AuthUser[]>([]);
+  const [query, setQuery] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     setUsers(listUsers());
   }, []);
 
   const sorted = useMemo(() => [...users].sort((a, b) => a.name.localeCompare(b.name)), [users]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return sorted;
+    return sorted.filter((u) => `${u.name} ${u.email}`.toLowerCase().includes(q));
+  }, [sorted, query]);
+
+  function handleCreate(input: { name: string; email: string; phone: string; password: string; role: UserRole }): true | string {
+    if (emailIsTaken(input.email)) return t("auth.emailTaken");
+    const created = createUser(input);
+    setUsers((current) => [...current, created]);
+    toast.success(t("admin.userCreateSuccess"));
+    return true;
+  }
 
   function handleRoleChange(target: AuthUser, role: UserRole) {
     if (target.id === currentUser?.id) {
@@ -128,16 +146,36 @@ export function UsersPage() {
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
-      <div>
-        <h1 style={{ fontSize: "1.6rem", fontWeight: 800 }}>{t("admin.users")}</h1>
-        <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginTop: 4 }}>{t("admin.usersSubtitle")}</p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <div>
+          <h1 style={{ fontSize: "1.6rem", fontWeight: 800 }}>{t("admin.users")}</h1>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginTop: 4 }}>{t("admin.usersSubtitle")}</p>
+        </div>
+        <Button size="sm" onClick={() => setShowAddModal(true)}>
+          <Plus size={15} strokeWidth={2.25} aria-hidden /> {t("admin.userAdd")}
+        </Button>
       </div>
 
-      {sorted.length === 0 ? (
-        <p style={{ color: "var(--text-muted)", padding: "24px 0" }}>{t("admin.usersEmpty")}</p>
+      <label className="admin-search">
+        <Search size={16} strokeWidth={1.75} aria-hidden />
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t("admin.userSearch")}
+          aria-label={t("admin.userSearch")}
+        />
+      </label>
+
+      {filtered.length === 0 ? (
+        <p style={{ color: "var(--text-muted)", padding: "24px 0" }}>
+          {sorted.length === 0 ? t("admin.usersEmpty") : t("admin.userSearchEmpty")}
+        </p>
       ) : (
-        <DataTable columns={columns} rows={sorted} rowKey={(u) => u.id} />
+        <DataTable columns={columns} rows={filtered} rowKey={(u) => u.id} />
       )}
+
+      {showAddModal && <UserFormModal onClose={() => setShowAddModal(false)} onSubmit={handleCreate} />}
     </div>
   );
 }
