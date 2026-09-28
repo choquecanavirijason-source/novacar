@@ -861,12 +861,44 @@ h3,
   color: var(--accent-neon);
   background: var(--accent-soft);
 }
+/* ---- Ajustes de layout responsive ---- */
 
-@media (max-width: 860px) {
+@media (min-width: 1181px) and (max-width: 1400px) {
+  .nav__center {
+    gap: 16px;
+    padding: 13px 28px;
+  }
+
+  .nav__sep {
+    margin-right: 16px;
+  }
+
+  .nav__link {
+    font-size: 0.72rem;
+    letter-spacing: 1.4px;
+  }
+}
+
+/* Ocultar el bloque central antes (antes era 860px, ahora 1180px) */
+@media (max-width: 1180px) {
   .nav__center {
     display: none;
   }
 }
+
+/* Ajustar separación del bloque derecho en pantallas medianas */
+@media (max-width: 1180px) {
+  .nav__right {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 560px) {
+  .nav__right {
+    gap: 12px;
+  }
+}
+/* Ajustar separación del bloque derecho en pantallas pequeñas */
 
 @media (max-width: 560px) {
   .nav__right {
