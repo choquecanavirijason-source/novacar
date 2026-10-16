@@ -9,7 +9,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LayoutGrid, LayoutList } from "lucide-react";
+import { Calculator, LayoutGrid, LayoutList } from "lucide-react";
 import type { CatalogVehicle } from "../../domain/entities/CatalogVehicle";
 import { catalogUseCases } from "../../di";
 import { useTranslation } from "@core/i18n/I18nProvider";
@@ -18,6 +18,8 @@ import { ScrollReveal } from "@ui/atoms/ScrollReveal";
 import { Skeleton } from "@ui/atoms/Skeleton";
 import { ImportVehicleCard } from "../components/ImportVehicleCard";
 import { ImportVehicleGridCard } from "../components/ImportVehicleGridCard";
+import { ImportCalculatorModal } from "../components/ImportCalculatorModal";
+import { ImportAuctionsSection } from "../components/ImportAuctionsSection";
 import "../styles/catalog.css";
 
 type ViewMode = "horizontal" | "grid";
@@ -26,6 +28,7 @@ export function ImportsPage() {
   const { t } = useTranslation();
   const [vehicles, setVehicles] = useState<CatalogVehicle[] | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("horizontal");
+  const [calcOpen, setCalcOpen] = useState(false);
 
   useEffect(() => {
     void catalogUseCases.filterVehicles.execute({}).then(setVehicles);
@@ -41,6 +44,12 @@ export function ImportsPage() {
           <h1 style={{ fontSize: "2.2rem", fontWeight: 900, marginTop: 12 }}>{t("imports.title")}</h1>
           <p style={{ color: "var(--text-secondary)", marginTop: 8, maxWidth: 640 }}>{t("imports.subtitle")}</p>
         </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <button type="button" className="imports-calc-cta" onClick={() => setCalcOpen(true)}>
+          <Calculator size={16} strokeWidth={2} aria-hidden />
+          {t("imports.calcCta")}
+        </button>
 
         <div className="catalog-view-toggle" role="group" aria-label="view mode">
           <button
@@ -62,7 +71,10 @@ export function ImportsPage() {
             <LayoutGrid size={16} strokeWidth={2} aria-hidden />
           </button>
         </div>
+        </div>
       </header>
+
+      <ImportAuctionsSection />
 
       {vehicles === null ? (
         <div className={viewMode === "grid" ? "catalog-grid--fixed" : "vehicle-stack"}>
@@ -85,6 +97,8 @@ export function ImportsPage() {
           ))}
         </div>
       )}
+
+      {calcOpen && <ImportCalculatorModal onClose={() => setCalcOpen(false)} />}
     </section>
   );
 }

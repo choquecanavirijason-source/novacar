@@ -7,4 +7,5 @@ storage/framework/sessions/*
 storage/framework/views/*
 .env
 docker-compose.yml
-Dockerfil
+Dockerfile
+.dockerignore

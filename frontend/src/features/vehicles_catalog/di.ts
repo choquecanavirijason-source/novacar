@@ -14,6 +14,7 @@ import { GetVehicleByIdUseCase } from "./domain/usecases/GetVehicleByIdUseCase";
 import { CreateVehicleUseCase } from "./domain/usecases/CreateVehicleUseCase";
 import { UpdateVehicleUseCase } from "./domain/usecases/UpdateVehicleUseCase";
 import { DeleteVehicleUseCase } from "./domain/usecases/DeleteVehicleUseCase";
+import type { ImportModelCatalog } from "./domain/entities/ImportModelCatalog";
 
 const useHttp = process.env.NEXT_PUBLIC_USE_API === "true";
 const dataSource = useHttp
@@ -30,4 +31,7 @@ export const catalogUseCases = {
   updateVehicle: new UpdateVehicleUseCase(repository),
   deleteVehicle: new DeleteVehicleUseCase(repository),
   getAllVehicles: () => repository.getAll(),
+  /** Marcas/modelos para la calculadora de importación (chunk aparte, carga bajo demanda). */
+  getImportModels: (): Promise<ImportModelCatalog> =>
+    import("./data/datasources/import-models.json").then((m) => m.default as ImportModelCatalog),
 } as const;

@@ -1285,3 +1285,552 @@
     transform: translateY(0);
   }
 }
+/* ---- ImportQuoteModal (cotización automática de Importaciones) ---- */
+.import-quote-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  animation: fadeInUp 220ms ease both;
+}
+
+.import-quote-panel {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+}
+
+.import-quote-panel::-webkit-scrollbar {
+  display: none;
+}
+
+.import-quote-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+}
+
+.import-quote-close:hover {
+  color: var(--text-primary);
+}
+
+.import-quote-vehicle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-right: 32px;
+}
+
+.import-quote-vehicle__img {
+  width: 72px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.import-quote-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.import-quote-vehicle__name {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  margin-top: 2px;
+}
+
+.import-quote-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+.import-quote-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.import-quote-row--total {
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  color: var(--text-primary);
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.import-quote-row--total span:last-child {
+  color: var(--accent-neon);
+}
+
+.import-quote-row--muted {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.import-quote-disclaimer {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.import-quote-form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-base);
+  overflow: hidden;
+}
+
+.import-quote-form__input {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 18px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  outline: none;
+}
+
+.import-quote-form__input::placeholder {
+  color: var(--text-muted);
+}
+
+.import-quote-form__submit {
+  flex-shrink: 0;
+  margin: 3px;
+  padding: 0 18px;
+  height: 40px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-brand);
+  color: var(--on-brand);
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: transform var(--transition-spring);
+}
+
+.import-quote-form__submit:hover {
+  transform: scale(1.04);
+}
+
+.import-quote-success {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--success-soft);
+  color: var(--success);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* ---- ImportVehicleCard: el auto entra deslizándose desde la derecha
+   cuando la tarjeta se revela (ScrollReveal, en el padre, agrega la clase
+   .scroll-reveal--visible al contenedor una sola vez al entrar al viewport). ---- */
+.import-vehicle-image {
+  opacity: 0;
+  transform: translateX(130px);
+  transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1) 150ms,
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1) 150ms;
+}
+
+.scroll-reveal--visible .import-vehicle-image {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ---- TestDriveModal: formulario de varios campos apilados (a diferencia
+   de .import-quote-form, pensado para un único input tipo barra) ---- */
+.test-drive-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.test-drive-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.test-drive-input {
+  width: 100%;
+  padding: 13px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color var(--transition-smooth);
+}
+
+.test-drive-input::placeholder {
+  color: var(--text-muted);
+}
+
+.test-drive-input:focus {
+  border-color: var(--accent-neon);
+}
+
+.test-drive-submit {
+  width: 100%;
+  padding: 13px 18px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-brand);
+  color: var(--on-brand);
+  font-weight: 700;
+  font-size: 0.92rem;
+  transition: transform var(--transition-spring);
+}
+
+.test-drive-submit:hover {
+  transform: scale(1.02);
+}
+
+.test-drive-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ---- ImportCalculatorModal: calculadora libre (auto fuera del listado) ---- */
+.import-calc-panel {
+  max-width: min(980px, 100%);
+  max-height: 94vh;
+  padding: clamp(24px, 4vw, 40px);
+  border-radius: 28px;
+}
+
+.import-calc-title {
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+  letter-spacing: -0.02em;
+}
+
+.import-calc-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  color: var(--accent-neon);
+}
+
+/* Dos columnas en desktop: datos del vehículo | desglose */
+.import-calc-layout {
+  display: grid;
+  gap: 24px;
+}
+
+@media (min-width: 820px) {
+  .import-calc-layout {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+  }
+
+  .import-calc-summary {
+    position: sticky;
+    top: 0;
+  }
+}
+
+.import-calc-form {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.import-calc-summary {
+  display: grid;
+  gap: 14px;
+}
+
+.import-calc-summary .import-quote-breakdown {
+  padding: 22px;
+  gap: 14px;
+}
+
+.import-calc-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.import-calc-field > span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.import-calc-kinds {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.import-calc-kind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: border-color var(--transition-smooth), color var(--transition-smooth), transform var(--transition-spring);
+}
+
+.import-calc-kind:hover {
+  color: var(--text-primary);
+  transform: scale(1.02);
+}
+
+.import-calc-kind:focus-visible {
+  outline: 2px solid var(--accent-neon);
+  outline-offset: 2px;
+}
+
+.import-calc-kind--active {
+  border-color: var(--accent-neon);
+  background: var(--accent-soft);
+  color: var(--text-primary);
+}
+
+.import-calc-origins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.import-calc-origin {
+  flex: 1 1 auto;
+  padding: 9px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: border-color var(--transition-smooth), color var(--transition-smooth), transform var(--transition-spring);
+}
+
+.import-calc-origin:hover {
+  color: var(--text-primary);
+  transform: scale(1.03);
+}
+
+.import-calc-origin:focus-visible {
+  outline: 2px solid var(--accent-neon);
+  outline-offset: 2px;
+}
+
+.import-calc-origin--active {
+  border-color: var(--accent-neon);
+  background: var(--accent-soft);
+  color: var(--text-primary);
+}
+
+.import-calc-note {
+  font-style: normal;
+  font-size: 0.75rem;
+  color: var(--accent-neon);
+}
+
+.imports-calc-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-brand);
+  color: var(--on-brand);
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  transition: transform var(--transition-spring);
+}
+
+.imports-calc-cta:hover {
+  transform: scale(1.04);
+}
+
+.imports-calc-cta:focus-visible {
+  outline: 2px solid var(--accent-neon);
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .import-calc-panel .test-drive-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- ImportAuctionsSection: subastas (logos) + proceso en 4 pasos ---- */
+.import-auctions {
+  display: grid;
+  gap: 32px;
+  margin-bottom: 56px;
+  padding: clamp(24px, 4vw, 48px);
+  border-radius: 28px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+}
+
+.import-auctions__head {
+  display: grid;
+  gap: 8px;
+  max-width: 720px;
+}
+
+.import-auctions__title {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.import-auctions__subtitle {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.import-auctions__logos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+/* Fondo claro fijo: los logos oficiales están pensados para fondo blanco. */
+.import-auctions__logo {
+  display: grid;
+  place-items: center;
+  height: 80px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  border: 1px solid var(--border);
+  transition: transform var(--transition-spring), box-shadow var(--transition-smooth);
+}
+
+.import-auctions__logo:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.08);
+}
+
+.import-auctions__logo img {
+  max-width: 100%;
+  max-height: 40px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.import-auctions__wordmark {
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #1f2937;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.import-auctions__steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+}
+
+.import-auctions__step {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  height: 100%;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--bg-base);
+  transition: border-color var(--transition-smooth), transform var(--transition-spring);
+}
+
+.import-auctions__step:hover {
+  border-color: var(--accent-neon);
+  transform: translateY(-3px);
+}
+
+.import-auctions__step-num {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  opacity: 0.08;
+}
+
+.import-auctions__step-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  color: var(--accent-neon);
+}
+
+.import-auctions__step-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.import-auctions__step-desc {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.import-auctions__legal {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
